@@ -1,4 +1,4 @@
-package com.cyphermessenger;
+package com.cyphermessenger.crypto;
 
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;

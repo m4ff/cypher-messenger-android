@@ -1,4 +1,4 @@
-package com.cyphermessenger;
+package com.cyphermessenger.crypto;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
