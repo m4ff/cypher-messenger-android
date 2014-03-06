@@ -13,7 +13,16 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat" >
-        
+        <activity
+            android:name="com.cyphermessenger.LoginActivity"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.AppCompat" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.cyphermessenger.ContactsActivity"
             android:label="@string/app_name"
