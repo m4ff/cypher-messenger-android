@@ -2,6 +2,7 @@ package com.cyphermessenger;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,7 +28,8 @@ public class RegistrationActivity extends Activity {
 		ImageView captcha = (ImageView) findViewById(R.id.captcha_image);
 		EditText captchaField = (EditText) findViewById(R.id.captcha_text_field);
 		
-		captcha.setImageResource(R.drawable.captcha_banner);
+		Bitmap imageSrcBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.);
+		//captcha.setImageResource(R.drawable.);
 		
 		name = nameField.getText().toString();
 		password = passwordField.getText().toString();
