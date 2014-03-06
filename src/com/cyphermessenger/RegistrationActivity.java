@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.EditText;
-//import android.widget.ImageView;
+import android.widget.ImageView;
 
 @SuppressLint("NewApi")
 public class RegistrationActivity extends Activity {
@@ -23,17 +23,21 @@ public class RegistrationActivity extends Activity {
 		EditText nameField = (EditText) findViewById(R.id.name_field);
 		EditText passwordField = (EditText) findViewById(R.id.password_field);
 		EditText passwordConfirmationField = (EditText) findViewById(R.id.confirm_password_field);
-		//ImageView captcha = (ImageView) findViewById(R.id.captcha_image);
+		ImageView captcha = (ImageView) findViewById(R.id.captcha_image);
 		EditText captchaField = (EditText) findViewById(R.id.captcha_text_field);
 		
-		name = String.valueOf(nameField.getText());
-		password = String.valueOf(passwordField.getText());
-		confirmation = String.valueOf(passwordConfirmationField.getText());
-		captchaText = String.valueOf(captchaField.getText());
+		name = nameField.getText().toString();
+		password = passwordField.getText().toString();
+		confirmation = passwordConfirmationField.getText().toString();
+		captchaText = captchaField.getText().toString();
 		
 		if(password.equals(confirmation)) {
 			
 		} else {
+			nameField.setHint(R.string.name_field_hint);
+			passwordField.setHint(R.string.password_field_hint);
+			passwordConfirmationField.setHint(R.string.password_confirm_field_hint);
+			captchaField.setHint(R.string.default_captcha_text);
 			
 		}
 		

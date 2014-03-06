@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:ems="10"
-        android:hint="NAME"
+        android:hint="@string/name_field_hint"
         android:inputType="textPersonName" >
 
         <requestFocus />
@@ -40,7 +40,7 @@
         android:layout_below="@+id/password_field"
         android:layout_marginTop="32dp"
         android:ems="10"
-        android:hint="CONFIRM PASSWORD"
+        android:hint="@string/password_confirm_field_hint"
         android:inputType="textPassword" />
 
     <EditText
@@ -52,7 +52,7 @@
         android:layout_marginTop="28dp"
         android:ems="10"
         android:inputType="textPassword"
-        android:hint="PASSWORD" />
+        android:hint="@string/password_field_hint" />
 
     <Button
         android:id="@+id/send_registration"
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Button" />
+        android:text="@string/registration_button" />
 
     <EditText
         android:id="@+id/captcha_text_field"
@@ -69,6 +69,6 @@
         android:layout_above="@+id/send_registration"
         android:layout_alignRight="@+id/confirm_password_field"
         android:ems="10"
-        android:hint="Insert captcha value" />
+        android:hint="@string/default_captcha_text" />
 
 </RelativeLayout>

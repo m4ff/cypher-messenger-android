@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Login</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -13,5 +13,6 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="registration_link_text">or register now</string>
 
 </resources>
