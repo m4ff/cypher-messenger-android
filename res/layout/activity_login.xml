@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
+    <EditText
+        style="@style/login_style_normal"
+        android:id="@+id/user_name_field"
+        android:hint="@string/prompt_name" />
+    
+    <EditText
+        style="@style/login_style_normal"
+        android:hint="@string/prompt_password" />
+    
+    <Button
+        style="@style/login_style_normal"
+        android:ems="10"
+        android:hint="@string/action_sign_in" />
 
 </LinearLayout>
