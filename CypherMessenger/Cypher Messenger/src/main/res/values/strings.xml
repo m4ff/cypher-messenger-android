@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- GENERAL STRINGS -->
+    <string name="app_name">CypherMessenger</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- LOGIN STRINGS -->
+    <string name="login_activity_name">Login</string>
+    <string name="button_login">Login</string>
+    <string name="button_register">or register now</string>
+    <string name="prompt_name">Insert user name</string>
+    <string name="prompt_password">Insert password</string>
+
+</resources>
