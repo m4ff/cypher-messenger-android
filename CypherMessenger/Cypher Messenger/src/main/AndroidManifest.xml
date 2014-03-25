@@ -10,6 +10,14 @@
         <activity
             android:name="com.cyphermessenger.LoginActivity"
             android:label="@string/login_activity_name" >
+        </activity>
+        <activity
+            android:name="com.cyphermessenger.RegistrationActivity"
+            android:label="@string/registration_activity_name" >
+        </activity>
+        <activity
+            android:name="com.cyphermessenger.MainActivity"
+            android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

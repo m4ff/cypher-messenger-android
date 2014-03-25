@@ -1,41 +1,30 @@
 package com.cyphermessenger;
 
-import android.annotation.TargetApi;
-import android.content.Intent;
-import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.os.Build;
 
+public class RegistrationActivity extends ActionBarActivity {
 
-public class LoginActivity extends ActionBarActivity {
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_registration);
 
-        final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
-        final Button registration = (Button) findViewById(R.id.button_registration);
-        registration.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(registrationIntent);
-                finish();
-            }
-        });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.login, menu);
+        getMenuInflater().inflate(R.menu.registration, menu);
         return true;
     }
 

@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    tools:context="com.cyphermessenger.RegistrationActivity">
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/name_field"
+        android:hint="@string/prompt_name"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_field"
+        android:id="@+id/password_field"
+        android:inputType="textPassword"
+        android:hint="@string/prompt_password" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password_field"
+        android:id="@+id/confirm_field"
+        android:hint="@string/prompt_confirmation"
+        android:inputType="textPassword" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/confirm_field"
+        android:id="@+id/captcha_image"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/captcha_image"
+        android:id="@+id/captcha_text_field"
+        android:hint="@string/prompt_captcha_text"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/captcha_text_field"
+        android:id="@+id/register_button"
+        android:text="@string/button_register"/>
+
+</RelativeLayout>
