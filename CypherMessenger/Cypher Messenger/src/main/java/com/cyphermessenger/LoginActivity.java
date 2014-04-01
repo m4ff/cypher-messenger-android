@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -19,12 +20,27 @@ public class LoginActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        EditText name = (EditText) findViewById(R.id.name_field);
+        EditText password = (EditText) findViewById(R.id.password_field);
+
         final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
         final Button registration = (Button) findViewById(R.id.button_registration);
         registration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                registrationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(registrationIntent);
+                finish();
+            }
+        });
+
+        final Intent contactsIntent = new Intent(this, ContactsActivity.class);
+        final Button login = (Button) findViewById(R.id.button_login);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contactsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(contactsIntent);
                 finish();
             }
         });

@@ -1,30 +1,24 @@
 package com.cyphermessenger;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.TabActivity;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.database.*;
-import android.database.sqlite.*;
-import android.view.animation.Animation;
+import android.view.View;
+import android.view.ViewGroup;
+import android.os.Build;
 
-import com.cyphermessenger.sqlite.MySQLiteHelper;
-
-public class MainActivity extends ActionBarActivity {
-
+public class ConversationsActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_conversations);
 
-        if(true){
-            final Intent login = new Intent(this, LoginActivity.class);
-            login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            overridePendingTransition(Animation.ZORDER_BOTTOM, Animation.ZORDER_TOP);
-            startActivity(login);
-            finish();
-        }
     }
 
 
@@ -32,7 +26,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.conversations, menu);
         return true;
     }
 

@@ -23,7 +23,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USER_PASSWORD = "PASSWORD";
     public static final String COLUMN_USER_PUBLIC_KEY = "PUBLIC KEY";
     public static final String COLUMN_USER_PRIVATE_KEY = "PRIVATE KEY";
-    public static final String COLUMN_USER_REGISTERED = "REGISTERED";
+    public static final String COLUMN_USER_LOGGED = "LOGGED";
 
     // CONTACTS COLUMNS
     public static final String COLUMN_CONTACTS_NAME = "NAME";
@@ -32,6 +32,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /* TODO think about all possible columns */
 
     // MESSAGES COLUMNS
+    public static final String COLUMN_MESSAGES_ID = "MEX_ID";
+    public static final String COLUMN_MESSAGES_SENDER_ID = "SENDER_ID";
+    public static final String COLUMN_MESSAGES_RECEIVER_ID = "REC_ID";
+    public static final String COLUMN_MESSAGES_TEXT = "TEXT";
+    public static final String COLUMN_MESSAGES_FILES = "FILES";
+    public static final String COLUMN_MESSAGES_SEEN = "SEEN";
+    public static final String COLUMN_MESSAGES_SENT = "SENT";
+    public static final String COLUMN_MESSAGES_DATE_TIME = "DATE&TIME";
+
     /* TODO think about all possible columns */
 
     // CREATION QUERIES
@@ -40,12 +49,23 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_USER_PASSWORD + " TEXT NOT NULL, "
             + COLUMN_USER_PUBLIC_KEY + " TEXT NOT NULL, "
             + COLUMN_USER_PRIVATE_KEY + " TEXT NOT NULL"
-            + COLUMN_USER_REGISTERED + " NUMERIC);";
+            + COLUMN_USER_LOGGED + " NUMERIC);";
+
     private static final String DATABASE_CREATE_CONTACTS = "CREATE TABLE " + TABLE_CONTACTS +"("
             + COLUMN_CONTACTS_NAME + " TEXT PRIMARY KEY NOT NULL, "
             + COLUMN_CONTACTS_HAS_SHARED_CONVERSATION + " NUMERIC, "
             + COLUMN_CONTACTS_LAST_TIME_LOGGED + "TEXT DEFAULT CURRENT_TIMESTAMP";
-    private static final String DATABASE_CREATE_MESSAGES = "";
+
+    private static final String DATABASE_CREATE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "("
+            + COLUMN_MESSAGES_ID + " INT PRIMARY KEY NOT NULL, "
+            + COLUMN_MESSAGES_SENDER_ID + " INT NOT NULL, "
+            + COLUMN_MESSAGES_RECEIVER_ID + " INT NOT NULL, "
+            + COLUMN_MESSAGES_TEXT + " TEXT NOT NULL, "
+            + COLUMN_MESSAGES_FILES + ""                                               // TODO SET UP FILE TYPE
+            + COLUMN_MESSAGES_SEEN + " NUMERIC NOT NULL, "
+            + COLUMN_MESSAGES_SENT + " NUMERIC NOT NULL, "
+            + COLUMN_MESSAGES_DATE_TIME + " ";
+
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

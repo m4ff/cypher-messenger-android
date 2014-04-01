@@ -10,7 +10,7 @@ public class User {
     private String password;
     private String publicKey;
     private String privateKey;
-    private boolean registered;
+    private boolean logged;
 
     public String getId() {
         return userId;
@@ -30,7 +30,7 @@ public class User {
         return privateKey;
     }
 
-    public boolean checkIfRegistered() { return registered; }
+    public boolean checkIfRegistered() { return logged; }
 
     public void setUserId(String userId) {
         this.userId = userId;
@@ -51,7 +51,7 @@ public class User {
     }
 
     public void hadRegistered() {
-        registered = true;
+        logged = true;
     }
 
 }
