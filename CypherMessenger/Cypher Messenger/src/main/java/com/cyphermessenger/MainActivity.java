@@ -21,7 +21,6 @@ public class MainActivity extends ActionBarActivity {
         if(true){
             final Intent login = new Intent(this, LoginActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            overridePendingTransition(Animation.ZORDER_BOTTOM, Animation.ZORDER_TOP);
             startActivity(login);
             finish();
         }

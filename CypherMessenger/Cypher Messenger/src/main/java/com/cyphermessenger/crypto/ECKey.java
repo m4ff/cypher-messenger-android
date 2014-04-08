@@ -18,7 +18,7 @@ import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.BigIntegers;
 
-public class ECKey {
+public class ECKey implements Key {
 	
 	private byte[] priv;
 	private byte[] pub;

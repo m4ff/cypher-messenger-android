@@ -34,13 +34,13 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
 
-        final Intent contactsIntent = new Intent(this, ContactsActivity.class);
+        final Intent conversIntent = new Intent(this, ConversationsActivity.class);
         final Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                contactsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(contactsIntent);
+                conversIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(conversIntent);
                 finish();
             }
         });

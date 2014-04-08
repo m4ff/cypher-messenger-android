@@ -5,53 +5,30 @@ package com.cyphermessenger.sqlite;
  */
 public class User {
 
-    private String userId;
     private String userName;
     private String password;
-    private String publicKey;
-    private String privateKey;
-    private boolean logged;
+    private UserKey userKey;
+    private int avatarId;
 
-    public String getId() {
-        return userId;
+    public User(String userName, String password, UserKey userKey, int avatarId) {
+        this.userName = userName;
+        this.password = password;
+        this.userKey = userKey;
+        this.avatarId = avatarId;
     }
 
+    // GETTERS
     public String getUserName() { return userName; }
 
     public String getPassword() {
         return password;
     }
 
-    public String getPublicKey() {
-        return publicKey;
+    public UserKey getUserKey() {
+        return userKey;
     }
 
-    public String getPrivateKey() {
-        return privateKey;
+    public int getAvatar() {
+        return avatarId;
     }
-
-    public boolean checkIfRegistered() { return logged; }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setUserName(String userName) { this.userName = userName; }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public void hadRegistered() {
-        logged = true;
-    }
-
 }

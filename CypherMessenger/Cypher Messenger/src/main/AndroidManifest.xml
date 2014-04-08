@@ -26,11 +26,11 @@
         </activity>
         <activity
             android:name="com.cyphermessenger.ContactsActivity"
-            android:label="@string/title_activity_contacts" >
+            android:label="@string/contacts_activity_name" >
         </activity>
         <activity
             android:name="com.cyphermessenger.ConversationsActivity"
-            android:label="@string/title_activity_conversations" >
+            android:label="@string/conversations_activity_name" >
         </activity>
     </application>
 

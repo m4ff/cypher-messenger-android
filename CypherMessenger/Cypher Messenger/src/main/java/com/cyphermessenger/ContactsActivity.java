@@ -1,5 +1,6 @@
 package com.cyphermessenger;
 
+import android.app.ListActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -12,19 +13,20 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.ScrollView;
 
 import java.util.ArrayList;
 
-public class ContactsActivity extends ActionBarActivity {
+public class ContactsActivity extends ActionBarActivity {//ListActivity {
 
-    ArrayList<GridLayout> contactsLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
-        ScrollView contactsView = (ScrollView) findViewById(R.id.contacts_main_view);
+       // ListView contactsView = getListView();
 
 
     }
