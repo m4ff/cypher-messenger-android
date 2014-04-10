@@ -13,10 +13,10 @@
     <string name="button_login">Login</string>
     <string name="button_register_in_login">Register now</string>
     <string name="button_register">Register</string>
-    <string name="prompt_name">Insert user name</string>
-    <string name="prompt_password">Insert password</string>
-    <string name="prompt_confirmation">Confirm your password</string>
-    <string name="prompt_captcha_text">Insert text shown above</string>
+    <string name="prompt_name">User name:</string>
+    <string name="prompt_password">Password:</string>
+    <string name="prompt_confirmation">Confirm password:</string>
+    <string name="prompt_captcha_text">Insert the text shown above:</string>
 
     <!-- CONTACTS & CONVERSATIONS STRINGS -->
     <string name="contacts_activity_name">Contacts</string>

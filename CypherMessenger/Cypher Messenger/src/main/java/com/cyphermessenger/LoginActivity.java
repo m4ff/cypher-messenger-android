@@ -25,12 +25,11 @@ public class LoginActivity extends ActionBarActivity {
 
         final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
         final Button registration = (Button) findViewById(R.id.button_registration);
+
         registration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registrationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(registrationIntent);
-                finish();
             }
         });
 

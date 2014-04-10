@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Cypher Messenger" />
+            <option value="C:\Users\Pier D'Agostino\Documents\GitHub\cypher-messenger-android\CypherMessenger" />
+            <option value="C:\Users\Pier D'Agostino\Documents\GitHub\cypher-messenger-android\CypherMessenger\Cypher Messenger" />
           </set>
         </option>
       </GradleProjectSettings>
