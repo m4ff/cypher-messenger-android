@@ -5,4 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="FormElementPadding">
+        <item name="android:layout_marginBottom">15dp</item>
+    </style>
 </resources>

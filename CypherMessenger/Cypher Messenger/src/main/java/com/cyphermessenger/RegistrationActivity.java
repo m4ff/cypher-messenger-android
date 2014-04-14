@@ -26,7 +26,6 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
     String captchaTextFromClient;
     String passwordFromServer;
 
-    private Button register;
     private EditText uNameField;
     private EditText passwordField;
     private EditText passConfirmField;
@@ -49,14 +48,11 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
 
 
         // VIEWS
-        register = (Button) findViewById(R.id.register_button);
         uNameField = (EditText) findViewById(R.id.name_field);
         passwordField = (EditText) findViewById(R.id.password_field);
         passConfirmField = (EditText) findViewById(R.id.confirm_field);
         captchaTextField = (EditText) findViewById(R.id.captcha_text_field);
 
-
-        register.setOnClickListener(this);
     }
 
     @Override
@@ -97,4 +93,6 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
 
         }*/
     }
+
+
 }
