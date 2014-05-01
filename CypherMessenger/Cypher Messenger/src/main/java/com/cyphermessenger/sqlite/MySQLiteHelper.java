@@ -66,7 +66,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_KEY_PUBLIC + " TEXT NOT NULL, "
             + COLUMN_KEY_PRIVATE + " TEXT NOT NULL);";
 
-    private MySQLiteHelper(Context context) {
+    public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

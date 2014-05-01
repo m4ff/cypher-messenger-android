@@ -1,6 +1,6 @@
 package com.cyphermessenger.sqlite;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.LinkedList;
 
 /**
@@ -10,16 +10,19 @@ public class Messages {
 
     private int messageId;
     private String messageText;
-    private LinkedList<Integer> messageFiles;
-    private Date messageDateTime;
+    //private LinkedList<Integer> messageFiles;
+    private int messageDateTime;
     private boolean messageSent;
+    private boolean isUserSender;
 
-    public Messages(int messageId, String messageText, LinkedList<Integer> messageFiles, Date messageDateTime, boolean messageSent) {
+    public Messages(int messageId, String messageText, int messageDateTime, boolean messageSent, boolean isUserSender) {
         this.messageId = messageId;
         this.messageText = messageText;
-        this.messageFiles = messageFiles;
+        //this.messageFiles = messageFiles;
         this.messageDateTime = messageDateTime;
         this.messageSent = messageSent;
+        this.isUserSender = isUserSender;
+
     }
 
     // GETTERS
@@ -31,19 +34,21 @@ public class Messages {
         return messageText;
     }
 
-    public Integer getFile(int fileId) {
+   /* public Integer getFile(int fileId) {
         return messageFiles.get(fileId);
     }
 
     public LinkedList<Integer> getFiles() {
         return messageFiles;
-    }
+    }*/
 
-    public Date getTime() {
+    public int getTime() {
         return messageDateTime;
     }
 
     public boolean isSent() {
         return messageSent;
     }
+
+    public boolean isUserSender(){ return isUserSender; };
 }

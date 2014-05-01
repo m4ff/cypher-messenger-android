@@ -31,6 +31,7 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
     private EditText passConfirmField;
     private EditText captchaTextField;
     private ImageView captchaView;
+    private Bundle savedState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,5 +95,21 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
         }*/
     }
 
+    @Override
+    protected void onStop() {
+        super.onPause();  // Always call the superclass method first
+        savedState = new Bundle();
+        savedState.putString("userNameClient", uNameFromClient);
+        savedState.putString("passwordClient", passwordFromClient);
+        savedState.putString("passwordConfirmationClient", confirmFromClient);
 
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onResume();
+        uNameField.setText(savedState.getString("userNameClient"));
+        passwordField.setText(savedState.getString("passwordClient"));
+        passConfirmField.setText(savedState.getString("passwordConfirmationClient"));
+    }
 }
