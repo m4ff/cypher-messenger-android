@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cyphermessenger.sqlite.Contact;
@@ -36,6 +38,13 @@ public class ConversationsActivity extends ActionBarActivity {
 
         ArrayAdapter<Contact> adapter = new ArrayAdapter<Contact>(this, R.layout.conversation_tamplate, R.id.conversation_last_time, contact);
         mainView.setAdapter(adapter);
+
+        LinearLayout gridLayout = (LinearLayout) findViewById(R.id.conversation_grid);
+        gridLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 
     @Override

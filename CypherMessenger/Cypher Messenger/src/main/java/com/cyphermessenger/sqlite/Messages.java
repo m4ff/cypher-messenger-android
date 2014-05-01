@@ -18,12 +18,13 @@ public class Messages {
     public Messages(int messageId, String messageText, int messageDateTime, boolean messageSent, boolean isUserSender) {
         this.messageId = messageId;
         this.messageText = messageText;
-        //this.messageFiles = messageFiles;
         this.messageDateTime = messageDateTime;
         this.messageSent = messageSent;
         this.isUserSender = isUserSender;
 
     }
+
+
 
     // GETTERS
     public int getId() {

@@ -1,19 +1,48 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
+    android:weightSum="100"
     tools:context="com.cyphermessenger.MessagesActivity">
 
-    <ListView
-        android:id="@+id/messages_main_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+    <LinearLayout
+        android:id="@+id/message_bubble_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:isScrollContainer="true"
+        android:layout_weight="90">
 
-    </ListView>
+        <ListView
+            android:id="@+id/messages_main_view"
+            android:scrollbarStyle="outsideOverlay"
+            android:divider="@android:color/transparent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        </ListView>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_editor"
+            android:inputType="text"
+            android:hint="Type something"
+            android:alpha="0.9"/>
+
+        <Button
+            android:id="@+id/message_button_send"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:alpha="0.9"
+            android:background="@drawable/ic_action_attachment"
+            android:enabled="true" />
+
+    </LinearLayout>
 
 </LinearLayout>
