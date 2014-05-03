@@ -24,4 +24,7 @@
     <string name="title_activity_messages">Messages</string>
     <string name="hello_world">Hello world!</string>
 
+    <!-- MESSAGES STRINGS -->
+    <string name="prompt_text_message_hint">Type your message</string>
+
 </resources>
