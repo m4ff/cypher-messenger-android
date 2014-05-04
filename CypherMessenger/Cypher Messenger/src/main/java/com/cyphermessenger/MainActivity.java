@@ -5,11 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.database.*;
-import android.database.sqlite.*;
-import android.view.animation.Animation;
-
-import com.cyphermessenger.sqlite.MySQLiteHelper;
 
 public class MainActivity extends ActionBarActivity {
 

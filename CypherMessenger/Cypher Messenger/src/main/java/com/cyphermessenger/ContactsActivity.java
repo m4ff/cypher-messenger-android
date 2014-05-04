@@ -1,33 +1,15 @@
 package com.cyphermessenger;
 
-import android.app.ListActivity;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridLayout;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 
 import com.cyphermessenger.sqlite.Contact;
-import com.cyphermessenger.sqlite.DBManager;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
-import com.cyphermessenger.sqlite.MySQLiteHelper;
 
-import org.bouncycastle.asn1.cmp.GenRepContent;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ContactsActivity extends ActionBarActivity {
