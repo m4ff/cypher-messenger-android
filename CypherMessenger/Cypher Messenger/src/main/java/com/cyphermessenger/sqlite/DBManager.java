@@ -6,9 +6,8 @@ import com.cyphermessenger.crypto.Key;
  */
 public interface DBManager {
     public void insertUser(User user);
-    public void deleteUser(User user);
-    public void insertContact(Contact contact);
-    public void deleteContact(Contact contact);
+    public void insertContact(User user, Contact contact);
+    public void deleteContact(User contact, Contact contact);
     public void insertKey(User user, Key key);
     public void insertMessage(User user, Contact contact, Messages msg);
     public void deleteMessage(Messages msg);

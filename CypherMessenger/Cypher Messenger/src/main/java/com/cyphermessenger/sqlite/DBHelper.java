@@ -103,12 +103,4 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS" + TABLE_KEYS);
         onCreate(db);
     }
-
-    public void emptyDatabase() {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("TRUNCATE TABLE" + TABLE_USERS);
-        db.execSQL("TRUNCATE TABLE" + TABLE_CONTACTS);
-        db.execSQL("TRUNCATE TABLE" + TABLE_MESSAGES);
-        db.execSQL("TRUNCATE TABLE" + TABLE_KEYS);
-    }
 }
