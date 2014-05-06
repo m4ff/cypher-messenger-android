@@ -5,12 +5,16 @@
  */
 package com.cyphermessenger.client;
 
+import com.cyphermessenger.crypto.Decrypt;
+import com.cyphermessenger.crypto.ECKey;
+import com.cyphermessenger.crypto.Encrypt;
 import com.cyphermessenger.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.BaseEncoding;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -194,24 +198,28 @@ public final class Request {
         return findUser(session, username, 10);
     }
 
-    public void sendMessageToUser(CypherSession session, String message, CypherUser contactUser, String[] hashtags) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
-        String finalurl = DOMAIN + "message";
+    public void sendMessageToUser(CypherSession session, String message, CypherUser contactUser) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
+        String finalUrl = DOMAIN + "message";
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(finalurl);
+        HttpPost post = new HttpPost(finalUrl);
         CypherUser user = session.getUser();
-        byte[] payload = new Encrypt(user.getKey().getSharedSecret(contactUser.getKey())).process(message.getBytes());
-        
         long timestamp = new Date().getTime();
         byte[] messageId = new byte[4];
         Utils.RANDOM.nextBytes(messageId);
+
+        byte[] timestampBytes = BigInteger.valueOf(timestamp).toByteArray();
+        Encrypt encryptionCtx = new Encrypt(user.getKey().getSharedSecret(contactUser.getKey()));
+        encryptionCtx.updateAuthenticatedData(messageId);
+        encryptionCtx.updateAuthenticatedData(timestampBytes);
+        byte[] payload = encryptionCtx.process(message.getBytes());
+
         ArrayList<NameValuePair> pair = new ArrayList<>();
         pair.add(new BasicNameValuePair("userID", session.getUser().getUserID() + ""));
         pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
         pair.add(new BasicNameValuePair("payload", Utils.BASE64_URL.encode(payload)));
         pair.add(new BasicNameValuePair("contactID", contactUser.getUserID() + ""));
-        pair.add(new BasicNameValuePair("messageID", Utils.BASE64_URL.encode(messageId)));
+        pair.add(new BasicNameValuePair("messageID", new BigInteger(messageId).intValue() + ""));
         pair.add(new BasicNameValuePair("timestamp", timestamp + ""));
-        pair.add(new BasicNameValuePair("hashtags", hashtags + ""));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
         InputStream in = response.getEntity().getContent();

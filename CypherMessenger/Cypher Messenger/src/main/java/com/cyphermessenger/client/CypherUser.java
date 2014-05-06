@@ -6,6 +6,8 @@
 
 package com.cyphermessenger.client;
 
+import com.cyphermessenger.crypto.ECKey;
+
 /**
  *
  * @author halfblood
