@@ -5,9 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.cyphermessenger.AddContactActivity">
 
-    <item android:id="@+id/add_contact_button_done"
+    <item android:id="@+id/add_contact_search_view"
         android:orderInCategory="100"
-        android:title="@string/button_done_add_contact"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_action_search"
+        android:title="Search"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.SearchView"/>
 
 </menu>

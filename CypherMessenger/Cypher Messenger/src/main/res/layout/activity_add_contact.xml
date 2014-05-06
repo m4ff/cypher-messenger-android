@@ -5,35 +5,12 @@
     android:orientation="vertical"
     tools:context="${packageName}.${activityClass}">
 
-    <ImageView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_action_person"
-        android:padding="30dp"/>
-
-
-    <LinearLayout
-        android:id="@+id/heading_layout"
-        android:layout_width="wrap_content"
+    <SearchView
+        android:id="@+id/add_contact_search_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:inputType="text">
 
-        <TextView
-            android:id="@+id/add_contact_info_string"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:typeface="sans"
-            android:text="@string/add_contact_info_string" />
-
-        <EditText
-            android:id="@+id/add_contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="@string/add_contact_name_hint" />
-
-    </LinearLayout>
+    </SearchView>
 
 </LinearLayout>

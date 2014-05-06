@@ -38,8 +38,8 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="com.cyphermessenger.AddContactActivity"
-            android:label="@string/app_name" >
+            android:name="com.cyphermessenger.AddContactActivity" >
+            <meta-data android:resource="@xml/searchable" />
         </activity>
     </application>
 
