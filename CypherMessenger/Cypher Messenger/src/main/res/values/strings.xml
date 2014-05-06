@@ -11,8 +11,8 @@
     <string name="login_activity_name">Login</string>
     <string name="registration_activity_name">Register</string>
     <string name="button_login">Login</string>
-    <string name="button_register_in_login">Register now</string>
-    <string name="button_register_in_registration">DONE</string>
+    <string name="button_register_login">Register now</string>
+    <string name="button_register_registration">DONE</string>
     <string name="prompt_name">User name:</string>
     <string name="prompt_password">Password:</string>
     <string name="prompt_confirmation">Confirm password:</string>
@@ -22,9 +22,12 @@
     <string name="contacts_activity_name">Contacts</string>
     <string name="conversations_activity_name">Chat</string>
     <string name="title_activity_messages">Messages</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="button_done_add_contact">DONE</string>
+    <string name="add_contact_info_string"><u>Add a new contact</u>:</string>
+    <string name="add_contact_name_hint">Insert contact name</string>
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
+
 
 </resources>

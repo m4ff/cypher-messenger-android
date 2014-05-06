@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/register_button"
-        android:title="@string/button_register_in_registration"
+        android:title="@string/button_register_registration"
         android:orderInCategory="100"
         app:showAsAction="always" />
 
