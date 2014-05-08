@@ -3,6 +3,7 @@ package com.cyphermessenger;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -19,13 +20,27 @@ public class AddContactActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_contact);
 
     }
-
+    /*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_contact_search_view:
+                onSearchRequested();
+                return true;
+            default:
+                return false;
+        }
+    }*/
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_contact, menu);
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchContact = (SearchView) menu.getItem(R.id.add_contact_search_view).getActionView();
+        SearchView searchContact = (SearchView) menu.findItem(R.id.add_contact_search_view).getActionView();
         searchContact.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        return super.onCreateOptionsMenu(menu);
+        //searchContact.setIconifiedByDefault(false);
+        //}
+        return true;
     }
 }

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="${packageName}.${activityClass}">
+    tools:context="com.cyphermessenger.AddContactActivity">
 
     <SearchView
         android:id="@+id/add_contact_search_view"
@@ -11,6 +11,6 @@
         android:layout_height="wrap_content"
         android:inputType="text">
 
-    </SearchView >
+    </SearchView>
 
 </LinearLayout>
