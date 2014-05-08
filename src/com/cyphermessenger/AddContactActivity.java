@@ -22,7 +22,6 @@ public class AddContactActivity extends ActionBarActivity {
         handleIntent(getIntent());
     }
     
-    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -32,7 +31,7 @@ public class AddContactActivity extends ActionBarActivity {
             default:
                 return false;
         }
-    }*/
+    }
     
     @Override
     protected void onNewIntent(Intent intent) {
@@ -50,12 +49,12 @@ public class AddContactActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_contact, menu);
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchContact = (SearchView) menu.findItem(R.id.add_contact_search_view).getActionView();
         searchContact.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        //searchContact.setIconifiedByDefault(false);
-        //}
+        searchContact.setIconifiedByDefault(false);
+        }
         return true;
     }
 }
