@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cyphermessenger" >
 
     <uses-sdk
@@ -43,8 +42,12 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity android:name=".AddContactActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
             <meta-data
-                android:name="android.app.searchable" 
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
     </application>

@@ -5,12 +5,4 @@
     android:orientation="vertical"
     tools:context="com.cyphermessenger.AddContactActivity">
 
-    <SearchView
-        android:id="@+id/add_contact_search_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text">
-
-    </SearchView>
-
 </LinearLayout>
