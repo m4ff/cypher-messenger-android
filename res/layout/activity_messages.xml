@@ -1,0 +1,54 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:weightSum="100"
+    android:id="@+id/messages_main_view"
+    tools:context="com.cyphermessenger.MessagesActivity">
+
+    <LinearLayout
+        android:id="@+id/message_bubble_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:isScrollContainer="true"
+        android:layout_weight="90">
+
+        <ListView
+            android:id="@+id/messages_list_view"
+            android:scrollbarStyle="outsideOverlay"
+            android:divider="@android:color/transparent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        </ListView>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1"
+        android:layout_marginBottom="2dp" >
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_editor"
+            android:inputType="textLongMessage"
+            android:hint="@string/prompt_text_message_hint"
+            android:alpha="0.9"
+            android:layout_weight="0.91" />
+
+        <ImageButton
+            android:id="@+id/message_button_send"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:alpha="0.9"
+            android:clickable="true"
+            android:background="@drawable/send_message_button"
+            android:layout_weight="0.1" />
+
+    </LinearLayout>
+
+</LinearLayout>

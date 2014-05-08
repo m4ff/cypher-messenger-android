@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- GENERAL STRINGS -->
+    <string name="app_name">CypherMessenger</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="action_contact">Contact</string>
+
+    <!-- LOGIN and REGISTRATION STRINGS -->
+    <string name="login_activity_name">Login</string>
+    <string name="registration_activity_name">Register</string>
+    <string name="button_login">Login</string>
+    <string name="button_register_login">Register now</string>
+    <string name="button_register_registration">DONE</string>
+    <string name="prompt_name">User name:</string>
+    <string name="prompt_password">Password:</string>
+    <string name="prompt_confirmation">Confirm password:</string>
+    <string name="prompt_captcha_text">Insert the text shown above:</string>
+
+    <!-- CONTACTS & CONVERSATIONS STRINGS -->
+    <string name="contacts_activity_name">Contacts</string>
+    <string name="conversations_activity_name">Chat</string>
+    <string name="title_activity_messages">Messages</string>
+    <string name="button_done_add_contact">DONE</string>
+    <string name="add_contact_info_string"><u>Add a new contact</u>:</string>
+    <string name="add_contact_name_hint">Insert contact name</string>
+
+    <!-- MESSAGES STRINGS -->
+    <string name="prompt_text_message_hint">Type your message</string>
+
+
+</resources>

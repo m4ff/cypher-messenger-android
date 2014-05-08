@@ -14,3 +14,9 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+#ADT
+project.properties
+proguard-project.txt
+gen/*
+bin/*
