@@ -5,9 +5,12 @@
  */
 package com.cyphermessenger.utils;
 
+import com.cyphermessenger.crypto.Decrypt;
+import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.crypto.SCrypt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
+
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -15,6 +18,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
  *
@@ -81,6 +86,23 @@ public class Utils {
             }
         }
         return true;
+    }
+    
+    public static ECKey decodeKey(String pub, String prv, String pass) throws InvalidCipherTextException {
+    	byte[] pubBytes = BASE64_URL.decode(pub);
+    	byte[] prvBytes = null;
+    	if(prv != null) {
+    		prvBytes = Decrypt.process(pass, BASE64_URL.decode(prv));
+    	}
+    	return new ECKey(pubBytes, prvBytes);
+    }
+    
+    public static ECKey decodeKey(String pub) {
+    	try {
+    		return decodeKey(pub, null, null);
+    	} catch(InvalidCipherTextException ex) {
+    		throw new RuntimeException(ex);
+    	}
     }
     
     public static void main(String args[]) {
