@@ -5,15 +5,6 @@
  */
 package com.cyphermessenger.client;
 
-import android.util.Log;
-
-import com.cyphermessenger.crypto.Decrypt;
-import com.cyphermessenger.crypto.ECKey;
-import com.cyphermessenger.crypto.Encrypt;
-import com.cyphermessenger.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -21,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,16 +22,20 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
-/**
- *
- * @author halfblood
- */
-public final class Request {
+import com.cyphermessenger.crypto.Decrypt;
+import com.cyphermessenger.crypto.ECKey;
+import com.cyphermessenger.crypto.Encrypt;
+import com.cyphermessenger.utils.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+public final class SyncRequest {
 
     final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
-    public Captcha requestCaptcha() throws IOException, APIErrorException {
+    public static Captcha requestCaptcha() throws IOException, APIErrorException {
         String finalurl = DOMAIN + "captcha";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
@@ -55,9 +51,9 @@ public final class Request {
         byte[] captchaImage = Utils.BASE64_URL.decode(captchaImageString);
         if (statusCode == StatusCode.OK) {
             Captcha captcha = new Captcha();
-            captcha.setCaptchaImage(captchaImage);
-            captcha.setCaptchaToken(captchaTokenString);
-            captcha.setCaptchaHash(captchaHash);
+            captcha.captchaImage = captchaImage;
+            captcha.captchaToken = captchaTokenString;
+            captcha.captchaHash = captchaHash;
             return captcha;
         } else {
             throw new APIErrorException(statusCode);
@@ -65,7 +61,7 @@ public final class Request {
     }
     /*Returns user id*/
 
-    public CypherUser registerUser(String captchaValue, String username, String password, Captcha captcha) throws IOException, APIErrorException {
+    public static CypherUser registerUser(String username, String password, String captchaValue, Captcha captcha) throws IOException, APIErrorException {
         String finalurl = DOMAIN + "register";
         CloseableHttpClient client = HttpClients.createDefault();
         byte[] passwordHash = Utils.cryptPassword(password.getBytes(), username);
@@ -76,13 +72,13 @@ public final class Request {
         try {
             privateKey = new Encrypt(password).process(privateKey);
         } catch (InvalidCipherTextException ex) {
-            Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SyncRequest.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
         String passwordHashEncoded = Utils.BASE64_URL.encode(passwordHash);
         HttpPost post = new HttpPost(finalurl);
         ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("captchaToken", captcha.getCaptchaToken()));
+        pair.add(new BasicNameValuePair("captchaToken", captcha.captchaToken));
         pair.add(new BasicNameValuePair("captchaValue", captchaValue));
         pair.add(new BasicNameValuePair("username", username));
         pair.add(new BasicNameValuePair("password", passwordHashEncoded));
@@ -95,29 +91,33 @@ public final class Request {
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
-            CypherUser user = new CypherUser(username, passwordHashEncoded, userID, key);
+            long keyTime = node.get("timestamp").asLong();
+            CypherUser user = new CypherUser(username, passwordHashEncoded, userID, key, keyTime);
             return user;
         } else {
             throw new APIErrorException(statusCode);
         }
     }
 
-    public CypherSession userLogin(String username, String password) throws IOException, APIErrorException {
+    public static CypherSession userLogin(String username, String password) throws IOException, APIErrorException, InvalidCipherTextException {
         String finalurl = DOMAIN + "login";
+        String passwordHashEncoded = Utils.BASE64_URL.encode(Utils.cryptPassword(password.getBytes(), username));
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
-
+        
         ArrayList<NameValuePair> pair = new ArrayList<>();
         pair.add(new BasicNameValuePair("username", username));
-        pair.add(new BasicNameValuePair("password", password));
+        pair.add(new BasicNameValuePair("password", passwordHashEncoded));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
-        InputStream in = response.getEntity().getContent();  // restituisce UserID e SessionID
+        InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
-            CypherUser newUser = new CypherUser(username, password, userID, null);
+            ECKey key = Utils.decodeKey(node.get("publicKey").asText(), node.get("privateKey").asText(), password);
+            long keyTimestamp = node.get("keyTimestamp").asLong();
+            CypherUser newUser = new CypherUser(username, passwordHashEncoded, userID, key, keyTimestamp);
             String sessionID = node.get("sessionID").asText();
             CypherSession session = new CypherSession(newUser, sessionID);
             return session;
@@ -125,8 +125,10 @@ public final class Request {
             throw new APIErrorException(statusCode);
         }
     }
-
-    public CypherSession requestUserKeyPair(CypherSession session, String password) throws IOException, APIErrorException, InvalidCipherTextException {
+    
+    /*
+    SOSTITUITO DA LOGIN e PULL 
+    public static CypherSession requestUserKeyPair(CypherSession session, String password) throws IOException, APIErrorException, InvalidCipherTextException {
         String finalurl = DOMAIN + "userkey";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
@@ -151,8 +153,9 @@ public final class Request {
             throw new APIErrorException(statusCode);
         }
     }
+    */
 
-    public void userLogout(int userID, String sessionID) throws IOException, APIErrorException {
+    public static void userLogout(int userID, String sessionID) throws IOException, APIErrorException {
         String finalurl = DOMAIN + "logout";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
@@ -170,7 +173,7 @@ public final class Request {
         }
     }
 
-    public ArrayList<String> findUser(CypherSession session, String username, int limit) throws IOException, APIErrorException {
+    public static ArrayList<String> findUser(CypherSession session, String username, int limit) throws IOException, APIErrorException {
         String finalurl = DOMAIN + "find";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
@@ -193,11 +196,11 @@ public final class Request {
         }
     }
     
-    public ArrayList<String> findUser(CypherSession session, String username) throws IOException, APIErrorException {
+    public static ArrayList<String> findUser(CypherSession session, String username) throws IOException, APIErrorException {
         return findUser(session, username, 10);
     }
 
-    public void sendMessageToUser(CypherSession session, String message, CypherUser contactUser) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
+    public static void sendMessageToUser(CypherSession session, String message, CypherUser contactUser) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
         String finalUrl = DOMAIN + "message";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalUrl);
@@ -229,7 +232,7 @@ public final class Request {
         }
     }
     
-    private JsonNode manageContact(CypherSession session, String contactName, boolean add) throws IOException, APIErrorException {
+    private static JsonNode manageContact(CypherSession session, String contactName, boolean add) throws IOException, APIErrorException {
         String finalurl = DOMAIN + "contact";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
@@ -261,7 +264,7 @@ public final class Request {
         }
     }
    
-    public void inviteContact(CypherSession session, String username) throws IOException, APIErrorException{
+    public static void inviteContact(CypherSession session, String username) throws IOException, APIErrorException{
         JsonNode node = manageContact(session, username, true);
         int statusCode = node.get("status").asInt();
         switch(statusCode) {
@@ -273,22 +276,22 @@ public final class Request {
         }
     }
     
-    public CypherUser acceptContact(CypherSession session, String username) throws IOException, APIErrorException{
+    public static CypherUser acceptContact(CypherSession session, String username) throws IOException, APIErrorException{
         JsonNode node = manageContact(session, username, true);
         int statusCode = node.get("status").asInt();
         switch(statusCode) {
             case StatusCode.OK:
                 long userID = node.get("contactID").asLong();
-                byte[] publicKey = Utils.BASE64_URL.decode(node.get("publicKey").asText());
-                ECKey key = new ECKey(publicKey, null);
-                CypherUser newUser = new CypherUser(username, null, userID, key);
+                long keyTimestamp = node.get("keyTimestamp").asLong();
+                ECKey key = Utils.decodeKey(node.get("publicKey").asText());
+                CypherUser newUser = new CypherUser(username, null, userID, key, keyTimestamp);
                 return newUser;
             default:
                 throw new APIErrorException(statusCode);
         }
     }
     
-    public void blockContact(CypherSession session, String username) throws IOException, APIErrorException{
+    public static void blockContact(CypherSession session, String username) throws IOException, APIErrorException{
         JsonNode node = manageContact(session, username, false);
         int statusCode = node.get("status").asInt();
         switch(statusCode) {
@@ -301,11 +304,11 @@ public final class Request {
     }
     
 
-    public static void main(String argString[]) throws IllegalStateException, InvalidCipherTextException, IOException, APIErrorException {
+    public static void main(String argString[]) throws Exception {
         String text = "asdasdasd";
         byte[] cypher = new Encrypt("ciao").process(text.getBytes());
         String plain = new String(Decrypt.process("cialo", cypher));
         System.out.println(plain);
-        Request r = new Request();
+        SyncRequest r = new SyncRequest();
     }
 }

@@ -13,24 +13,27 @@ import com.cyphermessenger.crypto.ECKey;
  * @author halfblood
  */
 public class CypherUser {
-    private final String username;
-    private final String password;
-    private final long userID;
-    private final ECKey key;
+    String username;
+    String password;
+    long userID;
+    long keyTime;
+    ECKey key;
 
     
-    public CypherUser(String username, String password, long userID, ECKey key) {
+    CypherUser(String username, String password, long userID, ECKey key, long keyTime) {
         this.username = username;
         this.password = password;
         this.userID = userID;
         this.key = key;
+        this.keyTime = keyTime;
     }
 
-    public CypherUser(String username, long userID, ECKey key) {
+    CypherUser(String username, long userID, ECKey key, long keyTime) {
         this.username = username;
         this.userID = userID;
         this.password = null;
         this.key = key;
+        this.keyTime = keyTime;
     }
 
     public ECKey getKey() {
@@ -48,5 +51,9 @@ public class CypherUser {
     public long getUserID() {
         return userID;
     }
+
+	public long getKeyTime() {
+		return keyTime;
+	}
 
 }

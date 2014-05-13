@@ -7,17 +7,17 @@ import java.util.Date;
  * Created by halfblood on 06/05/14.
  */
 public class PullResults {
-    private ArrayList<Message> messages;
+    private ArrayList<CypherMessage> messages;
     private ArrayList<CypherUser> contacts;
     private Date notifiedUntil;
 
-    PullResults(ArrayList<Message> messages, ArrayList<CypherUser> contacts, Date notifiedUntil) {
+    PullResults(ArrayList<CypherMessage> messages, ArrayList<CypherUser> contacts, Date notifiedUntil) {
         this.messages = messages;
         this.contacts = contacts;
         this.notifiedUntil = notifiedUntil;
     }
 
-    public ArrayList<Message> getMessages() {
+    public ArrayList<CypherMessage> getMessages() {
         return messages;
     }
 

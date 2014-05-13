@@ -12,7 +12,7 @@ import java.security.Timestamp;
  *
  * @author halfblood
  */
-public class Message {
+public class CypherMessage {
     private int messageID;
     private byte[] payload;
     private Timestamp timestamp;

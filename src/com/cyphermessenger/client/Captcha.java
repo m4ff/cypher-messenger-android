@@ -6,38 +6,20 @@
 
 package com.cyphermessenger.client;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Arrays;
 
-/**
- *
- * @author halfblood
- */
+import com.cyphermessenger.utils.Utils;
+
 public class Captcha {
-    private byte[] captchaImage;
-    private String captchaToken;
-    private byte[] captchaHash;
+    byte[] captchaImage;
+    String captchaToken;
+    byte[] captchaHash;
 
     public byte[] getCaptchaImage() {
         return captchaImage;
     }
 
-    public void setCaptchaImage(byte[] captchaImage) {
-        this.captchaImage = captchaImage;
-    }
-
-    public String getCaptchaToken() {
-        return captchaToken;
-    }
-
-    public void setCaptchaToken(String captchaToken) {
-        this.captchaToken = captchaToken;
-    }
-
-    public byte[] getCaptchaHash() {
-        return captchaHash;
-    }
-
-    public void setCaptchaHash(byte[] captchaHash) {
-        this.captchaHash = captchaHash;
+    public boolean verify(String value) {
+        return Arrays.equals(captchaHash, Utils.sha256(value));
     }
 }

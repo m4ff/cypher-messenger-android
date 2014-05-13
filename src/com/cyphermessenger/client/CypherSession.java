@@ -11,10 +11,10 @@ package com.cyphermessenger.client;
  * @author halfblood
  */
 public class CypherSession {
-    private final CypherUser user;
-    private final String sessionID;
+    CypherUser user;
+    String sessionID;
 
-    public CypherSession(CypherUser user, String sessionID) {
+    CypherSession(CypherUser user, String sessionID) {
         this.user = user;
         this.sessionID = sessionID;
     }
