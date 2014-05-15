@@ -6,7 +6,7 @@
 
 package com.cyphermessenger.client;
 
-import java.security.Timestamp;
+import java.util.Date;
 
 /**
  *
@@ -15,14 +15,20 @@ import java.security.Timestamp;
 public class CypherMessage {
     private int messageID;
     private byte[] payload;
-    private Timestamp timestamp;
+    private Date timestamp;
+    private boolean isSender;
+    private long contactID;
+
+    public CypherMessage(int messageID, byte[] payload, Date timestamp, boolean isSender, long contactID) {
+        this.messageID = messageID;
+        this.payload = payload;
+        this.timestamp = timestamp;
+        this.isSender = isSender;
+        this.contactID = contactID;
+    }
 
     public int getMessageID() {
         return messageID;
-    }
-
-    public void setCaptchaImage(int messageID) {
-        this.messageID = messageID;
     }
 
     public byte[] getPayload() {
@@ -33,11 +39,20 @@ public class CypherMessage {
         this.payload = payload;
     }
 
-    public Timestamp getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public long getContactID() {
+        return contactID;
+    }
+
 }

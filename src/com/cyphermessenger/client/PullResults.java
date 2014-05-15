@@ -1,5 +1,7 @@
 package com.cyphermessenger.client;
 
+import com.cyphermessenger.crypto.ECKey;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -8,12 +10,14 @@ import java.util.Date;
  */
 public class PullResults {
     private ArrayList<CypherMessage> messages;
-    private ArrayList<CypherUser> contacts;
+    private ArrayList<CypherContact> contacts;
+    private ArrayList<ECKey> keys;
     private Date notifiedUntil;
 
-    PullResults(ArrayList<CypherMessage> messages, ArrayList<CypherUser> contacts, Date notifiedUntil) {
+    PullResults(ArrayList<CypherMessage> messages, ArrayList<CypherContact> contacts, ArrayList<ECKey> keys, Date notifiedUntil) {
         this.messages = messages;
         this.contacts = contacts;
+        this.keys = keys;
         this.notifiedUntil = notifiedUntil;
     }
 
@@ -21,7 +25,7 @@ public class PullResults {
         return messages;
     }
 
-    public ArrayList<CypherUser> getContacts() {
+    public ArrayList<CypherContact> getContacts() {
         return contacts;
     }
 

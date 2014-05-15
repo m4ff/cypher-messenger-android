@@ -8,6 +8,8 @@ package com.cyphermessenger.client;
 
 import com.cyphermessenger.crypto.ECKey;
 
+import java.util.Date;
+
 /**
  *
  * @author halfblood
@@ -16,11 +18,11 @@ public class CypherUser {
     String username;
     String password;
     long userID;
-    long keyTime;
+    Date keyTime;
     ECKey key;
 
     
-    CypherUser(String username, String password, long userID, ECKey key, long keyTime) {
+    CypherUser(String username, String password, long userID, ECKey key, Date keyTime) {
         this.username = username;
         this.password = password;
         this.userID = userID;
@@ -28,7 +30,7 @@ public class CypherUser {
         this.keyTime = keyTime;
     }
 
-    CypherUser(String username, long userID, ECKey key, long keyTime) {
+    CypherUser(String username, long userID, ECKey key, Date keyTime) {
         this.username = username;
         this.userID = userID;
         this.password = null;
@@ -52,7 +54,7 @@ public class CypherUser {
         return userID;
     }
 
-	public long getKeyTime() {
+	public Date getKeyTime() {
 		return keyTime;
 	}
 

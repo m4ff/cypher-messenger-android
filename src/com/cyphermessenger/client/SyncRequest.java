@@ -8,11 +8,14 @@ package com.cyphermessenger.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import android.provider.ContactsContract;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,6 +31,7 @@ import com.cyphermessenger.crypto.Encrypt;
 import com.cyphermessenger.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
 
 
 public final class SyncRequest {
@@ -35,11 +39,17 @@ public final class SyncRequest {
     final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
+    public final boolean SINCE = true;
+    public final boolean UNTIL = false;
+
     public static Captcha requestCaptcha() throws IOException, APIErrorException {
         String finalurl = DOMAIN + "captcha";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(finalurl);
         CloseableHttpResponse response = client.execute(post);
+       if (response.getStatusLine().getStatusCode() == 200){
+           throw new IOException("Server error");
+       }
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
@@ -86,12 +96,15 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("privateKey", Utils.BASE64_URL.encode(privateKey)));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
-            long keyTime = node.get("timestamp").asLong();
+            Date keyTime = new Date(node.get("timestamp").asLong());
             CypherUser user = new CypherUser(username, passwordHashEncoded, userID, key, keyTime);
             return user;
         } else {
@@ -110,13 +123,17 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("password", passwordHashEncoded));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
             ECKey key = Utils.decodeKey(node.get("publicKey").asText(), node.get("privateKey").asText(), password);
-            long keyTimestamp = node.get("keyTimestamp").asLong();
+            Date keyTimestamp = new Date(node.get("keyTimestamp").asLong());
             CypherUser newUser = new CypherUser(username, passwordHashEncoded, userID, key, keyTimestamp);
             String sessionID = node.get("sessionID").asText();
             CypherSession session = new CypherSession(newUser, sessionID);
@@ -165,7 +182,11 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("sessionID", sessionID + ""));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
-        InputStream in = response.getEntity().getContent();  // restituisce StatusCode
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
+        InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
         if (statusCode != StatusCode.OK) {
@@ -185,6 +206,10 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("limit", limit + ""));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
@@ -224,6 +249,10 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("timestamp", timestamp + ""));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
@@ -250,6 +279,10 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("contactName", contactName));
         post.setEntity(new UrlEncodedFormEntity(pair));
         CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
         InputStream in = response.getEntity().getContent();
         JsonNode node = MAPPER.readTree(in);
         int statusCode = node.get("status").asInt();
@@ -282,7 +315,7 @@ public final class SyncRequest {
         switch(statusCode) {
             case StatusCode.OK:
                 long userID = node.get("contactID").asLong();
-                long keyTimestamp = node.get("keyTimestamp").asLong();
+                Date keyTimestamp = new Date(node.get("keyTimestamp").asLong());
                 ECKey key = Utils.decodeKey(node.get("publicKey").asText());
                 CypherUser newUser = new CypherUser(username, null, userID, key, keyTimestamp);
                 return newUser;
@@ -302,7 +335,111 @@ public final class SyncRequest {
                 throw new APIErrorException(statusCode);
         }
     }
-    
+
+    public static JsonNode pullUpdate(CypherSession session, long contactID, String action, boolean since, Date time) throws IOException, APIErrorException{
+        String finalurl = DOMAIN + "pull";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost post = new HttpPost(finalurl);
+        String timeRelativeTo = "since";
+        if (!since){
+            timeRelativeTo = "until";
+        }
+        CypherUser user = session.getUser();
+        ArrayList<NameValuePair> pair = new ArrayList<>();
+        pair.add(new BasicNameValuePair("userID", user.getUserID()+ ""));
+        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
+        pair.add(new BasicNameValuePair("action", action));
+        pair.add(new BasicNameValuePair("contactID", contactID + ""));
+        pair.add(new BasicNameValuePair(timeRelativeTo, time + ""));
+        post.setEntity(new UrlEncodedFormEntity(pair));
+        CloseableHttpResponse response = client.execute(post);
+        if (response.getStatusLine().getStatusCode() == 200){
+            throw new IOException("Server error");
+        }
+
+        InputStream in = response.getEntity().getContent();
+        JsonNode node = MAPPER.readTree(in);
+        int statusCode = node.get("status").asInt();
+        if(statusCode == StatusCode.OK) {
+            return node;
+        } else {
+            throw new APIErrorException(statusCode);
+        }
+    }
+
+    public static ArrayList<CypherMessage> pullMessages(CypherSession session, long contactID, boolean since, Date time) throws IOException, APIErrorException {
+        JsonNode node = pullUpdate(session, contactID,"messages",since, time);
+        int statusCode = node.get("status").asInt();
+        ArrayList<CypherMessage> array = new ArrayList<CypherMessage>();
+        if (statusCode == StatusCode.OK) {
+            JsonNode arrayNode = node.get("messages");
+            if (arrayNode.isArray()) {
+                for (JsonNode selectedNode : arrayNode) {
+                    boolean isSender = selectedNode.get("isSender").asBoolean();
+                    long receivedContactID = selectedNode.get("contactID").asLong();
+                    int messageID = selectedNode.get("messageID").asInt();
+                    byte[] payload = selectedNode.get("payload").asText().getBytes();
+                    Date timestamp = new Date(selectedNode.get("timestamp").asLong());
+                    CypherMessage message = new CypherMessage(messageID, payload, timestamp, isSender, receivedContactID);
+                    array.add(message);
+                }
+            }
+            return array;
+        } else {
+            throw new APIErrorException(statusCode);
+        }
+    }
+
+    public static ArrayList<CypherContact> pullContacts(CypherSession session, long contactID, boolean since, Date time) throws IOException, APIErrorException{
+        JsonNode node = pullUpdate(session, contactID,"contacts", since, time);
+        int statusCode = node.get("status").asInt();
+        ArrayList<CypherContact> array = new ArrayList<CypherContact>();
+        if(statusCode == StatusCode.OK) {
+            JsonNode arrayNode = node.get("contacts");
+            if (arrayNode.isArray()){
+                for (JsonNode selectedNode : arrayNode){
+                    String username = selectedNode.get("username").asText();
+                    long receivedContactID = selectedNode.get("contactID").asLong();
+                    String contactStatus = selectedNode.get("contactStatus").asText();
+                    ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
+                    Date timestamp = new Date(selectedNode.get("timestamp").asLong() );
+                    Date keyTime = new Date(selectedNode.get("keyTimestamp").asLong());
+                    CypherContact newContact = new CypherContact(username,contactID, publicKey, keyTime, contactStatus, timestamp);
+                    array.add(newContact);
+                }
+            }
+            return array;
+        } else {
+            throw  new APIErrorException(statusCode);
+        }
+    }
+
+    public static ArrayList<ECKey> pullKeys(CypherSession session, long contactID, String password, boolean since, Date time) throws IOException, APIErrorException, InvalidCipherTextException {
+        JsonNode node = pullUpdate(session, contactID,"keys", since, time);
+        int statusCode = node.get("status").asInt();
+        ArrayList<ECKey> array = new ArrayList<ECKey>();
+        if(statusCode == StatusCode.OK) {
+            JsonNode arrayNode = node.get("keys");
+            if (arrayNode.isArray()){
+                for (JsonNode selectedNode : arrayNode){
+                    ECKey newECKey = Utils.decodeKey(selectedNode.get("publicKey").asText(), selectedNode.get("privateKey").asText(), password);
+                    newECKey.setKeyTime(new Date(selectedNode.get("keyTimestamp").asLong()));
+                    array.add(newECKey);
+                }
+            }
+            return array;
+        } else {
+            throw  new APIErrorException(statusCode);
+        }
+    }
+
+    public static PullResults pullAll(CypherSession session, long contactID, String password, boolean since, Date time) throws IOException, APIErrorException, InvalidCipherTextException {
+        ArrayList<ECKey> keys = pullKeys(session, contactID, password, since, time);
+        ArrayList<CypherContact> contacts = pullContacts(session,contactID, since, time);
+        ArrayList<CypherMessage> messages = pullMessages(session, contactID, since, time);
+        return new PullResults(messages,contacts, keys, time);
+    }
+
 
     public static void main(String argString[]) throws Exception {
         String text = "asdasdasd";

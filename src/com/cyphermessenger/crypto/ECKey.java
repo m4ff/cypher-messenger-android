@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Date;
 
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
@@ -31,6 +32,7 @@ public class ECKey {
 
     private byte[] priv;
     private byte[] pub;
+    private Date keyTime;
 
     private final ECPrivateKeyParameters privParams;
     private final ECPublicKeyParameters pubParams;
@@ -76,6 +78,11 @@ public class ECKey {
         pubParams = new ECPublicKeyParameters(pkey, domainParams);
     }
 
+    public ECKey(byte[] pubBytes, byte[] privBytes, Date time) {
+        this(pubBytes, privBytes);
+        this.keyTime = time;
+    }
+
     /**
      * Returns the encoded public key
      *
@@ -98,6 +105,10 @@ public class ECKey {
             priv = BigIntegers.asUnsignedByteArray(privParams.getD());
         }
         return priv;
+    }
+
+    public void setKeyTime(Date keyTime) {
+        this.keyTime = keyTime;
     }
 
     /**
