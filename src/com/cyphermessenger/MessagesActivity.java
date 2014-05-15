@@ -83,7 +83,6 @@ public class MessagesActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 messagesList.addLast(new Messages(message_id,messageEditor.getText().toString(), (int) System.currentTimeMillis(), true, !is_User));
-                Log.d("DEBUG", "Send clicked: " + messageEditor.getText().toString());
                 messageListView.post(new Runnable() {
                     @Override
                     public void run() {

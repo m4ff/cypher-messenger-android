@@ -36,7 +36,7 @@ public class ConversationsActivity extends ActionBarActivity {
         contact.addFirst(new Contact("sdgxjdv", 12));
         contact.addFirst(new Contact("yrilouibfdhsgd", 13));
 
-        ArrayAdapter<Contact> adapter = new ArrayAdapter<Contact>(this, R.layout.conversation_tamplate, R.id.conversation_last_time, contact);
+        ArrayAdapter<Contact> adapter = new ArrayAdapter<Contact>(this, R.layout.conversation_template, R.id.conversation_last_time, contact);
         mainView.setAdapter(adapter);
 
         LinearLayout gridLayout = (LinearLayout) findViewById(R.id.conversation_grid);

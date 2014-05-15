@@ -36,7 +36,7 @@ public class ContactsActivity extends ActionBarActivity {
         contact.addFirst(new Contact("crujbdtvgcwex", 11));
         contact.addFirst(new Contact("sdgxjdv", 12));
         contact.addFirst(new Contact("yrilouibfdhsgd", 13));
-        ArrayAdapter<Contact> adapter = new ArrayAdapter<Contact>(this, R.layout.contacts_tamplate, R.id.contact_last_time, contact);
+        ArrayAdapter<Contact> adapter = new ArrayAdapter<Contact>(this, R.layout.contacts_template, R.id.contact_last_time, contact);
 
         mainView.setAdapter(adapter);
     }
