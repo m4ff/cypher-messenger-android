@@ -61,7 +61,7 @@ public class Decrypt extends Encryption {
     private static byte[] oneStepDecryption(byte[] key, byte[] cipherText, byte[] aad[]) throws InvalidCipherTextException {
         byte[] iv = Arrays.copyOf(cipherText, IV_LENGTH);
         byte[] onlyCypherText = Arrays.copyOfRange(cipherText, IV_LENGTH, cipherText.length);
-        Decrypt decrypt = new Decrypt(Utils.sha256(key), iv);
+        Decrypt decrypt = new Decrypt(key, iv);
         for (int i = 0; i < aad.length; i++) {
             decrypt.updateAuthenticatedData(aad[i]);
         }

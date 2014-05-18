@@ -35,7 +35,7 @@ public class Encrypt extends Encryption {
     }
 
     public Encrypt(String key) {
-        this(key.getBytes());
+        this(Utils.sha256(key));
     }
 
     /**
@@ -45,10 +45,10 @@ public class Encrypt extends Encryption {
      * @param key  Encryption key
      * @param text Plaintext to be encrypted
      * @param aad  Additional authenticated data
-     * @return Returns the ciphertext
+     * @return Returns the cipher text
      */
     public static byte[] process(byte[] key, byte[] text, byte[]... aad) throws InvalidCipherTextException {
-        return oneStepDecryption(key, text, aad);
+        return oneStepEncryption(key, text, aad);
     }
 
     /**
@@ -58,13 +58,13 @@ public class Encrypt extends Encryption {
      * @param key  Encryption plain password
      * @param text Plaintext to be encrypted
      * @param aad  Additional authenticated data
-     * @return Returns the ciphertext
+     * @return Returns the cipher text
      */
     public static byte[] process(String key, byte[] text, byte[]... aad) throws InvalidCipherTextException {
-        return oneStepDecryption(Utils.sha256(key), text, aad);
+        return oneStepEncryption(Utils.sha256(key), text, aad);
     }
 
-    private static byte[] oneStepDecryption(byte[] key, byte[] text, byte[] aad[]) throws InvalidCipherTextException {
+    private static byte[] oneStepEncryption(byte[] key, byte[] text, byte[] aad[]) throws InvalidCipherTextException {
         Encrypt encrypt = new Encrypt(key);
         for (int i = 0; i < aad.length; i++) {
             encrypt.updateAuthenticatedData(aad[i]);

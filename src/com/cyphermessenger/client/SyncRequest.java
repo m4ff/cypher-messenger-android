@@ -5,12 +5,15 @@
  */
 package com.cyphermessenger.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +39,8 @@ import org.json.JSONArray;
 
 public final class SyncRequest {
 
-    final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
+    //final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
+    final static String DOMAIN = "http://localhost:8080/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
     public final boolean SINCE = true;
@@ -442,10 +446,16 @@ public final class SyncRequest {
 
 
     public static void main(String argString[]) throws Exception {
-        String text = "asdasdasd";
-        byte[] cypher = new Encrypt("ciao").process(text.getBytes());
-        String plain = new String(Decrypt.process("cialo", cypher));
-        System.out.println(plain);
-        SyncRequest r = new SyncRequest();
+        Captcha c = requestCaptcha();
+        File f = new File("/Users/paolo/Desktop/chaptcha.png");
+        FileOutputStream out = new FileOutputStream(f);
+        out.write(c.getCaptchaImage());
+        out.close();
+        String captchaVal = new Scanner(System.in).nextLine();
+
+        CypherUser user = registerUser("paolo", "password", captchaVal, c);
+        CypherSession session = userLogin("paolo", "password");
+
+        System.out.println(session.getUser().getUsername() + " " + session.getSessionID());
     }
 }

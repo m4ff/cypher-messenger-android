@@ -68,7 +68,6 @@ public class Utils {
         for(; i < SALT_LEN; i++) {
             salt[i] = 0;
         }
-        RANDOM.nextBytes(salt);
         byte[] hash = scrypt_1024_4_2(b, salt);
         byte[] ret = new byte[HASH_LEN + SALT_LEN];
         System.arraycopy(hash, 0, ret, 0, HASH_LEN);
