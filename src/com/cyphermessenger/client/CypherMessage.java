@@ -6,22 +6,20 @@
 
 package com.cyphermessenger.client;
 
-import java.util.Date;
-
 /**
  *
  * @author halfblood
  */
 public class CypherMessage {
     private int messageID;
-    private byte[] payload;
-    private Date timestamp;
+    private String text;
+    private long timestamp;
     private boolean isSender;
     private long contactID;
 
-    public CypherMessage(int messageID, byte[] payload, Date timestamp, boolean isSender, long contactID) {
+    public CypherMessage(int messageID, String payload, long timestamp, boolean isSender, long contactID) {
         this.messageID = messageID;
-        this.payload = payload;
+        this.text = payload;
         this.timestamp = timestamp;
         this.isSender = isSender;
         this.contactID = contactID;
@@ -31,20 +29,12 @@ public class CypherMessage {
         return messageID;
     }
 
-    public byte[] getPayload() {
-        return payload;
+    public String getText() {
+        return text;
     }
 
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
-
-    public Date getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
     }
 
     public boolean isSender() {

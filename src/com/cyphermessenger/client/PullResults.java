@@ -12,9 +12,9 @@ public class PullResults {
     private ArrayList<CypherMessage> messages;
     private ArrayList<CypherContact> contacts;
     private ArrayList<ECKey> keys;
-    private Date notifiedUntil;
+    private long notifiedUntil;
 
-    PullResults(ArrayList<CypherMessage> messages, ArrayList<CypherContact> contacts, ArrayList<ECKey> keys, Date notifiedUntil) {
+    PullResults(ArrayList<CypherMessage> messages, ArrayList<CypherContact> contacts, ArrayList<ECKey> keys, long notifiedUntil) {
         this.messages = messages;
         this.contacts = contacts;
         this.keys = keys;
@@ -29,7 +29,7 @@ public class PullResults {
         return contacts;
     }
 
-    public Date getNotifiedUntil() {
+    public long getNotifiedUntil() {
         return notifiedUntil;
     }
 }

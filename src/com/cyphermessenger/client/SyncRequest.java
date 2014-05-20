@@ -5,6 +5,7 @@
  */
 package com.cyphermessenger.client;
 
+import com.cyphermessenger.crypto.Decrypt;
 import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.crypto.Encrypt;
 import com.cyphermessenger.utils.Utils;
@@ -299,7 +300,7 @@ public final class SyncRequest {
         }
     }
 
-    public static JsonNode pullUpdate(CypherSession session, long contactID, String action, boolean since, Date time) throws IOException, APIErrorException{
+    public static JsonNode pullUpdate(CypherSession session, CypherUser contact, String action, boolean since, long time) throws IOException, APIErrorException{
         String finalurl = DOMAIN + "pull";
         HttpPost post = new HttpPost(finalurl);
         String timeRelativeTo = "since";
@@ -311,7 +312,9 @@ public final class SyncRequest {
         pair.add(new BasicNameValuePair("userID", user.getUserID()+ ""));
         pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
         pair.add(new BasicNameValuePair("action", action));
-        pair.add(new BasicNameValuePair("contactID", contactID + ""));
+        if (contact != null) {
+            pair.add(new BasicNameValuePair("contactID", contact.getUserID() + ""));
+        }
         pair.add(new BasicNameValuePair(timeRelativeTo, time + ""));
         post.setEntity(new UrlEncodedFormEntity(pair));
         HttpResponse response = HTTP_CLIENT.execute(post);
@@ -329,10 +332,10 @@ public final class SyncRequest {
         }
     }
 
-    public static ArrayList<CypherMessage> pullMessages(CypherSession session, long contactID, boolean since, Date time) throws IOException, APIErrorException {
-        JsonNode node = pullUpdate(session, contactID,"messages",since, time);
+    public static ArrayList<CypherMessage> pullMessages(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+        JsonNode node = pullUpdate(session, contact,"messages",since, time);
         int statusCode = node.get("status").asInt();
-        ArrayList<CypherMessage> array = new ArrayList<CypherMessage>();
+        ArrayList<CypherMessage> array = new ArrayList<>();
         if (statusCode == StatusCode.OK) {
             JsonNode arrayNode = node.get("messages");
             if (arrayNode.isArray()) {
@@ -340,9 +343,12 @@ public final class SyncRequest {
                     boolean isSender = selectedNode.get("isSender").asBoolean();
                     long receivedContactID = selectedNode.get("contactID").asLong();
                     int messageID = selectedNode.get("messageID").asInt();
-                    byte[] payload = selectedNode.get("payload").asText().getBytes();
-                    Date timestamp = new Date(selectedNode.get("timestamp").asLong());
-                    CypherMessage message = new CypherMessage(messageID, payload, timestamp, isSender, receivedContactID);
+                    byte[] payload = Utils.BASE64_URL.decode(selectedNode.get("payload").asText());
+                    long timestamp = selectedNode.get("timestamp").asLong();
+                    byte[] sharedSecret = session.getUser().getKey().getSharedSecret(contact.getKey());
+                    String plainText = new String(Decrypt.process(sharedSecret, payload, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
+
+                    CypherMessage message = new CypherMessage(messageID, plainText, timestamp, isSender, receivedContactID);
                     array.add(message);
                 }
             }
@@ -352,10 +358,10 @@ public final class SyncRequest {
         }
     }
 
-    public static ArrayList<CypherContact> pullContacts(CypherSession session, long contactID, boolean since, Date time) throws IOException, APIErrorException{
-        JsonNode node = pullUpdate(session, contactID,"contacts", since, time);
+    public static ArrayList<CypherContact> pullContacts(CypherSession session, boolean since, long time) throws IOException, APIErrorException{
+        JsonNode node = pullUpdate(session, null,"contacts", since, time);
         int statusCode = node.get("status").asInt();
-        ArrayList<CypherContact> array = new ArrayList<CypherContact>();
+        ArrayList<CypherContact> array = new ArrayList<>();
         if(statusCode == StatusCode.OK) {
             JsonNode arrayNode = node.get("contacts");
             if (arrayNode.isArray()){
@@ -366,7 +372,7 @@ public final class SyncRequest {
                     ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
                     long timestamp = selectedNode.get("timestamp").asLong();
                     long keyTime = selectedNode.get("keyTimestamp").asLong();
-                    CypherContact newContact = new CypherContact(username,contactID, publicKey, keyTime, contactStatus, timestamp);
+                    CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp);
                     array.add(newContact);
                 }
             }
@@ -376,8 +382,8 @@ public final class SyncRequest {
         }
     }
 
-    public static ArrayList<ECKey> pullKeys(CypherSession session, long contactID, String password, boolean since, Date time) throws IOException, APIErrorException, InvalidCipherTextException {
-        JsonNode node = pullUpdate(session, contactID,"keys", since, time);
+    public static ArrayList<ECKey> pullKeys(CypherSession session, CypherUser contact, String password, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+        JsonNode node = pullUpdate(session, contact,"keys", since, time);
         int statusCode = node.get("status").asInt();
         ArrayList<ECKey> array = new ArrayList<ECKey>();
         if(statusCode == StatusCode.OK) {
@@ -395,10 +401,10 @@ public final class SyncRequest {
         }
     }
 
-    public static PullResults pullAll(CypherSession session, long contactID, String password, boolean since, Date time) throws IOException, APIErrorException, InvalidCipherTextException {
-        ArrayList<ECKey> keys = pullKeys(session, contactID, password, since, time);
-        ArrayList<CypherContact> contacts = pullContacts(session,contactID, since, time);
-        ArrayList<CypherMessage> messages = pullMessages(session, contactID, since, time);
+    public static PullResults pullAll(CypherSession session, CypherContact contact, String password, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+        ArrayList<ECKey> keys = pullKeys(session, contact, password, since, time);
+        ArrayList<CypherContact> contacts = pullContacts(session, since, time);
+        ArrayList<CypherMessage> messages = pullMessages(session, contact, since, time);
         return new PullResults(messages,contacts, keys, time);
     }
 
