@@ -10,7 +10,7 @@ public class CypherContact extends CypherUser {
     String status;
     long contactTimestamp;
 
-    CypherContact(String username, long userID, ECKey key, long keyTime, String status, long timestamp) {
+    public CypherContact(String username, long userID, ECKey key, long keyTime, String status, long timestamp) {
         super(username, userID, key, keyTime);
         this.status = status;
         this.contactTimestamp = timestamp;

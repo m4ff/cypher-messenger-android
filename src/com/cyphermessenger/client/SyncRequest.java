@@ -190,7 +190,7 @@ public final class SyncRequest {
         return findUser(session, username, 10);
     }
 
-    public static void sendMessage(CypherSession session, String message, CypherUser contactUser) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
+    public static void sendMessage(CypherSession session, CypherUser contactUser, String message) throws IOException, APIErrorException, IllegalStateException, InvalidCipherTextException {
         String finalUrl = DOMAIN + "message";
         HttpPost post = new HttpPost(finalUrl);
         CypherUser user = session.getUser();
