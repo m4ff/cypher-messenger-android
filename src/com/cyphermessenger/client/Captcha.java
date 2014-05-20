@@ -6,9 +6,9 @@
 
 package com.cyphermessenger.client;
 
-import java.util.Arrays;
-
 import com.cyphermessenger.utils.Utils;
+
+import java.util.Arrays;
 
 public class Captcha {
     byte[] captchaImage;

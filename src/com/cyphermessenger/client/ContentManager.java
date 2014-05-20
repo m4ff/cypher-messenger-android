@@ -1,9 +1,9 @@
 package com.cyphermessenger.client;
 
+import org.spongycastle.crypto.InvalidCipherTextException;
+
 import java.io.IOException;
 import java.util.List;
-
-import org.bouncycastle.crypto.InvalidCipherTextException;
 
 public class ContentManager {
     private static ContentManager contentManager;

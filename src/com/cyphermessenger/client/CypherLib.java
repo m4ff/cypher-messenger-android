@@ -5,10 +5,7 @@
  */
 package com.cyphermessenger.client;
 
-import com.google.common.io.Files;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.File;
 
 /**
  *

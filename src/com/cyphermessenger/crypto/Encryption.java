@@ -9,8 +9,8 @@ package com.cyphermessenger.crypto;
  *
  * @author halfblood
  */
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.modes.GCMBlockCipher;
+import org.spongycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.crypto.modes.GCMBlockCipher;
 
 public abstract class Encryption {
 

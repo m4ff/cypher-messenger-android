@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +20,7 @@ import java.security.SecureRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.crypto.InvalidCipherTextException;
 
 /**
  *
@@ -102,6 +103,33 @@ public class Utils {
     	} catch(InvalidCipherTextException ex) {
     		throw new RuntimeException(ex);
     	}
+    }
+
+
+    public static int randomInt() {
+        byte[] bytes = new byte[4];
+        RANDOM.nextBytes(bytes);
+        return new BigInteger(bytes).intValue();
+    }
+
+    public static long randomLong() {
+        byte[] bytes = new byte[8];
+        RANDOM.nextBytes(bytes);
+        return new BigInteger(bytes).longValue();
+    }
+
+    public static byte[] randomBytes(int size) {
+        byte[] bytes = new byte[size];
+        RANDOM.nextBytes(bytes);
+        return bytes;
+    }
+
+    public static byte[] longToBytes(long a) {
+        return BigInteger.valueOf(a).toByteArray();
+    }
+
+    public static long bytesToLong(byte[] b) {
+        return new BigInteger(b).longValue();
     }
     
     public static void main(String args[]) {
