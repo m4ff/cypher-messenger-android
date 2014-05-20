@@ -33,12 +33,11 @@ import java.util.logging.Logger;
 
 public final class SyncRequest {
 
-    //final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
-    final static String DOMAIN = "http://10.23.197.222:8080/";
+    final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
-    public final boolean SINCE = true;
-    public final boolean UNTIL = false;
+    public static final boolean SINCE = true;
+    public static final boolean UNTIL = false;
     private static final AbstractHttpClient HTTP_CLIENT = new DefaultHttpClient();
 
     public static Captcha requestCaptcha() throws IOException, APIErrorException {
@@ -58,11 +57,7 @@ public final class SyncRequest {
         byte[] captchaHash = Utils.BASE64_URL.decode(captchaHashString);
         byte[] captchaImage = Utils.BASE64_URL.decode(captchaImageString);
         if (statusCode == StatusCode.OK) {
-            Captcha captcha = new Captcha();
-            captcha.captchaImage = captchaImage;
-            captcha.captchaToken = captchaTokenString;
-            captcha.captchaHash = captchaHash;
-            return captcha;
+            return new Captcha(captchaTokenString, captchaHash, captchaImage);
         } else {
             throw new APIErrorException(statusCode);
         }
@@ -70,25 +65,29 @@ public final class SyncRequest {
     /*Returns user id*/
 
     public static CypherUser registerUser(String username, String password, String captchaValue, Captcha captcha) throws IOException, APIErrorException {
+        if(!captcha.verify(captchaValue)) {
+            throw new APIErrorException(StatusCode.CAPTCHA_INVALID);
+        }
+
         String finalurl = DOMAIN + "register";
-        byte[] passwordHash = Utils.cryptPassword(password.getBytes(), username);
+        byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
+        byte[] localPassword = Utils.sha256(password);
 
         ECKey key = new ECKey();
         byte[] publicKey = key.getPublicKey();
         byte[] privateKey = key.getPrivateKey();
         try {
-            privateKey = new Encrypt(password).process(privateKey);
+            privateKey = Encrypt.process(localPassword, privateKey);
         } catch (InvalidCipherTextException ex) {
-            Logger.getLogger(SyncRequest.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
-        String passwordHashEncoded = Utils.BASE64_URL.encode(passwordHash);
+        String serverPasswordEncoded = Utils.BASE64_URL.encode(serverPassword);
         HttpPost post = new HttpPost(finalurl);
         ArrayList<NameValuePair> pair = new ArrayList<>();
         pair.add(new BasicNameValuePair("captchaToken", captcha.captchaToken));
         pair.add(new BasicNameValuePair("captchaValue", captchaValue));
         pair.add(new BasicNameValuePair("username", username));
-        pair.add(new BasicNameValuePair("password", passwordHashEncoded));
+        pair.add(new BasicNameValuePair("password", serverPasswordEncoded));
         pair.add(new BasicNameValuePair("publicKey", Utils.BASE64_URL.encode(publicKey)));
         pair.add(new BasicNameValuePair("privateKey", Utils.BASE64_URL.encode(privateKey)));
         post.setEntity(new UrlEncodedFormEntity(pair));
@@ -102,7 +101,7 @@ public final class SyncRequest {
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
             long keyTime = node.get("timestamp").asLong();
-            CypherUser user = new CypherUser(username, passwordHashEncoded, userID, key, keyTime);
+            CypherUser user = new CypherUser(username, localPassword, serverPassword, userID, key, keyTime);
             return user;
         } else {
             throw new APIErrorException(statusCode);
@@ -111,7 +110,10 @@ public final class SyncRequest {
 
     public static CypherSession userLogin(String username, String password) throws IOException, APIErrorException, InvalidCipherTextException {
         String finalurl = DOMAIN + "login";
-        String passwordHashEncoded = Utils.BASE64_URL.encode(Utils.cryptPassword(password.getBytes(), username));
+        byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
+        byte[] localPassword = Utils.sha256(password);
+
+        String passwordHashEncoded = Utils.BASE64_URL.encode(serverPassword);
         HttpPost post = new HttpPost(finalurl);
         
         ArrayList<NameValuePair> pair = new ArrayList<>();
@@ -128,9 +130,9 @@ public final class SyncRequest {
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
-            ECKey key = Utils.decodeKey(node.get("publicKey").asText(), node.get("privateKey").asText(), password);
+            ECKey key = Utils.decodeKey(node.get("publicKey").asText(), node.get("privateKey").asText(), localPassword);
             long keyTimestamp = node.get("keyTimestamp").asLong();
-            CypherUser newUser = new CypherUser(username, passwordHashEncoded, userID, key, keyTimestamp);
+            CypherUser newUser = new CypherUser(username, localPassword, serverPassword, userID, key, keyTimestamp);
             String sessionID = node.get("sessionID").asText();
             CypherSession session = new CypherSession(newUser, sessionID);
             return session;
@@ -281,7 +283,7 @@ public final class SyncRequest {
                 long userID = node.get("contactID").asLong();
                 long keyTimestamp = node.get("keyTimestamp").asLong();
                 ECKey key = Utils.decodeKey(node.get("publicKey").asText());
-                CypherUser newUser = new CypherUser(username, null, userID, key, keyTimestamp);
+                CypherUser newUser = new CypherUser(username, userID, key, keyTimestamp);
                 return newUser;
             default:
                 throw new APIErrorException(statusCode);
@@ -332,20 +334,63 @@ public final class SyncRequest {
         }
     }
 
-    public static ArrayList<CypherMessage> pullMessages(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+    public static PullResults pullMessages(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
         JsonNode node = pullUpdate(session, contact,"messages",since, time);
         int statusCode = node.get("status").asInt();
-        ArrayList<CypherMessage> array = new ArrayList<>();
         if (statusCode == StatusCode.OK) {
+            ArrayList<CypherMessage> array = handeMessageNode(node, session.getUser().getKey(), contact.getKey());
+            return new PullResults(array, null, null, node.get("notifiedUntil").asLong());
+        } else {
+            throw new APIErrorException(statusCode);
+        }
+    }
+
+    public static PullResults pullContacts(CypherSession session, boolean since, long time) throws IOException, APIErrorException{
+        JsonNode node = pullUpdate(session, null,"contacts", since, time);
+        int statusCode = node.get("status").asInt();
+        if(statusCode == StatusCode.OK) {
+            ArrayList<CypherContact> array = handleContactNode(node);
+            return new PullResults(null, array, null, node.get("notifiedUntil").asLong());
+        } else {
+            throw  new APIErrorException(statusCode);
+        }
+    }
+
+    public static PullResults pullKeys(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+        JsonNode node = pullUpdate(session, contact,"keys", since, time);
+        int statusCode = node.get("status").asInt();
+        if(statusCode == StatusCode.OK) {
+            return new PullResults(null, null, handleKeyNode(node, session.getUser().getLocalPassword()), node.get("notifiedUntil").asLong());
+        } else {
+            throw  new APIErrorException(statusCode);
+        }
+    }
+
+    public static PullResults pullAll(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
+        JsonNode node = pullUpdate(session, contact, "all", since, time);
+        int statusCode = node.get("status").asInt();
+        if(statusCode == StatusCode.OK) {
+            ArrayList<ECKey> keysArray = handleKeyNode(node, session.getUser().getLocalPassword());
+            ArrayList<CypherContact> contactsArray = handleContactNode(node);
+            ArrayList<CypherMessage> messagesArray = handeMessageNode(node, session.getUser().getKey(), contact.getKey());
+            long notifiedUntil = node.get("notifiedUntil").asLong();
+            return new PullResults(messagesArray, contactsArray, keysArray, notifiedUntil);
+        } else {
+            throw new APIErrorException(statusCode);
+        }
+    }
+
+    private static ArrayList<CypherMessage> handeMessageNode(JsonNode node, ECKey key1, ECKey key2) throws InvalidCipherTextException {
+        ArrayList<CypherMessage> array = new ArrayList<>();
             JsonNode arrayNode = node.get("messages");
             if (arrayNode.isArray()) {
                 for (JsonNode selectedNode : arrayNode) {
                     boolean isSender = selectedNode.get("isSender").asBoolean();
                     long receivedContactID = selectedNode.get("contactID").asLong();
+                    long timestamp = selectedNode.get("timestamp").asLong();
                     int messageID = selectedNode.get("messageID").asInt();
                     byte[] payload = Utils.BASE64_URL.decode(selectedNode.get("payload").asText());
-                    long timestamp = selectedNode.get("timestamp").asLong();
-                    byte[] sharedSecret = session.getUser().getKey().getSharedSecret(contact.getKey());
+                    byte[] sharedSecret = key1.getSharedSecret(key2);
                     String plainText = new String(Decrypt.process(sharedSecret, payload, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
 
                     CypherMessage message = new CypherMessage(messageID, plainText, timestamp, isSender, receivedContactID);
@@ -353,99 +398,38 @@ public final class SyncRequest {
                 }
             }
             return array;
-        } else {
-            throw new APIErrorException(statusCode);
-        }
     }
 
-    public static ArrayList<CypherContact> pullContacts(CypherSession session, boolean since, long time) throws IOException, APIErrorException{
-        JsonNode node = pullUpdate(session, null,"contacts", since, time);
-        int statusCode = node.get("status").asInt();
+    private static ArrayList<ECKey> handleKeyNode(JsonNode node, byte[] localPassword) throws InvalidCipherTextException {
+        ArrayList<ECKey> array = new ArrayList<>();
+            JsonNode arrayNode = node.get("keys");
+            if (arrayNode.isArray()) {
+                for (JsonNode selectedNode : arrayNode){
+                    ECKey newECKey = Utils.decodeKey(selectedNode.get("publicKey").asText(), selectedNode.get("privateKey").asText(), localPassword);
+                    newECKey.setTime(selectedNode.get("timestamp").asLong());
+                    array.add(newECKey);
+                }
+            }
+            return array;
+    }
+
+    private static ArrayList<CypherContact> handleContactNode(JsonNode node) {
         ArrayList<CypherContact> array = new ArrayList<>();
-        if(statusCode == StatusCode.OK) {
             JsonNode arrayNode = node.get("contacts");
             if (arrayNode.isArray()){
                 for (JsonNode selectedNode : arrayNode){
-                    String username = selectedNode.get("username").asText();
                     long receivedContactID = selectedNode.get("contactID").asLong();
+                    long timestamp = selectedNode.get("contactTimestamp").asLong();
+                    long keyTime = selectedNode.get("keyTimestamp").asLong();
+                    String username = selectedNode.get("username").asText();
                     String contactStatus = selectedNode.get("contactStatus").asText();
                     ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
-                    long timestamp = selectedNode.get("timestamp").asLong();
-                    long keyTime = selectedNode.get("keyTimestamp").asLong();
+
                     CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp);
                     array.add(newContact);
                 }
             }
             return array;
-        } else {
-            throw  new APIErrorException(statusCode);
-        }
-    }
-
-    public static ArrayList<ECKey> pullKeys(CypherSession session, CypherUser contact, String password, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
-        JsonNode node = pullUpdate(session, contact,"keys", since, time);
-        int statusCode = node.get("status").asInt();
-        ArrayList<ECKey> array = new ArrayList<ECKey>();
-        if(statusCode == StatusCode.OK) {
-            JsonNode arrayNode = node.get("keys");
-            if (arrayNode.isArray()){
-                for (JsonNode selectedNode : arrayNode){
-                    ECKey newECKey = Utils.decodeKey(selectedNode.get("publicKey").asText(), selectedNode.get("privateKey").asText(), password);
-                    newECKey.setTime(selectedNode.get("keyTimestamp").asLong());
-                    array.add(newECKey);
-                }
-            }
-            return array;
-        } else {
-            throw  new APIErrorException(statusCode);
-        }
-    }
-
-    public static PullResults pullAll(CypherSession session, CypherContact contact, String password, boolean since, long time) throws IOException, APIErrorException, InvalidCipherTextException {
-        JsonNode node = pullUpdate(session, contact,"all",since, time);
-        int statusCode = node.get("status").asInt();
-        ArrayList<ECKey> keysArray = new ArrayList<>();
-        ArrayList<CypherContact> contactsArray = new ArrayList<>();
-        ArrayList<CypherMessage> messagesArray = new ArrayList<>();
-
-        if(statusCode == StatusCode.OK) {
-            JsonNode keysNode = node.get("keys");
-            if (keysNode.isArray()){
-                for (JsonNode selectedNode : keysNode){
-                    ECKey newECKey = Utils.decodeKey(selectedNode.get("publicKey").asText(), selectedNode.get("privateKey").asText(), password);
-                    newECKey.setTime(selectedNode.get("keyTimestamp").asLong());
-                    keysArray.add(newECKey);
-                }
-            }
-            JsonNode contactsNode = node.get("contacts");
-            if (contactsNode.isArray()) {
-                for (JsonNode selectedNode : contactsNode){
-                    String username = selectedNode.get("username").asText();
-                    long receivedContactID = selectedNode.get("contactID").asLong();
-                    String contactStatus = selectedNode.get("contactStatus").asText();
-                    ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
-                    long timestamp = selectedNode.get("timestamp").asLong();
-                    long keyTime = selectedNode.get("keyTimestamp").asLong();
-                    CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp);
-                    contactsArray.add(newContact);
-                }
-            }
-            JsonNode messageNode = node.get("messages");
-            if (messageNode.isArray()) {
-                for (JsonNode selectedNode : messageNode) {
-                    boolean isSender = selectedNode.get("isSender").asBoolean();
-                    long receivedContactID = selectedNode.get("contactID").asLong();
-                    int messageID = selectedNode.get("messageID").asInt();
-                    byte[] payload = Utils.BASE64_URL.decode(selectedNode.get("payload").asText());
-                    long timestamp = selectedNode.get("timestamp").asLong();
-                    byte[] sharedSecret = session.getUser().getKey().getSharedSecret(contact.getKey());
-                    String plainText = new String(Decrypt.process(sharedSecret, payload, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
-                    CypherMessage message = new CypherMessage(messageID, plainText, timestamp, isSender, receivedContactID);
-                    messagesArray.add(message);
-                }
-            }
-        }
-        return new PullResults(messagesArray,contactsArray, keysArray, time);
     }
 
 

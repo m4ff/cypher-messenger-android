@@ -88,7 +88,7 @@ public class Utils {
         return true;
     }
     
-    public static ECKey decodeKey(String pub, String prv, String pass) throws InvalidCipherTextException {
+    public static ECKey decodeKey(String pub, String prv, byte[] pass) throws InvalidCipherTextException {
     	byte[] pubBytes = BASE64_URL.decode(pub);
     	byte[] prvBytes = null;
     	if(prv != null) {

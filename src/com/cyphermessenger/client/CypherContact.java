@@ -16,6 +16,4 @@ public class CypherContact extends CypherUser {
         this.contactTimestamp = timestamp;
     }
 
-
-
 }

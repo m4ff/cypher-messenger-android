@@ -29,6 +29,10 @@ public class PullResults {
         return contacts;
     }
 
+    public ArrayList<ECKey> getKeys() {
+        return keys;
+    }
+
     public long getNotifiedUntil() {
         return notifiedUntil;
     }

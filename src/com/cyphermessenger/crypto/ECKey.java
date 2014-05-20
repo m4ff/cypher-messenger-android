@@ -13,8 +13,10 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Date;
 
+import com.cyphermessenger.utils.Utils;
 import org.spongycastle.asn1.sec.SECNamedCurves;
 import org.spongycastle.asn1.x9.X9ECParameters;
 import org.spongycastle.crypto.AsymmetricCipherKeyPair;
@@ -134,5 +136,27 @@ public class ECKey {
     @SuppressWarnings("deprecation")
     private static ECPoint compressPoint(ECPoint uncompressed) {
         return new ECPoint.Fp(domainParams.getCurve(), uncompressed.getX(), uncompressed.getY(), true);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ECKey ecKey = (ECKey) o;
+
+        if (!Arrays.equals(getPublicKey(), ecKey.getPublicKey())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(getPublicKey());
+    }
+
+    @Override
+    public String toString() {
+        return Utils.BASE32.encode(getPublicKey());
     }
 }

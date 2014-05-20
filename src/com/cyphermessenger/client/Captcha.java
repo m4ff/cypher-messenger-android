@@ -15,6 +15,12 @@ public class Captcha {
     String captchaToken;
     byte[] captchaHash;
 
+    public Captcha(String captchaToken, byte[] captchaHash, byte[] captchaImage) {
+        this.captchaImage = captchaImage;
+        this.captchaToken = captchaToken;
+        this.captchaHash = captchaHash;
+    }
+
     public byte[] getCaptchaImage() {
         return captchaImage;
     }

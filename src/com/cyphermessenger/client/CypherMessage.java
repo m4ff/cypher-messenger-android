@@ -45,4 +45,28 @@ public class CypherMessage {
         return contactID;
     }
 
+    @Override
+    public String toString() {
+        return '"' + text + '"';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CypherMessage that = (CypherMessage) o;
+
+        if (contactID != that.contactID) return false;
+        if (messageID != that.messageID) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = messageID;
+        result = 31 * result + (int) (contactID ^ (contactID >>> 32));
+        return result;
+    }
 }
