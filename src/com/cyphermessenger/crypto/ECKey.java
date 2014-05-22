@@ -13,24 +13,28 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Date;
 
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.BasicAgreement;
-import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
-import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
-import org.bouncycastle.crypto.params.ECDomainParameters;
-import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
-import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.BigIntegers;
+import com.cyphermessenger.utils.Utils;
+import org.spongycastle.asn1.sec.SECNamedCurves;
+import org.spongycastle.asn1.x9.X9ECParameters;
+import org.spongycastle.crypto.AsymmetricCipherKeyPair;
+import org.spongycastle.crypto.BasicAgreement;
+import org.spongycastle.crypto.agreement.ECDHBasicAgreement;
+import org.spongycastle.crypto.generators.ECKeyPairGenerator;
+import org.spongycastle.crypto.params.ECDomainParameters;
+import org.spongycastle.crypto.params.ECKeyGenerationParameters;
+import org.spongycastle.crypto.params.ECPrivateKeyParameters;
+import org.spongycastle.crypto.params.ECPublicKeyParameters;
+import org.spongycastle.math.ec.ECPoint;
+import org.spongycastle.util.BigIntegers;
 
 public class ECKey {
 
     private byte[] priv;
     private byte[] pub;
+    private long time;
 
     private final ECPrivateKeyParameters privParams;
     private final ECPublicKeyParameters pubParams;
@@ -76,6 +80,11 @@ public class ECKey {
         pubParams = new ECPublicKeyParameters(pkey, domainParams);
     }
 
+    public ECKey(byte[] pubBytes, byte[] privBytes, long time) {
+        this(pubBytes, privBytes);
+        this.time = time;
+    }
+
     /**
      * Returns the encoded public key
      *
@@ -100,6 +109,11 @@ public class ECKey {
         return priv;
     }
 
+    public void setTime(long time) {
+        this.time = time;
+    }
+    public long getTime() { return time; }
+
     /**
      * Return the SHA-256 digest of the shared secret
      *
@@ -111,8 +125,6 @@ public class ECKey {
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
         BasicAgreement agr = new ECDHBasicAgreement();
@@ -124,5 +136,27 @@ public class ECKey {
     @SuppressWarnings("deprecation")
     private static ECPoint compressPoint(ECPoint uncompressed) {
         return new ECPoint.Fp(domainParams.getCurve(), uncompressed.getX(), uncompressed.getY(), true);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ECKey ecKey = (ECKey) o;
+
+        if (!Arrays.equals(getPublicKey(), ecKey.getPublicKey())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(getPublicKey());
+    }
+
+    @Override
+    public String toString() {
+        return Utils.BASE32.encode(getPublicKey());
     }
 }

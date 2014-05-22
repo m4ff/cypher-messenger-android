@@ -14,24 +14,25 @@ import com.cyphermessenger.crypto.ECKey;
  */
 public class CypherUser {
     String username;
-    String password;
+    byte[] localPassword;
+    byte[] serverPassword;
     long userID;
     long keyTime;
     ECKey key;
 
     
-    CypherUser(String username, String password, long userID, ECKey key, long keyTime) {
+    public CypherUser(String username, byte[] localPassword, byte[] serverPassword, long userID, ECKey key, long keyTime) {
         this.username = username;
-        this.password = password;
+        this.localPassword = localPassword;
+        this.serverPassword = serverPassword;
         this.userID = userID;
         this.key = key;
         this.keyTime = keyTime;
     }
 
-    CypherUser(String username, long userID, ECKey key, long keyTime) {
+    public CypherUser(String username, long userID, ECKey key, long keyTime) {
         this.username = username;
         this.userID = userID;
-        this.password = null;
         this.key = key;
         this.keyTime = keyTime;
     }
@@ -40,12 +41,16 @@ public class CypherUser {
         return key;
     }
     
-    public String getPassword() {
-        return password;
-    }
-    
     public String getUsername() {
         return username;
+    }
+
+    public byte[] getLocalPassword() {
+        return localPassword;
+    }
+
+    public byte[] getServerPassword() {
+        return serverPassword;
     }
 
     public long getUserID() {
@@ -56,4 +61,25 @@ public class CypherUser {
 		return keyTime;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CypherUser that = (CypherUser) o;
+
+        if (userID != that.userID) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (userID ^ (userID >>> 32));
+    }
+
+    @Override
+    public String toString() {
+        return "{ name: " + username + ", id: " + userID + " }";
+    }
 }

@@ -12,11 +12,11 @@ package com.cyphermessenger.crypto;
 
 import com.cyphermessenger.utils.Utils;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.modes.GCMBlockCipher;
-import org.bouncycastle.crypto.params.AEADParameters;
-import org.bouncycastle.crypto.params.KeyParameter;
+import org.spongycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.crypto.engines.AESEngine;
+import org.spongycastle.crypto.modes.GCMBlockCipher;
+import org.spongycastle.crypto.params.AEADParameters;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.security.SecureRandom;
 
@@ -35,7 +35,7 @@ public class Encrypt extends Encryption {
     }
 
     public Encrypt(String key) {
-        this(key.getBytes());
+        this(Utils.sha256(key));
     }
 
     /**
@@ -45,10 +45,10 @@ public class Encrypt extends Encryption {
      * @param key  Encryption key
      * @param text Plaintext to be encrypted
      * @param aad  Additional authenticated data
-     * @return Returns the ciphertext
+     * @return Returns the cipher text
      */
     public static byte[] process(byte[] key, byte[] text, byte[]... aad) throws InvalidCipherTextException {
-        return oneStepDecryption(key, text, aad);
+        return oneStepEncryption(key, text, aad);
     }
 
     /**
@@ -58,13 +58,13 @@ public class Encrypt extends Encryption {
      * @param key  Encryption plain password
      * @param text Plaintext to be encrypted
      * @param aad  Additional authenticated data
-     * @return Returns the ciphertext
+     * @return Returns the cipher text
      */
     public static byte[] process(String key, byte[] text, byte[]... aad) throws InvalidCipherTextException {
-        return oneStepDecryption(Utils.sha256(key), text, aad);
+        return oneStepEncryption(Utils.sha256(key), text, aad);
     }
 
-    private static byte[] oneStepDecryption(byte[] key, byte[] text, byte[] aad[]) throws InvalidCipherTextException {
+    private static byte[] oneStepEncryption(byte[] key, byte[] text, byte[] aad[]) throws InvalidCipherTextException {
         Encrypt encrypt = new Encrypt(key);
         for (int i = 0; i < aad.length; i++) {
             encrypt.updateAuthenticatedData(aad[i]);

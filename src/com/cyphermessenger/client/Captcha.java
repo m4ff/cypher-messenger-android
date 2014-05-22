@@ -6,14 +6,20 @@
 
 package com.cyphermessenger.client;
 
-import java.util.Arrays;
-
 import com.cyphermessenger.utils.Utils;
+
+import java.util.Arrays;
 
 public class Captcha {
     byte[] captchaImage;
     String captchaToken;
     byte[] captchaHash;
+
+    public Captcha(String captchaToken, byte[] captchaHash, byte[] captchaImage) {
+        this.captchaImage = captchaImage;
+        this.captchaToken = captchaToken;
+        this.captchaHash = captchaHash;
+    }
 
     public byte[] getCaptchaImage() {
         return captchaImage;

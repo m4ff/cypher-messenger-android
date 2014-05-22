@@ -6,38 +6,67 @@
 
 package com.cyphermessenger.client;
 
-import java.security.Timestamp;
-
 /**
  *
  * @author halfblood
  */
 public class CypherMessage {
     private int messageID;
-    private byte[] payload;
-    private Timestamp timestamp;
+    private String text;
+    private long timestamp;
+    private boolean isSender;
+    private long contactID;
+
+    public CypherMessage(int messageID, String payload, long timestamp, boolean isSender, long contactID) {
+        this.messageID = messageID;
+        this.text = payload;
+        this.timestamp = timestamp;
+        this.isSender = isSender;
+        this.contactID = contactID;
+    }
 
     public int getMessageID() {
         return messageID;
     }
 
-    public void setCaptchaImage(int messageID) {
-        this.messageID = messageID;
+    public String getText() {
+        return text;
     }
 
-    public byte[] getPayload() {
-        return payload;
-    }
-
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
-
-    public Timestamp getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public long getContactID() {
+        return contactID;
+    }
+
+    @Override
+    public String toString() {
+        return '"' + text + '"';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CypherMessage that = (CypherMessage) o;
+
+        if (contactID != that.contactID) return false;
+        if (messageID != that.messageID) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = messageID;
+        result = 31 * result + (int) (contactID ^ (contactID >>> 32));
+        return result;
     }
 }

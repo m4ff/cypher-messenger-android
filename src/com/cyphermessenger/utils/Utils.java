@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +20,7 @@ import java.security.SecureRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.crypto.InvalidCipherTextException;
 
 /**
  *
@@ -68,7 +69,6 @@ public class Utils {
         for(; i < SALT_LEN; i++) {
             salt[i] = 0;
         }
-        RANDOM.nextBytes(salt);
         byte[] hash = scrypt_1024_4_2(b, salt);
         byte[] ret = new byte[HASH_LEN + SALT_LEN];
         System.arraycopy(hash, 0, ret, 0, HASH_LEN);
@@ -88,7 +88,7 @@ public class Utils {
         return true;
     }
     
-    public static ECKey decodeKey(String pub, String prv, String pass) throws InvalidCipherTextException {
+    public static ECKey decodeKey(String pub, String prv, byte[] pass) throws InvalidCipherTextException {
     	byte[] pubBytes = BASE64_URL.decode(pub);
     	byte[] prvBytes = null;
     	if(prv != null) {
@@ -103,6 +103,33 @@ public class Utils {
     	} catch(InvalidCipherTextException ex) {
     		throw new RuntimeException(ex);
     	}
+    }
+
+
+    public static int randomInt() {
+        byte[] bytes = new byte[4];
+        RANDOM.nextBytes(bytes);
+        return new BigInteger(bytes).intValue();
+    }
+
+    public static long randomLong() {
+        byte[] bytes = new byte[8];
+        RANDOM.nextBytes(bytes);
+        return new BigInteger(bytes).longValue();
+    }
+
+    public static byte[] randomBytes(int size) {
+        byte[] bytes = new byte[size];
+        RANDOM.nextBytes(bytes);
+        return bytes;
+    }
+
+    public static byte[] longToBytes(long a) {
+        return BigInteger.valueOf(a).toByteArray();
+    }
+
+    public static long bytesToLong(byte[] b) {
+        return new BigInteger(b).longValue();
     }
     
     public static void main(String args[]) {

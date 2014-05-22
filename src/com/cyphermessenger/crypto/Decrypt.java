@@ -7,11 +7,12 @@ package com.cyphermessenger.crypto;
 
 import com.cyphermessenger.utils.Utils;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.modes.GCMBlockCipher;
-import org.bouncycastle.crypto.params.AEADParameters;
-import org.bouncycastle.crypto.params.KeyParameter;
+import org.spongycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.crypto.engines.AESEngine;
+import org.spongycastle.crypto.modes.GCMBlockCipher;
+import org.spongycastle.crypto.params.AEADParameters;
+import org.spongycastle.crypto.params.KeyParameter;
+
 
 import java.util.Arrays;
 
@@ -61,7 +62,7 @@ public class Decrypt extends Encryption {
     private static byte[] oneStepDecryption(byte[] key, byte[] cipherText, byte[] aad[]) throws InvalidCipherTextException {
         byte[] iv = Arrays.copyOf(cipherText, IV_LENGTH);
         byte[] onlyCypherText = Arrays.copyOfRange(cipherText, IV_LENGTH, cipherText.length);
-        Decrypt decrypt = new Decrypt(Utils.sha256(key), iv);
+        Decrypt decrypt = new Decrypt(key, iv);
         for (int i = 0; i < aad.length; i++) {
             decrypt.updateAuthenticatedData(aad[i]);
         }
