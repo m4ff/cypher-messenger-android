@@ -1,17 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.cyphermessenger.ContactsActivity" >
-    
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="always" />
 
-    <item android:id="@+id/action_search"
-        android:title="@string/action_search"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_action_search" />
+    <item
+        android:id="@+id/action_add_contact"
+        android:title="@string/add_contact_menu_icon"
+        android:icon="@drawable/ic_action_add_person"
+        android:showAsAction="collapseActionView|always" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_action_overflow"
+        android:showAsAction="ifRoom" />
+
 
 </menu>

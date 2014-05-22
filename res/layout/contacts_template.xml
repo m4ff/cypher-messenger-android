@@ -13,8 +13,9 @@
         android:layout_height="wrap_content"
         android:maxWidth="120dp"
         android:maxHeight="120dp"
-        android:padding="10dp" />
-
+        android:padding="10dp"
+        android:src="@drawable/ic_action_person" />
+    <!--
     <LinearLayout
         android:id="@+id/contact_text_layout"
         android:layout_width="wrap_content"
@@ -34,11 +35,16 @@
             android:editable="false" />
 
     </LinearLayout>
-
+    -->
     <TextView
         android:id="@+id/contact_last_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:includeFontPadding="true"
+        android:layout_gravity="center"
+        android:fontFamily="Arial|sans-serif"
+        android:textColor="@android:color/black"
+        android:padding="10dp"
         android:editable="false" />
 
 </LinearLayout>

@@ -13,9 +13,9 @@
         android:layout_height="wrap_content"
         android:maxWidth="120dp"
         android:maxHeight="120dp"
-        android:src="@drawable/avatar_1"
-        android:padding="10dp" />
-
+        android:padding="10dp"
+        android:src="@drawable/ic_action_person" />
+    <!--
     <LinearLayout
         android:id="@+id/conversation_text_column"
         android:layout_width="wrap_content"
@@ -35,11 +35,14 @@
             android:editable="false" />
 
     </LinearLayout>
-
+    -->
     <TextView
         android:id="@+id/conversation_last_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:includeFontPadding="true"
+        android:layout_gravity="center"
+        android:padding="10dp"
         android:editable="false" />
 
 </LinearLayout>

@@ -22,12 +22,14 @@
     <string name="contacts_activity_name">Contacts</string>
     <string name="conversations_activity_name">Chat</string>
     <string name="title_activity_messages">Messages</string>
+    <string name="add_contact_menu_icon">Add Contact</string>
     <string name="add_contact_name_hint">Insert contact name</string>
     <string name="add_contact_search_view_title">Search</string>
     <string name="add_contact_activity_title">SearchCypheredUser</string>
-    <string name="alert_text">Would you add this contact to your library?</string>
-    <string name="alert_button_add">ADD</string>
-    <string name="alert_button_cancel">CANCEL</string>
+    <string name="alert_text">Contact successfully added</string>
+    <string name="alert_title">Add a Contact</string>
+    <string name="alert_button_add">add</string>
+    <string name="alert_button_cancel">cancel</string>
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
