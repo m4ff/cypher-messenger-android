@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.cyphermessenger.sqlite.Contact;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 import org.w3c.dom.Text;
 

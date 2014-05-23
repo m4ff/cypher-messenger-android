@@ -136,7 +136,7 @@ public class ContentManager {
             public void run() {
                 try {
                     CypherUser user = SyncRequest.registerUser(username, password, captchaValue, captcha);
-                    dbManager.addUser(user);
+                    dbManager.setUser(user);
                     CypherSession _session = SyncRequest.userLogin(username, password);
                     dbManager.setSession(_session);
                     session = _session;
@@ -184,13 +184,13 @@ public class ContentManager {
             }
         });
         addThread(th);
-        dbManager.logout(session.getUser(), deleteData);
+        dbManager.logout();
         session = null;
     }
 
 
     public List<CypherMessage> getMessageList(CypherUser contact) {
-        return dbManager.getMessages(session.getUser(), contact);
+        return dbManager.getMessages(contact);
     }
 
     public void sendMessage(final CypherUser contact, final String text) {
@@ -199,7 +199,7 @@ public class ContentManager {
             public void run() {
                 try {
                     CypherMessage msg = SyncRequest.sendMessage(session, contact, text);
-                    dbManager.insertMessage(session.getUser(), msg);
+                    dbManager.insertMessage(msg);
                     contentListener.onMessageSent(msg);
                 } catch (Exception e) {
                     handleException(e);
@@ -230,7 +230,7 @@ public class ContentManager {
             public void run() {
                 try {
                     CypherContact contact = SyncRequest.addContact(session, username);
-                    dbManager.insertContact(session.getUser(), contact);
+                    dbManager.insertContact(contact);
                     contentListener.onContactChange(contact);
                 } catch (Exception e) {
                     handleException(e);
@@ -246,7 +246,7 @@ public class ContentManager {
             public void run() {
                 try {
                     CypherContact contact = SyncRequest.blockContact(session, username);
-                    dbManager.insertContact(session.getUser(), contact);
+                    dbManager.insertContact(contact);
                     contentListener.onContactChange(contact);
                 } catch (Exception e) {
                     handleException(e);
@@ -260,20 +260,20 @@ public class ContentManager {
         if(res.getKeys() != null) {
             contentListener.onPullKeys(res.getKeys());
             for(ECKey k : res.getKeys()) {
-                dbManager.insertKey(session.getUser(), k);
+                dbManager.insertKey(k);
             }
         } else if(res.getContacts() != null) {
             contentListener.onPullContacts(res.getContacts());
             for(CypherContact c : res.getContacts()) {
-                dbManager.insertContact(session.getUser(), c);
+                dbManager.insertContact(c);
             }
         } else if(res.getMessages() != null) {
             contentListener.onPullMessages(res.getMessages());
             for(CypherMessage m : res.getMessages()) {
-                dbManager.insertMessage(session.getUser(), m);
+                dbManager.insertMessage(m);
             }
         }
-        dbManager.setNotifiedUntil(session.getUser(), res.getNotifiedUntil());
+        dbManager.setNotifiedUntil(res.getNotifiedUntil());
     }
 
     public void pullMessages(final CypherUser contact, final boolean since, final long time) {
@@ -338,6 +338,6 @@ public class ContentManager {
 
 
     public List<CypherContact> getContactList(CypherSession session) {
-        return dbManager.getContacts(session.getUser());
+        return dbManager.getContacts();
     }
 }

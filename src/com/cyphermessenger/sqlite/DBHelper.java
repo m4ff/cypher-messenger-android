@@ -39,8 +39,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // MESSAGES COLUMNS
     public static final String COLUMN_MESSAGE_ID = "messageID";
-    public static final String COLUMN_MESSAGE_SENDER = "sender";
-    public static final String COLUMN_MESSAGE_RECEIVER = "receiver";
+    public static final String COLUMN_MESSAGE_IS_SENDER = "isSender";
+    public static final String COLUMN_MESSAGE_CONTACT_ID = "contactID";
     public static final String COLUMN_MESSAGE_TEXT = "text";
     public static final String COLUMN_MESSAGE_SENT = "sent";
     public static final String COLUMN_MESSAGE_DATE_TIME = "timestamp";
@@ -70,8 +70,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_CREATE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "("
             + COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY, "
-            + COLUMN_MESSAGE_SENDER + " INTEGER NOT NULL, "
-            + COLUMN_MESSAGE_RECEIVER + " INTEGER NOT NULL, "
+            + COLUMN_MESSAGE_IS_SENDER + " INTEGER NOT NULL, "
+            + COLUMN_MESSAGE_CONTACT_ID + " INTEGER NOT NULL, "
             + COLUMN_MESSAGE_TEXT + " TEXT NOT NULL, "
             + COLUMN_MESSAGE_SENT + " INTEGER DEFAULT 0, "
             + COLUMN_MESSAGE_DATE_TIME + " INTEGER NOT NULL);";

@@ -2,10 +2,15 @@ package com.cyphermessenger.sqlite;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.cyphermessenger.client.*;
 import com.cyphermessenger.crypto.ECKey;
+
+import java.util.List;
+
 /**
  * Created by Pier DAgostino on 08/04/14.
  */
@@ -26,75 +31,89 @@ public class DBManagerAndroidImpl implements DBManager {
     }
 
     @Override
-    public void insertUser(User user) {
+    public void setUser(CypherUser user) {
         SQLiteDatabase db = openHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_USER_NAME, user.getUserName());
-        values.put(DBHelper.COLUMN_USER_PASSWORD, user.getPassword());
-        values.put(DBHelper.COLUMN_USER_AVATAR, user.getAvatar());
-        db.insert(DBHelper.TABLE_USERS, null, values);
-        db.close();
+        ContentValues val = new ContentValues();
+        val.put(DBHelper.COLUMN_USER_ID, user.getUserID());
+        val.put(DBHelper.COLUMN_USER_NAME, user.getUsername());
+        val.put(DBHelper.COLUMN_LOCAL_PASSWORD, user.getLocalPassword());
+        val.put(DBHelper.COLUMN_SERVER_PASSWORD, user.getServerPassword());
+        db.replace(DBHelper.TABLE_USERS, null, val);
     }
 
     @Override
-    public void insertContact(User user, Contact contact) {
+    public void setSession(CypherSession session) {
+    }
+
+    @Override
+    public void insertContact(CypherContact contact) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        ContentValues val = new ContentValues();
+        val.put(DBHelper.COLUMN_CONTACT_ID , contact.getUserID());
+        val.put(DBHelper.COLUMN_CONTACT_NAME, contact.getUsername());
+        val.put(DBHelper.COLUMN_CONTACT_STATUS, contact.getStatus());
+        db.replace(DBHelper.TABLE_CONTACTS, null, val);
+    }
+
+    @Override
+    public void insertMessage(CypherMessage msg) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        ContentValues val = new ContentValues();
+        val.put(DBHelper.COLUMN_MESSAGE_ID, msg.getMessageID());
+        val.put(DBHelper.COLUMN_MESSAGE_TEXT, msg.getText());
+        val.put(DBHelper.COLUMN_MESSAGE_DATE_TIME, msg.getTimestamp());
+        val.put(DBHelper.COLUMN_MESSAGE_IS_SENDER, msg.isSender());
+        val.put(DBHelper.COLUMN_MESSAGE_CONTACT_ID, msg.getContactID());
+        db.replace(DBHelper.TABLE_MESSAGES, null, val);
+    }
+
+    @Override
+    public void insertKey(ECKey key) {
 
     }
 
     @Override
-    public void deleteContact(User contact, Contact contact2) {
+    public void setNotifiedUntil(long timestamp) {
 
-    }
-
-
-    public void deleteUser(User user) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        db.delete(DBHelper.TABLE_USERS, DBHelper.COLUMN_USER_NAME + "=?",new String[]{"" + user.getUserName()});
-        db.close();
-    }
-
-    public void insertContact(Contact contact) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_CONTACT_NAME, contact.getName());
-        values.put(DBHelper.COLUMN_CONTACT_AVATAR, contact.getAvatar());
-        db.insert(DBHelper.TABLE_CONTACTS, null, values);
-        db.close();
-    }
-
-    public void deleteContact(Contact contact) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        db.delete(DBHelper.TABLE_CONTACTS, DBHelper.COLUMN_CONTACT_NAME + "=?", new String[]{"" + contact.getName()});
-        db.close();
-    }
-
-    public void insertKey(User user, ECKey key) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_KEY_USER, user.getUserName());
-        values.put(DBHelper.COLUMN_KEY_PUBLIC, key.getPublicKey());
-        values.put(DBHelper.COLUMN_KEY_PRIVATE, key.getPrivateKey());
-        db.insert(DBHelper.TABLE_KEYS, null, values);
-        db.close();
     }
 
     @Override
-    public void insertMessage(User user, Contact contact, Messages msg) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DBHelper.COLUMN_MESSAGES_ID, msg.getId());
-        values.put(DBHelper.COLUMN_MESSAGES_SENDER, user.getUserName());
-        values.put(DBHelper.COLUMN_MESSAGES_RECEIVER, contact.getName());
-        values.put(DBHelper.COLUMN_MESSAGES_TEXT, msg.getText());
-        values.put(DBHelper.COLUMN_MESSAGES_SENT, msg.isSent());
-        db.insert(DBHelper.TABLE_MESSAGES, null, values);
-        db.close();
+    public void setMessageSent(CypherMessage msg) {
+
     }
 
     @Override
-    public void deleteMessage(Messages msg) {
-        SQLiteDatabase db = openHelper.getWritableDatabase();
-        db.delete(DBHelper.TABLE_MESSAGES, DBHelper.COLUMN_MESSAGES_ID + "=?", new String[]{"" + msg.getId()});
-        db.close();
+    public CypherSession getSession() {
+        return null;
+    }
+
+    @Override
+    public CypherUser getUser() {
+        return null;
+    }
+
+    @Override
+    public ECKey getKeyForTime(long time) {
+        return null;
+    }
+
+    @Override
+    public List<CypherMessage> getMessages(CypherUser contact) {
+        return null;
+    }
+
+    @Override
+    public List<CypherContact> getContacts() {
+        return null;
+    }
+
+    @Override
+    public void logout() {
+        //TRUNCATE TABLE ...
+    }
+
+    @Override
+    public void deleteContact(CypherUser contact) {
+
     }
 }

@@ -1,5 +1,7 @@
 package com.cyphermessenger.client;
 
+import com.cyphermessenger.crypto.ECKey;
+
 import java.util.List;
 
 /**
@@ -20,17 +22,23 @@ class BasicContentListener implements ContentListener {
     }
 
     @Override
-    public void onCaptcha(Captcha captcha) {
+    public void onPullMessages(List<CypherMessage> messages) {
 
     }
 
     @Override
-    public void onError(int statusCode) {
-        switch (statusCode) {
-            case StatusCode.SESSION_EXPIRED:
-            case StatusCode.SESSION_INVALID:
-                // retry
-        }
+    public void onPullContacts(List<CypherContact> contacts) {
+
+    }
+
+    @Override
+    public void onPullKeys(List<ECKey> keys) {
+
+    }
+
+    @Override
+    public void onCaptcha(Captcha captcha) {
+
     }
 
     @Override
@@ -40,6 +48,56 @@ class BasicContentListener implements ContentListener {
 
     @Override
     public void onContactChange(CypherContact contact) {
+
+    }
+
+    @Override
+    public void onServerError() {
+
+    }
+
+    @Override
+    public void onSessionInvalid() {
+
+    }
+
+    @Override
+    public void onCaptchaInvalid() {
+
+    }
+
+    @Override
+    public void onUsernameTaken() {
+
+    }
+
+    @Override
+    public void onUsernameNotFound() {
+
+    }
+
+    @Override
+    public void onLoginInvalid() {
+
+    }
+
+    @Override
+    public void onContactNotFound() {
+
+    }
+
+    @Override
+    public void onContactWaiting() {
+
+    }
+
+    @Override
+    public void onContactBlocked() {
+
+    }
+
+    @Override
+    public void onContactDenied() {
 
     }
 }
