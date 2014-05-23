@@ -16,12 +16,12 @@ public class CypherUser {
     String username;
     byte[] localPassword;
     byte[] serverPassword;
-    long userID;
-    long keyTime;
+    Long userID;
+    Long keyTime;
     ECKey key;
 
     
-    public CypherUser(String username, byte[] localPassword, byte[] serverPassword, long userID, ECKey key, long keyTime) {
+    public CypherUser(String username, byte[] localPassword, byte[] serverPassword, Long userID, ECKey key, Long keyTime) {
         this.username = username;
         this.localPassword = localPassword;
         this.serverPassword = serverPassword;
@@ -30,7 +30,7 @@ public class CypherUser {
         this.keyTime = keyTime;
     }
 
-    public CypherUser(String username, long userID, ECKey key, long keyTime) {
+    public CypherUser(String username, Long userID, ECKey key, Long keyTime) {
         this.username = username;
         this.userID = userID;
         this.key = key;
@@ -53,29 +53,29 @@ public class CypherUser {
         return serverPassword;
     }
 
-    public long getUserID() {
+    public Long getUserID() {
         return userID;
     }
 
-	public long getKeyTime() {
+	public Long getKeyTime() {
 		return keyTime;
 	}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof CypherUser)) return false;
 
         CypherUser that = (CypherUser) o;
 
-        if (userID != that.userID) return false;
+        if (!username.equals(that.username)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return (int) (userID ^ (userID >>> 32));
+        return username.hashCode();
     }
 
     @Override

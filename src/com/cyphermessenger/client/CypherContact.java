@@ -7,13 +7,30 @@ import com.cyphermessenger.crypto.ECKey;
  */
 public class CypherContact extends CypherUser {
 
-    String status;
-    long contactTimestamp;
+    public static final String ACCEPTED = "accepted";
+    public static final String WAITING = "waiting";
+    public static final String BLOCKED = "blocked";
+    public static final String DENIED = "denied";
 
-    public CypherContact(String username, long userID, ECKey key, long keyTime, String status, long timestamp) {
+    String status;
+    Long contactTimestamp;
+
+    public CypherContact(String username, Long userID, ECKey key, Long keyTime, String status, Long timestamp) {
         super(username, userID, key, keyTime);
         this.status = status;
         this.contactTimestamp = timestamp;
     }
 
+    public CypherContact(String username, String status) {
+        super(username, null, null, null);
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Long getContactTimestamp() {
+        return contactTimestamp;
+    }
 }
