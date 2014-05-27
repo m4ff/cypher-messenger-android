@@ -5,19 +5,30 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.cyphermessenger.R;
+import com.cyphermessenger.client.ContentManager;
+import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
 public class MainActivity extends ActionBarActivity {
+
+    /** TODO
+     * RegistrationActivity: back button
+     * LoginActiviti: spostare bottoni in alto
+     */
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if(true){
-            final Intent login = new Intent(this, LoginActivity.class);
+        ContentManager contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this));
+        if(contentManager.getUser() == null) {
+            Intent login = new Intent(this, LoginActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(login);
+            finish();
+        } else {
+            Intent logged = new Intent(this, ContactsActivity.class);
+            logged.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(logged);
             finish();
         }
     }

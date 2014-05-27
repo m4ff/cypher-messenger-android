@@ -38,7 +38,7 @@ class BasicContentListener implements ContentListener {
 
     @Override
     public void onGetMessages(List<CypherMessage> messages) {
-        
+
     }
 
     @Override
