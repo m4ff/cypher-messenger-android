@@ -1,4 +1,4 @@
-package com.cyphermessenger;
+package com.cyphermessenger.android;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import com.cyphermessenger.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

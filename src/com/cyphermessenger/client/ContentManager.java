@@ -340,6 +340,19 @@ public class ContentManager {
         addThread(th);
     }
 
+    public void getMessages(final CypherUser user, final int offset, final int limit) {
+        Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<CypherMessage> messages = dbManager.getMessages(user, offset, limit);
+                if(messages.size() < limit) {
+
+                }
+            }
+        });
+        addThread(th);
+    }
+
 
     public List<CypherContact> getContactList(CypherSession session) {
         return dbManager.getContacts();

@@ -37,6 +37,11 @@ class BasicContentListener implements ContentListener {
     }
 
     @Override
+    public void onGetMessages(List<CypherMessage> messages) {
+        
+    }
+
+    @Override
     public void onCaptcha(Captcha captcha) {
 
     }

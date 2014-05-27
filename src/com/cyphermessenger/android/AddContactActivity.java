@@ -1,4 +1,4 @@
-package com.cyphermessenger;
+package com.cyphermessenger.android;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.cyphermessenger.R;
 
 import java.util.LinkedList;
 

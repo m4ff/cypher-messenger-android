@@ -19,6 +19,8 @@ public interface ContentListener {
 
     public void onPullKeys(List<ECKey> keys, long notifiedUntil);
 
+    public void onGetMessages(List<CypherMessage> messages);
+
     public void onCaptcha(Captcha captcha);
 
     public void onFindUser(List<String> list);

@@ -1,21 +1,17 @@
-package com.cyphermessenger;
+package com.cyphermessenger.android;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.cyphermessenger.R;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
-import org.w3c.dom.Text;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
 public class ContactsActivity extends Activity {
