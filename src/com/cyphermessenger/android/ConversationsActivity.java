@@ -12,8 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.cyphermessenger.R;
 
+import com.cyphermessenger.R;
 
 import java.util.Iterator;
 import java.util.LinkedList;

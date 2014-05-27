@@ -158,6 +158,11 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     }
 
     @Override
+    public void onGetMessages(List<CypherMessage> messages) {
+
+    }
+
+    @Override
     public void onLogged(CypherUser user) {}
     @Override
     public void onMessageSent(CypherMessage message) {}

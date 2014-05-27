@@ -448,7 +448,6 @@ public final class SyncRequest {
         out.write(c.getCaptchaImage());
         out.close();
         String captchaVal = new Scanner(System.in).nextLine();
-
         CypherUser user = registerUser("paolo", "password", captchaVal, c);
         CypherSession session = userLogin("paolo", "password");
 

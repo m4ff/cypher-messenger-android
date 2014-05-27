@@ -15,7 +15,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         if(true){
-            final Intent login = new Intent(this, ContactsActivity.class);
+            final Intent login = new Intent(this, LoginActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(login);
             finish();

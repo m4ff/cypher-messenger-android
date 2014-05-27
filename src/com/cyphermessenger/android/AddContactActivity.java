@@ -92,6 +92,12 @@ public class AddContactActivity extends Activity {
             //use the query to search your data somehow
 
             contacts.addLast(query);
+            contacts.addLast("pippo91");
+            contacts.addLast("pippo74");
+            contacts.addLast("pippo53");
+            contacts.addLast("pippoGoofy");
+            contacts.addLast("pippo90");
+            contacts.addLast("pippoFoo");
             addContactList.setAdapter(contactsAdapter);
 
             final AddContactActivity that = this;
@@ -115,7 +121,6 @@ public class AddContactActivity extends Activity {
         // TODO SOME WORK
         Toast t = new Toast(getApplicationContext());
         t.makeText(getApplicationContext(), R.string.alert_text, Toast.LENGTH_LONG).show();
-
         finishActivity(RESULT_OK);
     }
 }

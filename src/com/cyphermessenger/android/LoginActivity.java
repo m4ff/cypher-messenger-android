@@ -1,19 +1,20 @@
 package com.cyphermessenger.android;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import com.cyphermessenger.R;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -34,13 +35,15 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
 
-        final Intent conversIntent = new Intent(this, ConversationsActivity.class);
+        final Intent contactIntent = new Intent(this, ContactsActivity.class);
         final Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                conversIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(conversIntent);
+                Toast t = new Toast(getApplicationContext());
+                t.makeText(getApplicationContext(), R.string.login_toast_success, Toast.LENGTH_SHORT);
+                contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(contactIntent);
                 finish();
             }
         });

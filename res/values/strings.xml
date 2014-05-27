@@ -10,6 +10,8 @@
     <!-- LOGIN and REGISTRATION STRINGS -->
     <string name="login_activity_name">Login</string>
     <string name="registration_activity_name">Register</string>
+    <string name="login_toast_success">Login success</string>
+    <string name="login_toast_failed">Login failed</string>
     <string name="button_login">Login</string>
     <string name="button_register_login">Register now</string>
     <string name="button_register_registration">DONE</string>
