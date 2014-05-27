@@ -2,6 +2,7 @@ package com.cyphermessenger.client;
 
 
 import com.cyphermessenger.crypto.ECKey;
+import org.apache.http.impl.entity.StrictContentLengthStrategy;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ContentManager {
+
     private static ContentManager contentManager;
     private final DBManager dbManager;
     private ContentListener contentListener;
@@ -44,6 +46,19 @@ public class ContentManager {
         }
     }
 
+    public void waitForAllRequests(long millis) throws InterruptedException {
+        synchronized (activeThreads) {
+            Iterator<Thread> i = activeThreads.iterator();
+            while (i.hasNext()) {
+                Thread th = i.next();
+                if (th.isAlive()) {
+                    th.join(millis);
+                }
+                i.remove();
+            }
+        }
+    }
+
     private void addThread(Thread thread) {
         thread.start();
         synchronized (activeThreads) {
@@ -67,23 +82,6 @@ public class ContentManager {
     public CypherSession getSession() {
         return session;
     }
-    /*
-    private boolean handleSessionRestore(int statusCode) {
-        if(statusCode == StatusCode.SESSION_EXPIRED || statusCode == StatusCode.SESSION_INVALID) {
-            try {
-                CypherSession _session = SyncRequest.userLogin(session.getUser());
-                session = _session;
-                return true;
-            } catch (IOException e) {
-                return false;
-            } catch (APIErrorException e) {
-                e.printStackTrace();
-            }
-        } else {
-            return false;
-        }
-    }
-    */
 
     private void handleException(Exception e) {
         if(e.getClass() == IOException.class) {
@@ -190,7 +188,7 @@ public class ContentManager {
 
 
     public List<CypherMessage> getMessageList(CypherUser contact) {
-        return dbManager.getMessages(contact);
+        return dbManager.getMessages(contact, 0, 100);
     }
 
     public void sendMessage(final CypherUser contact, final String text) {
@@ -256,24 +254,28 @@ public class ContentManager {
         addThread(th);
     }
 
+    public CypherContact getContactByID(long id) {
+        return dbManager.getContactByID(id);
+    }
+
     private void handlePullResults(PullResults res) {
+        long notifiedUntil = res.getNotifiedUntil();
         if(res.getKeys() != null) {
-            contentListener.onPullKeys(res.getKeys());
+            contentListener.onPullKeys(res.getKeys(), notifiedUntil);
             for(ECKey k : res.getKeys()) {
-                dbManager.insertKey(k);
+                dbManager.insertKey(session.getUser(), k);
             }
         } else if(res.getContacts() != null) {
-            contentListener.onPullContacts(res.getContacts());
+            contentListener.onPullContacts(res.getContacts(), notifiedUntil);
             for(CypherContact c : res.getContacts()) {
                 dbManager.insertContact(c);
             }
         } else if(res.getMessages() != null) {
-            contentListener.onPullMessages(res.getMessages());
+            contentListener.onPullMessages(res.getMessages(), notifiedUntil);
             for(CypherMessage m : res.getMessages()) {
                 dbManager.insertMessage(m);
             }
         }
-        dbManager.setNotifiedUntil(res.getNotifiedUntil());
     }
 
     public void pullMessages(final CypherUser contact, final boolean since, final long time) {
@@ -306,12 +308,12 @@ public class ContentManager {
         addThread(th);
     }
 
-    public void pullKeys(final CypherUser contact, final boolean since, final long time) {
+    public void pullKeys(final CypherUser user, final boolean since, final long time) {
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    PullResults res = SyncRequest.pullKeys(session, contact, since, time);
+                    PullResults res = SyncRequest.pullKeys(session, user, since, time);
                     handlePullResults(res);
                 } catch(Exception e) {
                     handleException(e);
@@ -321,12 +323,14 @@ public class ContentManager {
         addThread(th);
     }
 
-    public void pullAll(final CypherUser contact, final boolean since, final long time) {
+    public void pullAll() {
+        final long since = dbManager.getLastUpdateTime();
+        dbManager.setLastUpdateTime(System.currentTimeMillis());
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    PullResults res = SyncRequest.pullAll(session, contact, since, time);
+                    PullResults res = SyncRequest.pullAll(session, null, true, since);
                     handlePullResults(res);
                 } catch(Exception e) {
                     handleException(e);

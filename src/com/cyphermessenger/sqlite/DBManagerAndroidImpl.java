@@ -43,6 +43,11 @@ public class DBManagerAndroidImpl implements DBManager {
 
     @Override
     public void setSession(CypherSession session) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        ContentValues val = new ContentValues();
+        /** TODO
+         * continua
+         */
     }
 
     @Override
@@ -68,13 +73,23 @@ public class DBManagerAndroidImpl implements DBManager {
     }
 
     @Override
-    public void insertKey(ECKey key) {
+    public void insertKey(CypherUser user, ECKey key) {
 
     }
 
     @Override
-    public void setNotifiedUntil(long timestamp) {
+    public void setLastUpdateTime(long time) {
 
+    }
+
+    @Override
+    public long getLastUpdateTime() {
+        return 0;
+    }
+
+    @Override
+    public CypherContact getContactByID(long id) {
+        return null;
     }
 
     @Override
@@ -98,7 +113,7 @@ public class DBManagerAndroidImpl implements DBManager {
     }
 
     @Override
-    public List<CypherMessage> getMessages(CypherUser contact) {
+    public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit) {
         return null;
     }
 

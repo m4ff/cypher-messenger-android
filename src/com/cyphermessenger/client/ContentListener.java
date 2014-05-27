@@ -13,11 +13,11 @@ public interface ContentListener {
 
     public void onMessageSent(CypherMessage message);
 
-    public void onPullMessages(List<CypherMessage> messages);
+    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil);
 
-    public void onPullContacts(List<CypherContact> contacts);
+    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil);
 
-    public void onPullKeys(List<ECKey> keys);
+    public void onPullKeys(List<ECKey> keys, long notifiedUntil);
 
     public void onCaptcha(Captcha captcha);
 

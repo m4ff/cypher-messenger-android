@@ -22,17 +22,17 @@ class BasicContentListener implements ContentListener {
     }
 
     @Override
-    public void onPullMessages(List<CypherMessage> messages) {
+    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
 
     }
 
     @Override
-    public void onPullContacts(List<CypherContact> contacts) {
+    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
 
     }
 
     @Override
-    public void onPullKeys(List<ECKey> keys) {
+    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {
 
     }
 
