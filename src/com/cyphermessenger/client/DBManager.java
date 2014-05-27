@@ -8,7 +8,6 @@ import java.util.List;
  * Created by Pier DAgostino on 08/04/14.
  */
 public interface DBManager {
-    public void setUser(CypherUser user);
     public void setSession(CypherSession session);
     public void insertContact(CypherContact contact);
     public void insertMessage(CypherMessage msg);
@@ -21,7 +20,6 @@ public interface DBManager {
     public void setMessageSent(CypherMessage msg);
     
     public CypherSession getSession();
-    public CypherUser getUser();
     public ECKey getKeyForTime(long time);
     public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit);
     public List<CypherContact> getContacts();

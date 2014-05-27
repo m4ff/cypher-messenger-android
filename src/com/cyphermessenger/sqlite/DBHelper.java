@@ -23,11 +23,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // USER COLUMNS
     public static final String COLUMN_USER_ID = "userID";
-    public static final String COLUMN_SESSION_ID = "sessionID";
-    public static final String COLUMN_NOTIFIED_UNTIL = "notifiedUntil";
+    public static final String COLUMN_USER_SESSION_ID = "sessionID";
+    public static final String COLUMN_USER_NOTIFIED_UNTIL = "notifiedUntil";
     public static final String COLUMN_USER_NAME = "username";
-    public static final String COLUMN_LOCAL_PASSWORD = "localPassword";
-    public static final String COLUMN_SERVER_PASSWORD = "localPassword";
+    public static final String COLUMN_USER_LOCAL_PASSWORD = "localPassword";
+    public static final String COLUMN_USER_SERVER_PASSWORD = "localPassword";
     public static final String COLUMN_USER_ACTIVE = "userActive";
     public static final String COLUMN_USER_AVATAR = "avatar";
 
@@ -35,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CONTACT_ID = "contactID";
     public static final String COLUMN_CONTACT_NAME = "contactName";
     public static final String COLUMN_CONTACT_STATUS = "contactStatus";
+    public static final String COLUMN_CONTACT_DATE_TIME = "timestamp";
     public static final String COLUMN_CONTACT_AVATAR = "avatar";
 
     // MESSAGES COLUMNS
@@ -55,15 +56,16 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_USER = "CREATE TABLE " + TABLE_USERS + "("
             + COLUMN_USER_ID + " INTEGER PRIMARY KEY, "
             + COLUMN_USER_NAME + " TEXT UNIQUE KEY NOT NULL, "
-            + COLUMN_SESSION_ID + " TEXT UNIQUE KEY NOT NULL, "
+            + COLUMN_USER_SESSION_ID + " TEXT NOT NULL, "
             + COLUMN_USER_ACTIVE + " INTEGER DEFAULT 1, "
-            + COLUMN_NOTIFIED_UNTIL + " INTEGER DEFAULT 0, "
-            + COLUMN_LOCAL_PASSWORD + " BLOB NOT NULL, "
-            + COLUMN_SERVER_PASSWORD + " BLOB NOT NULL, "
+            + COLUMN_USER_NOTIFIED_UNTIL + " INTEGER DEFAULT 0, "
+            + COLUMN_USER_LOCAL_PASSWORD + " BLOB NOT NULL, "
+            + COLUMN_USER_SERVER_PASSWORD + " BLOB NOT NULL, "
             + COLUMN_USER_AVATAR + " BLOB);";
 
     private static final String DATABASE_CREATE_CONTACT = "CREATE TABLE " + TABLE_CONTACTS +"("
             + COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY, "
+            + COLUMN_CONTACT_DATE_TIME + " INTEGER NOT NULL, "
             + COLUMN_CONTACT_NAME + " TEXT UNIQUE NOT NULL, "
             + COLUMN_CONTACT_STATUS + " TEXT NOT NULL, "
             + COLUMN_CONTACT_AVATAR + " BLOB);";

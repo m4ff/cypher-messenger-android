@@ -75,10 +75,7 @@ public class ContentManager {
     public boolean isLogged() {
     	return session != null;
     }
-    
-    public CypherUser getUser() {
-    	return dbManager.getUser();
-    }
+
     public CypherSession getSession() {
         return session;
     }
@@ -134,7 +131,6 @@ public class ContentManager {
             public void run() {
                 try {
                     CypherUser user = SyncRequest.registerUser(username, password, captchaValue, captcha);
-                    dbManager.setUser(user);
                     CypherSession _session = SyncRequest.userLogin(username, password);
                     dbManager.setSession(_session);
                     session = _session;

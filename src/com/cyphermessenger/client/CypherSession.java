@@ -14,7 +14,7 @@ public class CypherSession {
     CypherUser user;
     String sessionID;
 
-    CypherSession(CypherUser user, String sessionID) {
+    public CypherSession(CypherUser user, String sessionID) {
         this.user = user;
         this.sessionID = sessionID;
     }
