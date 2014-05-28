@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     private static final String DATABASE_NAME = "cypherMessenger.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // TABLES
     public static final String TABLE_USERS = "users";
@@ -27,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USER_NOTIFIED_UNTIL = "notifiedUntil";
     public static final String COLUMN_USER_NAME = "username";
     public static final String COLUMN_USER_LOCAL_PASSWORD = "localPassword";
-    public static final String COLUMN_USER_SERVER_PASSWORD = "localPassword";
+    public static final String COLUMN_USER_SERVER_PASSWORD = "serverPassword";
     public static final String COLUMN_USER_ACTIVE = "userActive";
     public static final String COLUMN_USER_AVATAR = "avatar";
 
@@ -55,7 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
     // CREATION QUERIES
     private static final String DATABASE_CREATE_USER = "CREATE TABLE " + TABLE_USERS + "("
             + COLUMN_USER_ID + " INTEGER PRIMARY KEY, "
-            + COLUMN_USER_NAME + " TEXT UNIQUE KEY NOT NULL, "
+            + COLUMN_USER_NAME + " TEXT UNIQUE NOT NULL, "
             + COLUMN_USER_SESSION_ID + " TEXT NOT NULL, "
             + COLUMN_USER_ACTIVE + " INTEGER DEFAULT 1, "
             + COLUMN_USER_NOTIFIED_UNTIL + " INTEGER DEFAULT 0, "
@@ -63,7 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + COLUMN_USER_SERVER_PASSWORD + " BLOB NOT NULL, "
             + COLUMN_USER_AVATAR + " BLOB);";
 
-    private static final String DATABASE_CREATE_CONTACT = "CREATE TABLE " + TABLE_CONTACTS +"("
+    private static final String DATABASE_CREATE_CONTACT = "CREATE TABLE " + TABLE_CONTACTS + "("
             + COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY, "
             + COLUMN_CONTACT_DATE_TIME + " INTEGER NOT NULL, "
             + COLUMN_CONTACT_NAME + " TEXT UNIQUE NOT NULL, "
@@ -71,25 +71,27 @@ public class DBHelper extends SQLiteOpenHelper {
             + COLUMN_CONTACT_AVATAR + " BLOB);";
 
     private static final String DATABASE_CREATE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "("
-            + COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY, "
+            + COLUMN_MESSAGE_ID + " INTEGER NOT NULL, "
             + COLUMN_MESSAGE_IS_SENDER + " INTEGER NOT NULL, "
             + COLUMN_MESSAGE_CONTACT_ID + " INTEGER NOT NULL, "
             + COLUMN_MESSAGE_TEXT + " TEXT NOT NULL, "
             + COLUMN_MESSAGE_SENT + " INTEGER DEFAULT 0, "
-            + COLUMN_MESSAGE_DATE_TIME + " INTEGER NOT NULL);";
+            + COLUMN_MESSAGE_DATE_TIME + " INTEGER NOT NULL, "
+            + "CONSTRAINT messagesKey PRIMARY KEY(" + COLUMN_MESSAGE_ID + ", " + COLUMN_MESSAGE_CONTACT_ID + "));";
 
     private static final String DATABASE_CREATE_KEY = "CREATE TABLE " + TABLE_KEYS + "("
-            + COLUMN_KEY_ID + " INTEGER PRIMARY KEY, "
+            + COLUMN_KEY_ID + " INTEGER NOT NULL, "
             + COLUMN_KEY_USER + " INTEGER NOT NULL, "
             + COLUMN_KEY_PUBLIC + " BLOB NOT NULL, "
-            + COLUMN_KEY_PRIVATE + " BLOB);";
+            + COLUMN_KEY_PRIVATE + " BLOB, "
+            + "CONSTRAINT keyKey PRIMARY KEY(" + COLUMN_KEY_ID + ", " + COLUMN_KEY_USER + "));";
 
     private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public static synchronized DBHelper getInstance(Context ctx) {
-        if(instance == null) {
+        if (instance == null) {
             instance = new DBHelper(ctx);
         }
         return instance;

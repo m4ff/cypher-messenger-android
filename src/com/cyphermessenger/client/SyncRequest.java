@@ -12,19 +12,13 @@ import com.cyphermessenger.crypto.Encrypt;
 import com.cyphermessenger.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.AbstractHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.*;
 
 
 public final class SyncRequest {
@@ -34,17 +28,15 @@ public final class SyncRequest {
 
     public static final boolean SINCE = true;
     public static final boolean UNTIL = false;
-    private static final AbstractHttpClient HTTP_CLIENT = new DefaultHttpClient();
 
     public static Captcha requestCaptcha() throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "captcha";
-        HttpPost post = new HttpPost(finalurl);
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        HttpURLConnection conn = doRequest("captcha");
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         String captchaTokenString = node.get("captchaToken").asText();
         String captchaHashString = node.get("captchaHash").asText();
@@ -64,10 +56,9 @@ public final class SyncRequest {
             throw new APIErrorException(StatusCode.CAPTCHA_INVALID);
         }
 
-        String finalurl = DOMAIN + "register";
         byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
         byte[] localPassword = Utils.sha256(password);
-
+        String serverPasswordEncoded = Utils.BASE64_URL.encode(serverPassword);
         ECKey key = new ECKey();
         byte[] publicKey = key.getPublicKey();
         byte[] privateKey = key.getPrivateKey();
@@ -76,49 +67,45 @@ public final class SyncRequest {
         } catch (InvalidCipherTextException ex) {
             throw new RuntimeException(ex);
         }
-        String serverPasswordEncoded = Utils.BASE64_URL.encode(serverPassword);
-        HttpPost post = new HttpPost(finalurl);
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("captchaToken", captcha.captchaToken));
-        pair.add(new BasicNameValuePair("captchaValue", captchaValue));
-        pair.add(new BasicNameValuePair("username", username));
-        pair.add(new BasicNameValuePair("password", serverPasswordEncoded));
-        pair.add(new BasicNameValuePair("publicKey", Utils.BASE64_URL.encode(publicKey)));
-        pair.add(new BasicNameValuePair("privateKey", Utils.BASE64_URL.encode(privateKey)));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        String[] keys = new String[]{"captchaToken", "captchaValue", "username", "password", "publicKey", "privateKey"};
+        String[] vals = new String[]{
+                captcha.captchaToken,
+                captchaValue,
+                username,
+                serverPasswordEncoded,
+                Utils.BASE64_URL.encode(publicKey),
+                Utils.BASE64_URL.encode(privateKey)
+        };
+        HttpURLConnection conn = doRequest("register", null, keys, vals);
+
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
             long keyTime = node.get("timestamp").asLong();
-            CypherUser user = new CypherUser(username, localPassword, serverPassword, userID, key, keyTime);
-            return user;
+            return new CypherUser(username, localPassword, serverPassword, userID, key, keyTime);
         } else {
             throw new APIErrorException(statusCode);
         }
     }
 
     public static CypherSession userLogin(String username, byte[] serverPassword, byte[] localPassword) throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "login";
         String passwordHashEncoded = Utils.BASE64_URL.encode(serverPassword);
-        HttpPost post = new HttpPost(finalurl);
 
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("username", username));
-        pair.add(new BasicNameValuePair("password", passwordHashEncoded));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        HttpURLConnection conn = doRequest("login", null, new String[]{"username", "password"}, new String[]{username, passwordHashEncoded});
+
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
@@ -131,8 +118,7 @@ public final class SyncRequest {
             long keyTimestamp = node.get("keyTimestamp").asLong();
             CypherUser newUser = new CypherUser(username, localPassword, serverPassword, userID, key, keyTimestamp);
             String sessionID = node.get("sessionID").asText();
-            CypherSession session = new CypherSession(newUser, sessionID);
-            return session;
+            return new CypherSession(newUser, sessionID);
         } else {
             throw new APIErrorException(statusCode);
         }
@@ -141,7 +127,7 @@ public final class SyncRequest {
     public static CypherSession userLogin(String username, String password) throws IOException, APIErrorException {
         byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
         byte[] localPassword = Utils.sha256(password);
-        return userLogin(username, serverPassword,localPassword);
+        return userLogin(username, serverPassword, localPassword);
     }
 
     public static CypherSession userLogin(CypherUser user) throws IOException, APIErrorException {
@@ -149,20 +135,15 @@ public final class SyncRequest {
     }
 
     public static void userLogout(CypherSession session) throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "logout";
-        HttpPost post = new HttpPost(finalurl);
+        HttpURLConnection conn = doRequest("logout", session, null);
 
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("userID", session.getUser().getUserID() + ""));
-        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode != StatusCode.OK) {
             throw new APIErrorException(statusCode);
@@ -170,28 +151,22 @@ public final class SyncRequest {
     }
 
     public static List<String> findUser(CypherSession session, String username, int limit) throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "find";
-        HttpPost post = new HttpPost(finalurl);
-        CypherUser user = session.getUser();
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("userID", user.getUserID() + ""));
-        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
-        pair.add(new BasicNameValuePair("username", username));
-        pair.add(new BasicNameValuePair("limit", limit + ""));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        String[] keys = new String[]{"username", "limit"};
+        String[] vals = new String[]{username, limit + ""};
+
+        HttpURLConnection conn = doRequest("find", session, keys, vals);
+
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
-        JsonNode node = MAPPER.readTree(in);
+        JsonNode node = MAPPER.readTree(conn.getInputStream());
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode != StatusCode.OK) {
             throw new APIErrorException(statusCode);
         } else {
-            ArrayList<String> users = Utils.MAPPER.treeToValue(node.get("users"), ArrayList.class);
-            return users;
+            return Utils.MAPPER.treeToValue(node.get("users"), ArrayList.class);
         }
     }
 
@@ -200,8 +175,6 @@ public final class SyncRequest {
     }
 
     public static CypherMessage sendMessage(CypherSession session, CypherUser contactUser, String message) throws IOException, APIErrorException {
-        String finalUrl = DOMAIN + "message";
-        HttpPost post = new HttpPost(finalUrl);
         CypherUser user = session.getUser();
         long timestamp = System.currentTimeMillis();
         byte[] messageID = Utils.randomBytes(4);
@@ -216,24 +189,22 @@ public final class SyncRequest {
         } catch (InvalidCipherTextException e) {
             throw new RuntimeException(e);
         }
+        HashMap<String, String> pairs = new HashMap<>(6);
+        pairs.put("payload", Utils.BASE64_URL.encode(payload));
+        pairs.put("contactID", contactUser.getUserID() + "");
+        pairs.put("messageID", messageIDLong + "");
+        pairs.put("messageTimestamp", timestamp + "");
+        pairs.put("userKeyTimestamp", session.getUser().getKeyTime() + "");
+        pairs.put("contactKeyTimestamp", contactUser.getKeyTime() + "");
 
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("userID", session.getUser().getUserID() + ""));
-        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
-        pair.add(new BasicNameValuePair("payload", Utils.BASE64_URL.encode(payload)));
-        pair.add(new BasicNameValuePair("contactID", contactUser.getUserID() + ""));
-        pair.add(new BasicNameValuePair("messageID", messageIDLong + ""));
-        pair.add(new BasicNameValuePair("messageTimestamp", timestamp + ""));
-        pair.add(new BasicNameValuePair("userKeyTimestamp", session.getUser().getKeyTime() + ""));
-        pair.add(new BasicNameValuePair("contactKeyTimestamp", contactUser.getKeyTime() + ""));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        HttpURLConnection conn = doRequest("message", session, pairs);
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode != StatusCode.OK) {
             throw new APIErrorException(statusCode);
@@ -242,30 +213,23 @@ public final class SyncRequest {
     }
 
     private static CypherContact manageContact(CypherSession session, String contactName, boolean add) throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "contact";
-        HttpPost post = new HttpPost(finalurl);
-
         String action = "block";
         if (add) {
             action = "add";
         }
+        String[] keys = new String[]{"action", "contactName"};
+        String[] vals = new String[]{action, contactName};
 
-        CypherUser user = session.getUser();
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("userID", user.getUserID() + ""));
-        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
-        pair.add(new BasicNameValuePair("action", action));
-        pair.add(new BasicNameValuePair("contactName", contactName));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        HttpURLConnection conn = doRequest("contact", session, keys, vals);
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
-        if(statusCode == StatusCode.OK) {
+        if (statusCode == StatusCode.OK) {
             long userID = node.get("contactID").asLong();
             long keyTimestamp = node.get("keyTimestamp").asLong();
             long contactTimestamp = node.get("contactTimestamp").asLong();
@@ -275,11 +239,14 @@ public final class SyncRequest {
             String status;
             switch (statusCode) {
                 case StatusCode.CONTACT_WAITING:
-                    status = CypherContact.WAITING; break;
+                    status = CypherContact.WAITING;
+                    break;
                 case StatusCode.CONTACT_BLOCKED:
-                    status = CypherContact.BLOCKED; break;
+                    status = CypherContact.BLOCKED;
+                    break;
                 case StatusCode.CONTACT_DENIED:
-                    status = CypherContact.DENIED; break;
+                    status = CypherContact.DENIED;
+                    break;
                 default:
                     throw new APIErrorException(statusCode);
             }
@@ -295,30 +262,28 @@ public final class SyncRequest {
         return manageContact(session, username, false);
     }
 
-    private static JsonNode pullUpdate(CypherSession session, CypherUser contact, String action, boolean since, long time) throws IOException, APIErrorException {
-        String finalurl = DOMAIN + "pull";
-        HttpPost post = new HttpPost(finalurl);
+    private static JsonNode pullUpdate(CypherSession session, CypherUser contact, String action, Boolean since, Long time) throws IOException, APIErrorException {
+
         String timeRelativeTo = "since";
-        if (!since) {
+        if (since != null && !since) {
             timeRelativeTo = "until";
         }
-        CypherUser user = session.getUser();
-        ArrayList<NameValuePair> pair = new ArrayList<>();
-        pair.add(new BasicNameValuePair("userID", user.getUserID() + ""));
-        pair.add(new BasicNameValuePair("sessionID", session.getSessionID()));
-        pair.add(new BasicNameValuePair("action", action));
+        HashMap<String, String> pairs = new HashMap<>(3);
+        pairs.put("action", action);
         if (contact != null) {
-            pair.add(new BasicNameValuePair("contactID", contact.getUserID() + ""));
+            pairs.put("contactID", contact.getUserID() + "");
         }
-        pair.add(new BasicNameValuePair(timeRelativeTo, time + ""));
-        post.setEntity(new UrlEncodedFormEntity(pair));
-        HttpResponse response = HTTP_CLIENT.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
+        if (since != null) {
+            pairs.put(timeRelativeTo, time + "");
+        }
+        HttpURLConnection conn = doRequest("pull", session, pairs);
+        if (conn.getResponseCode() != 200) {
             throw new IOException("Server error");
         }
 
-        InputStream in = response.getEntity().getContent();
+        InputStream in = conn.getInputStream();
         JsonNode node = MAPPER.readTree(in);
+        conn.disconnect();
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
             return node;
@@ -327,7 +292,7 @@ public final class SyncRequest {
         }
     }
 
-    public static PullResults pullMessages(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException {
+    public static PullResults pullMessages(CypherSession session, CypherUser contact, Boolean since, Long time) throws IOException, APIErrorException {
         JsonNode node = pullUpdate(session, contact, "messages", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
@@ -338,7 +303,7 @@ public final class SyncRequest {
         }
     }
 
-    public static PullResults pullContacts(CypherSession session, boolean since, long time) throws IOException, APIErrorException {
+    public static PullResults pullContacts(CypherSession session, Boolean since, Long time) throws IOException, APIErrorException {
         JsonNode node = pullUpdate(session, null, "contacts", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
@@ -349,7 +314,7 @@ public final class SyncRequest {
         }
     }
 
-    public static PullResults pullKeys(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException {
+    public static PullResults pullKeys(CypherSession session, CypherUser contact, Boolean since, Long time) throws IOException, APIErrorException {
         JsonNode node = pullUpdate(session, contact, "keys", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
@@ -359,7 +324,7 @@ public final class SyncRequest {
         }
     }
 
-    public static PullResults pullAll(CypherSession session, CypherUser contact, boolean since, long time) throws IOException, APIErrorException {
+    public static PullResults pullAll(CypherSession session, CypherUser contact, Boolean since, Long time) throws IOException, APIErrorException {
         JsonNode node = pullUpdate(session, contact, "all", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
@@ -440,17 +405,50 @@ public final class SyncRequest {
         return array;
     }
 
-
-    public static void main(String argString[]) throws Exception {
-        Captcha c = requestCaptcha();
-        File f = new File("/Users/paolo/Desktop/chaptcha.png");
-        FileOutputStream out = new FileOutputStream(f);
-        out.write(c.getCaptchaImage());
-        out.close();
-        String captchaVal = new Scanner(System.in).nextLine();
-        CypherUser user = registerUser("paolo", "password", captchaVal, c);
-        CypherSession session = userLogin("paolo", "password");
-
-        System.out.println(session.getUser().getUsername() + " " + session.getSessionID());
+    public static HttpURLConnection doRequest(String endpoint, CypherSession session, String[] keys, String[] values) throws IOException {
+        HttpURLConnection connection = (java.net.HttpURLConnection) new URL(DOMAIN + endpoint).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Accept-Charset", "UTF-8");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+        connection.connect();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+        if (session != null) {
+            writer.write("userID=");
+            writer.write(session.getUser().getUserID() + "&sessionID=");
+            writer.write(session.getSessionID());
+        }
+        if (keys != null && keys.length > 0) {
+            if (session != null) {
+                writer.write('&');
+            }
+            // write first row
+            writer.write(keys[0]);
+            writer.write('=');
+            writer.write(URLEncoder.encode(values[0], "UTF-8"));
+            for (int i = 1; i < keys.length; i++) {
+                writer.write('&');
+                writer.write(keys[i]);
+                writer.write('=');
+                writer.write(URLEncoder.encode(values[i], "UTF-8"));
+            }
+        }
+        writer.close();
+        return connection;
     }
+
+    public static HttpURLConnection doRequest(String endpoint, CypherSession session, Map<String, String> m) throws IOException {
+        String[] keys = null;
+        String[] vals = null;
+        if (m != null) {
+            keys = (String[]) m.keySet().toArray();
+            vals = (String[]) m.values().toArray();
+        }
+        return doRequest(endpoint, session, keys, vals);
+    }
+
+    public static HttpURLConnection doRequest(String endpoint) throws IOException {
+        return doRequest(endpoint, null, null, null);
+    }
+
 }

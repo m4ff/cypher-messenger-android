@@ -78,7 +78,8 @@
                 android:name=".AddContactActivity"
                 android:parentActivityName=".ContactsActivity"
                 android:launchMode="singleTop"
-                android:allowTaskReparenting="false">
+                android:allowTaskReparenting="false"
+                android:windowSoftInputMode="adjustResize" >
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

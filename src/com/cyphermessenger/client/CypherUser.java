@@ -80,6 +80,6 @@ public class CypherUser {
 
     @Override
     public String toString() {
-        return "{ name: " + username + ", id: " + userID + " }";
+        return username;
     }
 }

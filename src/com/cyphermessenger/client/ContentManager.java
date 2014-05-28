@@ -1,6 +1,7 @@
 package com.cyphermessenger.client;
 
 
+import android.util.Log;
 import com.cyphermessenger.crypto.ECKey;
 import org.apache.http.impl.entity.StrictContentLengthStrategy;
 
@@ -59,6 +60,14 @@ public class ContentManager {
         }
     }
 
+    public void waitForAllRequests() {
+        try {
+            waitForAllRequests(1000 * 30);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addThread(Thread thread) {
         thread.start();
         synchronized (activeThreads) {
@@ -81,6 +90,7 @@ public class ContentManager {
     }
 
     private void handleException(Exception e) {
+        Log.e("ContentManager", "handleException", e);
         if(e.getClass() == IOException.class) {
             contentListener.onServerError();
         } else if(e.getClass() == APIErrorException.class) {
@@ -150,6 +160,7 @@ public class ContentManager {
                 try {
                     CypherSession _session = SyncRequest.userLogin(username, password);
                     dbManager.setSession(_session);
+                    dbManager.insertKey(_session.getUser(), _session.getUser().getKey());
                     session = _session;
                     contentListener.onLogged(_session.getUser());
                 } catch (Exception e) {
@@ -225,6 +236,9 @@ public class ContentManager {
                 try {
                     CypherContact contact = SyncRequest.addContact(session, username);
                     dbManager.insertContact(contact);
+                    if(contact.getKey() != null) {
+                        dbManager.insertKey(contact, contact.getKey());
+                    }
                     contentListener.onContactChange(contact);
                 } catch (Exception e) {
                     handleException(e);
@@ -265,6 +279,9 @@ public class ContentManager {
             contentListener.onPullContacts(res.getContacts(), notifiedUntil);
             for(CypherContact c : res.getContacts()) {
                 dbManager.insertContact(c);
+                if(c.getKey() != null) {
+                    dbManager.insertKey(c, c.getKey());
+                }
             }
         } else if(res.getMessages() != null) {
             contentListener.onPullMessages(res.getMessages(), notifiedUntil);
@@ -289,12 +306,12 @@ public class ContentManager {
         addThread(th);
     }
 
-    public void pullContacts(final boolean since, final long time) {
+    public void pullContacts(final long since) {
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    PullResults res = SyncRequest.pullContacts(session, since, time);
+                    PullResults res = SyncRequest.pullContacts(session, SyncRequest.SINCE, since);
                     handlePullResults(res);
                 } catch(Exception e) {
                     handleException(e);
@@ -302,6 +319,10 @@ public class ContentManager {
             }
         });
         addThread(th);
+    }
+
+    public void pullContacts() {
+        pullContacts(dbManager.getLastUpdateTime());
     }
 
     public void pullKeys(final CypherUser user, final boolean since, final long time) {
@@ -350,7 +371,7 @@ public class ContentManager {
     }
 
 
-    public List<CypherContact> getContactList(CypherSession session) {
+    public List<CypherContact> getContactList() {
         return dbManager.getContacts();
     }
 }

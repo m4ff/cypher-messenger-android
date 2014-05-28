@@ -24,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cyphermessenger.R;
 import com.cyphermessenger.sqlite.Messages;
 
 import java.util.LinkedList;

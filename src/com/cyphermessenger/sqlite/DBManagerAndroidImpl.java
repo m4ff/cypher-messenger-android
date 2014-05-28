@@ -71,7 +71,12 @@ public class DBManagerAndroidImpl implements DBManager {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues val = new ContentValues();
         val.put(DBHelper.COLUMN_KEY_PUBLIC, key.getPublicKey());
-        val.put(DBHelper.COLUMN_KEY_PRIVATE, key.getPrivateKey());
+        byte[] privateKey = key.getPrivateKey();
+        if(privateKey == null) {
+            val.putNull(DBHelper.COLUMN_KEY_PRIVATE);
+        } else {
+            val.put(DBHelper.COLUMN_KEY_PRIVATE, privateKey);
+        }
         val.put(DBHelper.COLUMN_KEY_ID, key.getTime());
         val.put(DBHelper.COLUMN_KEY_USER, user.getUserID());
         db.replace(DBHelper.TABLE_KEYS, null, val);
@@ -178,15 +183,20 @@ public class DBManagerAndroidImpl implements DBManager {
     public List<CypherContact> getContacts() {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         String[] columns = new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_ID, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME};
-        Cursor c = db.query(DBHelper.TABLE_MESSAGES, columns, null, null, null, null, null, null);
+        Cursor c = db.query(DBHelper.TABLE_CONTACTS, columns, null, null, null, null, null, null);
         List<CypherContact> list = new LinkedList<>();
         while(c.moveToNext()) {
             long contactID = c.getLong(1);
             Cursor d = db.query(DBHelper.TABLE_KEYS, new String[] {DBHelper.COLUMN_KEY_ID, DBHelper.COLUMN_KEY_PUBLIC}, DBHelper.COLUMN_KEY_USER + " = " + contactID, null, null, null, "1");
             d.moveToNext();
-            ECKey key = new ECKey(d.getBlob(1), null);
-            key.setTime(d.getLong(0));
-            list.add(new CypherContact(c.getString(0), contactID, key, d.getLong(0), c.getString(2), c.getLong(3)));
+            ECKey key = null;
+            Long keyTime = null;
+            if(d.moveToNext()) {
+                key = new ECKey(d.getBlob(1), null);
+                keyTime = d.getLong(0);
+                key.setTime(keyTime);
+            }
+            list.add(new CypherContact(c.getString(0), contactID, key, keyTime, c.getString(2), c.getLong(3)));
         }
         return list;
     }

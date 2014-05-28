@@ -63,7 +63,6 @@ public class ECKey {
      * @param privateBytes Encoded private key
      */
     public ECKey(byte[] publicBytes, byte[] privateBytes) {
-
         BigInteger key = null;
         ECPoint pkey = null;
         if (privateBytes != null) {
@@ -76,7 +75,11 @@ public class ECKey {
         } else {
             throw new RuntimeException("No public key provided");
         }
-        privParams = new ECPrivateKeyParameters(key, domainParams);
+        if(key != null) {
+            privParams = new ECPrivateKeyParameters(key, domainParams);
+        } else {
+            privParams = null;
+        }
         pubParams = new ECPublicKeyParameters(pkey, domainParams);
     }
 
@@ -103,7 +106,7 @@ public class ECKey {
      * @return
      */
     public byte[] getPrivateKey() {
-        if (priv == null) {
+        if (priv == null && privParams != null) {
             priv = BigIntegers.asUnsignedByteArray(privParams.getD());
         }
         return priv;

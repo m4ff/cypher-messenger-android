@@ -28,10 +28,13 @@
     <string name="add_contact_name_hint">Insert contact name</string>
     <string name="add_contact_search_view_title">Search</string>
     <string name="add_contact_activity_title">SearchCypheredUser</string>
-    <string name="alert_text">Contact successfully added</string>
+    <string name="alert_text">Contact request sent</string>
     <string name="alert_title">Add a Contact</string>
-    <string name="alert_button_add">add</string>
-    <string name="alert_button_cancel">cancel</string>
+    <string name="alert_button_add">Add</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="error_contact_denied">This user blocked you</string>
+    <string name="error_contact_not_found">User not found</string>
+    <string name="error_general_error">Server error</string>
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>

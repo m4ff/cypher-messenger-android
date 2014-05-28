@@ -7,9 +7,7 @@ import java.util.List;
 /**
  * Created by paolo on 22/05/14.
  */
-class BasicContentListener implements ContentListener {
-
-    BasicContentListener() {}
+public class BasicContentListener implements ContentListener {
 
     @Override
     public void onLogged(CypherUser user) {

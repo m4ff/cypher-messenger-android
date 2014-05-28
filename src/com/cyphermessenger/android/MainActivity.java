@@ -20,7 +20,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ContentManager contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this));
-        if(contentManager.getUser() == null) {
+        if(contentManager.getSession() == null) {
             Intent login = new Intent(this, LoginActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(login);

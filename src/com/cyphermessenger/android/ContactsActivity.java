@@ -4,53 +4,51 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.cyphermessenger.R;
+import com.cyphermessenger.client.*;
+import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
-public class ContactsActivity extends Activity {
+public class ContactsActivity extends Activity implements NotificationListener {
 
-    protected DBManagerAndroidImpl dbManagerAndroid;
-    private ListView mainView = null;
-    private MenuItem menuItem = null;
-    private LinkedList<String> contact = null;
-    private ArrayAdapter<String> adapter = null;
+    private ListView mainView;
+    private List<CypherContact> contact = new LinkedList<>();
+    private ArrayAdapter<CypherContact> adapter;
     private final ContactsActivity that = this;
-    private Menu menu = null;
+
+    private MenuItem menuItem;
+    private Menu menu;
+
+    private ContentUpdateManager updateManager;
+    private ContentManager contentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+
+        contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this));
+        updateManager = new ContentUpdateManager(this, this);
+
         mainView = (ListView) findViewById(R.id.contacts_list);
 
-        contact = new LinkedList<>();
-        contact.addLast("Contact n1");
-        contact.addLast("Contact n2");
-        contact.addLast("Contact n3");
-        contact.addLast("Contact n4");
-        contact.addLast("Contact n5");
-        contact.addLast("Contact n6");
-        contact.addLast("Contact n7");
-        contact.addLast("Contact n8");
-        contact.addLast("Contact n9");
-        contact.addLast("Contact n10");
-        contact.addLast("Contact n11");
-        contact.addLast("Contact n12");
-        contact.addLast("Contact n13");
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        contact = contentManager.getContactList();
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View template = inflater.inflate(R.layout.contacts_template, null);
 
-        adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.contacts_template, R.id.contact_last_time, contact);
+        adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contact);
         mainView.setAdapter(adapter);
 
-        /*contact.addAll( );  TODO ADD QUERY RESULTS*/
         mainView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -62,7 +60,19 @@ public class ContactsActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateManager.setShortInterval();
+        contact.clear();
+        contact.addAll(contentManager.getContactList());
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        updateManager.setLongInterval();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,5 +93,21 @@ public class ContactsActivity extends Activity {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void onNewContacts(List<CypherContact> contacts) {
+        contact.addAll(contacts);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onNewMessages(HashMap<Long, List<CypherMessage>> message) {
+
+    }
+
+    @Override
+    public void onNewKeys() {
+
     }
 }

@@ -21,11 +21,16 @@ import java.util.List;
 
 public class LoginActivity extends Activity implements ContentListener {
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private Toast toast;
+    private ContentManager contentManager;
+
+    //@TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        toast = new Toast(this);
 
         final EditText name = (EditText) findViewById(R.id.name_field);
         final EditText password = (EditText) findViewById(R.id.password_field);
@@ -41,23 +46,28 @@ public class LoginActivity extends Activity implements ContentListener {
         });
 
         final Button login = (Button) findViewById(R.id.button_login);
-        final ContentManager contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
+        contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
         final Context that = this;
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String _name = name.getText().toString();
                 String _pass = password.getText().toString();
-                if(!_name.isEmpty() && !_pass.isEmpty()) {
+                if(!"".equals(_name) && !"".equals(_pass)) {
                     contentManager.login(_name, _pass);
+                    login.setEnabled(false);
                 } else {
-                    Toast t = new Toast(that);
-                    t.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG);
+                    toast.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        contentManager.interruptRequests();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,10 +91,14 @@ public class LoginActivity extends Activity implements ContentListener {
 
     @Override
     public void onLoginInvalid() {
-        Toast t = new Toast(this);
-        t.makeText(this, R.string.login_toast_failed, Toast.LENGTH_LONG);
-        EditText password = (EditText) findViewById(R.id.password_field);
-        password.getText().clear();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toast.makeText(getApplicationContext(), R.string.login_toast_failed, Toast.LENGTH_LONG).show();
+                ((EditText) findViewById(R.id.password_field)).getText().clear();
+                findViewById(R.id.button_login).setEnabled(true);
+            }
+        });
     }
 
     @Override
