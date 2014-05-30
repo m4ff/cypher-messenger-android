@@ -204,10 +204,10 @@ public class DBManagerAndroidImpl implements DBManager {
     @Override
     public void logout() {
         SQLiteDatabase db = openHelper.getWritableDatabase();
-        db.execSQL("TRUNCATE TABLE " + DBHelper.TABLE_CONTACTS);
-        db.execSQL("TRUNCATE TABLE " + DBHelper.TABLE_USERS);
-        db.execSQL("TRUNCATE TABLE " + DBHelper.TABLE_KEYS);
-        db.execSQL("TRUNCATE TABLE " + DBHelper.TABLE_MESSAGES);
+        db.execSQL("DELETE FROM " + DBHelper.TABLE_CONTACTS);
+        db.execSQL("DELETE FROM " + DBHelper.TABLE_USERS);
+        db.execSQL("DELETE FROM " + DBHelper.TABLE_KEYS);
+        db.execSQL("DELETE FROM " + DBHelper.TABLE_MESSAGES);
     }
 
     @Override

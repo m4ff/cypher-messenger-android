@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,6 @@ public class LoginActivity extends Activity implements ContentListener {
     private Toast toast;
     private ContentManager contentManager;
 
-    //@TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +37,7 @@ public class LoginActivity extends Activity implements ContentListener {
 
         final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
         final Button registration = (Button) findViewById(R.id.button_registration);
+        //registrationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         registration.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,7 +54,7 @@ public class LoginActivity extends Activity implements ContentListener {
             public void onClick(View v) {
                 String _name = name.getText().toString();
                 String _pass = password.getText().toString();
-                if(!"".equals(_name) && !"".equals(_pass)) {
+                if (!"".equals(_name) && !"".equals(_pass)) {
                     contentManager.login(_name, _pass);
                     login.setEnabled(false);
                 } else {

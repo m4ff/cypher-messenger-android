@@ -142,6 +142,7 @@ public class ContentManager {
                 try {
                     CypherUser user = SyncRequest.registerUser(username, password, captchaValue, captcha);
                     CypherSession _session = SyncRequest.userLogin(username, password);
+                    dbManager.insertKey(_session.getUser(), _session.getUser().getKey());
                     dbManager.setSession(_session);
                     session = _session;
                     contentListener.onLogged(_session.getUser());
@@ -171,7 +172,7 @@ public class ContentManager {
         addThread(th);
     }
 
-    public void logout(boolean deleteData) {
+    public void logout() {
         if(session == null) {
             return;
         }

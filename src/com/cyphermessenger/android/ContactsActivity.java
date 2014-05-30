@@ -88,8 +88,10 @@ public class ContactsActivity extends Activity implements NotificationListener {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_add_contact:
-                Intent addContactIntent = new Intent(this, AddContactActivity.class);
-                this.startActivityForResult(addContactIntent, Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+                startActivity(new Intent(this, AddContactActivity.class));
+            case R.id.action_logout:
+                contentManager.logout();
+                startActivity(new Intent(this, LoginActivity.class));
             default:
                 return false;
         }

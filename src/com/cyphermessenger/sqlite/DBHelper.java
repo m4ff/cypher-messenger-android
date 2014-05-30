@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     private static final String DATABASE_NAME = "cypherMessenger.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // TABLES
     public static final String TABLE_USERS = "users";
@@ -64,9 +64,9 @@ public class DBHelper extends SQLiteOpenHelper {
             + COLUMN_USER_AVATAR + " BLOB);";
 
     private static final String DATABASE_CREATE_CONTACT = "CREATE TABLE " + TABLE_CONTACTS + "("
-            + COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY, "
-            + COLUMN_CONTACT_DATE_TIME + " INTEGER NOT NULL, "
-            + COLUMN_CONTACT_NAME + " TEXT UNIQUE NOT NULL, "
+            + COLUMN_CONTACT_NAME + " TEXT PRIMARY KEY, "
+            + COLUMN_CONTACT_ID + " INTEGER, "
+            + COLUMN_CONTACT_DATE_TIME + " INTEGER, "
             + COLUMN_CONTACT_STATUS + " TEXT NOT NULL, "
             + COLUMN_CONTACT_AVATAR + " BLOB);";
 
@@ -109,10 +109,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(DBHelper.class.getName(), "Updating from version " + oldVersion + " to "
                 + newVersion + " which will destroy all data");
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_USERS);
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_CONTACTS);
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_MESSAGES);
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_KEYS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_KEYS);
         onCreate(db);
     }
 }

@@ -1,71 +1,85 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
+    android:scrollbarStyle="outsideInset"
     tools:context="com.cyphermessenger.RegistrationActivity">
 
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:isScrollContainer="true">
+        <TextView
+                android:id="@+id/name_field_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:text="@string/prompt_name" />
 
-    <TextView
-        android:id="@+id/name_field_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:editable="false"
-        android:text="@string/prompt_name" />
-
-    <EditText
-        android:id="@+id/name_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/FormElementPadding" />
+        <EditText
+                android:id="@+id/name_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/FormElementPadding" />
 
 
-    <TextView
-        android:id="@+id/password_field_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:editable="false"
-        android:text="@string/prompt_password" />
+        <TextView
+                android:id="@+id/password_field_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:text="@string/prompt_password" />
 
-    <EditText
-        android:id="@+id/password_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        style="@style/FormElementPadding" />
+        <EditText
+                android:id="@+id/password_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                style="@style/FormElementPadding" />
 
-    <TextView
-        android:id="@+id/confirmation_field_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:editable="false"
-        android:text="@string/prompt_confirmation" />
+        <TextView
+                android:id="@+id/confirmation_field_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:text="@string/prompt_confirmation" />
 
-    <EditText
-        android:id="@+id/confirm_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        style="@style/FormElementPadding" />
+        <EditText
+                android:id="@+id/confirm_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                style="@style/FormElementPadding" />
 
-    <ImageView
-        android:id="@+id/captcha_image"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        style="@style/FormElementPadding" />
+        <ImageView
+                android:id="@+id/captcha_image"
+                android:layout_width="170dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_height="65dp"
+                style="@style/FormElementPadding" />
 
-    <TextView
-        android:id="@+id/captcha_field_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:editable="false"
-        android:text="@string/prompt_captcha_text" />
+        <ProgressBar
+                android:id="@+id/captcha_loading_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true" />
 
-    <EditText
-        android:id="@+id/captcha_text_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/FormElementPadding" />
+        <TextView
+                android:id="@+id/captcha_field_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:text="@string/prompt_captcha_text" />
 
-</LinearLayout>
+        <EditText
+                android:id="@+id/captcha_text_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/FormElementPadding" />
+
+
+    </LinearLayout>
+
+</ScrollView>

@@ -21,11 +21,19 @@ public class Captcha {
         this.captchaHash = captchaHash;
     }
 
+    public Captcha(String[] s) {
+        this(s[0], Utils.BASE64_URL.decode(s[1]), Utils.BASE64_URL.decode(s[2]));
+    }
+
     public byte[] getCaptchaImage() {
         return captchaImage;
     }
 
     public boolean verify(String value) {
-        return Arrays.equals(captchaHash, Utils.sha256(value));
+        return Arrays.equals(captchaHash, Utils.sha256(value.toLowerCase()));
+    }
+
+    public String[] toStringArray() {
+        return new String[] {captchaToken, Utils.BASE64_URL.encode(captchaHash), Utils.BASE64_URL.encode(captchaImage)};
     }
 }

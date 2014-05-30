@@ -55,7 +55,8 @@ public final class SyncRequest {
         if (!captcha.verify(captchaValue)) {
             throw new APIErrorException(StatusCode.CAPTCHA_INVALID);
         }
-
+        username = username.toLowerCase();
+        captchaValue = captchaValue.toLowerCase();
         byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
         byte[] localPassword = Utils.sha256(password);
         String serverPasswordEncoded = Utils.BASE64_URL.encode(serverPassword);
@@ -125,6 +126,7 @@ public final class SyncRequest {
     }
 
     public static CypherSession userLogin(String username, String password) throws IOException, APIErrorException {
+        username = username.toLowerCase();
         byte[] serverPassword = Utils.cryptPassword(password.getBytes(), username);
         byte[] localPassword = Utils.sha256(password);
         return userLogin(username, serverPassword, localPassword);

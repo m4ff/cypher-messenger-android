@@ -8,17 +8,24 @@
     <string name="action_contact">Contact</string>
 
     <!-- LOGIN and REGISTRATION STRINGS -->
+    <string name="menu_logout_button">Logout</string>
     <string name="login_activity_name">Login</string>
     <string name="registration_activity_name">Register</string>
     <string name="login_toast_success">Login success</string>
     <string name="login_toast_failed">Login failed</string>
     <string name="button_login">Login</string>
     <string name="button_register_login">Register now</string>
-    <string name="button_register_registration">DONE</string>
+    <string name="button_register_registration">Submit</string>
     <string name="prompt_name">User name:</string>
     <string name="prompt_password">Password:</string>
     <string name="prompt_confirmation">Confirm password:</string>
     <string name="prompt_captcha_text">Insert the text shown above:</string>
+    <string name="registration_password_too_short">Password must be at least 8 characters long</string>
+    <string name="registration_password_dont_match">Passwords don\'t match</string>
+    <string name="registration_username_too_short">Username must be at least 3 characters long</string>
+    <string name="registration_username_already_taken">Username already taken</string>
+    <string name="registration_captcha_invalid">Invalid Captcha</string>
+
 
     <!-- CONTACTS & CONVERSATIONS STRINGS -->
     <string name="contacts_activity_name">Contacts</string>
@@ -38,6 +45,9 @@
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
+
+    <string name="loading_message">Loading...</string>
+
 
 
 </resources>

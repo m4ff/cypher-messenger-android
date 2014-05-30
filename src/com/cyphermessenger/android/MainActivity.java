@@ -12,7 +12,7 @@ public class MainActivity extends ActionBarActivity {
 
     /** TODO
      * RegistrationActivity: back button
-     * LoginActiviti: spostare bottoni in alto
+     * LoginActivity: spostare bottoni in alto
      */
 
 
