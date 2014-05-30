@@ -57,7 +57,7 @@ public class AddContactActivity extends FragmentActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem menuItem = menu.findItem(R.id.add_contact_search_view);
         MenuItemCompat.expandActionView(menuItem);
-        SearchView searchContactsView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        final SearchView searchContactsView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchContactsView.setIconifiedByDefault(true);
         searchContactsView.setIconified(false);
         searchContactsView.setFocusable(true);
@@ -94,6 +94,13 @@ public class AddContactActivity extends FragmentActivity {
                     }
                 });
                 contentManager.findUser(s);
+            }
+        });
+        searchContactsView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchContactsView.setIconified(false);
+                return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
