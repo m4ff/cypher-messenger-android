@@ -27,6 +27,7 @@ public class AddContactActivity extends FragmentActivity {
     private final List<String> contacts = new LinkedList<>();
     private ProgressBar progressBar;
     private ArrayAdapter<String> contactsAdapter;
+    private MenuItem menuItem;
     private boolean lock = false;
 
     @Override
@@ -55,7 +56,7 @@ public class AddContactActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_contact, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        MenuItem menuItem = menu.findItem(R.id.add_contact_search_view);
+        menuItem = menu.findItem(R.id.add_contact_search_view);
         MenuItemCompat.expandActionView(menuItem);
         final SearchView searchContactsView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchContactsView.setIconifiedByDefault(true);
@@ -156,5 +157,9 @@ public class AddContactActivity extends FragmentActivity {
             cm.addContact(name);
         }
         lock = false;
+    }
+
+    public MenuItem getMenuItem() {
+        return menuItem;
     }
 }

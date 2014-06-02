@@ -89,9 +89,11 @@ public class ContactsActivity extends Activity implements NotificationListener {
         switch (item.getItemId()) {
             case R.id.action_add_contact:
                 startActivity(new Intent(this, AddContactActivity.class));
+                return true;
             case R.id.action_logout:
                 contentManager.logout();
                 startActivity(new Intent(this, LoginActivity.class));
+                return  true;
             default:
                 return false;
         }
