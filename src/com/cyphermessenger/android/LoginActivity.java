@@ -1,16 +1,12 @@
 package com.cyphermessenger.android;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.cyphermessenger.client.*;
@@ -24,44 +20,22 @@ public class LoginActivity extends Activity implements ContentListener {
 
     private Toast toast;
     private ContentManager contentManager;
+    private ProgressDialog progressDialog;
+    private EditText name;
+    private EditText password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading_message));
         toast = new Toast(this);
 
-        final EditText name = (EditText) findViewById(R.id.name_field);
-        final EditText password = (EditText) findViewById(R.id.password_field);
-
-        final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
-        final Button registration = (Button) findViewById(R.id.button_registration);
-        //registrationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        registration.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(registrationIntent);
-            }
-        });
-
-        final Button login = (Button) findViewById(R.id.button_login);
+        name = (EditText) findViewById(R.id.name_field);
+        password = (EditText) findViewById(R.id.password_field);
         contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
-        final Context that = this;
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String _name = name.getText().toString();
-                String _pass = password.getText().toString();
-                if (!"".equals(_name) && !"".equals(_pass)) {
-                    contentManager.login(_name, _pass);
-                    login.setEnabled(false);
-                } else {
-                    toast.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     @Override
@@ -83,9 +57,29 @@ public class LoginActivity extends Activity implements ContentListener {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch(item.getItemId()) {
+            case R.id.home :
+                break;
+            case R.id.action_settings:
+                return true;
+            case R.id.action_login:
+                final Context that = getApplicationContext();
+                String _name = name.getText().toString();
+                String _pass = password.getText().toString();
+                if (!"".equals(_name) && !"".equals(_pass)) {
+                    progressDialog.show();
+                    contentManager.login(_name, _pass);
+                } else {
+                    toast.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG).show();
+                }
+
+                return true;
+            case R.id.action_register:
+                final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
+                startActivity(registrationIntent);
+                return true;
+            default:
+                return false;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -97,7 +91,6 @@ public class LoginActivity extends Activity implements ContentListener {
             public void run() {
                 toast.makeText(getApplicationContext(), R.string.login_toast_failed, Toast.LENGTH_LONG).show();
                 ((EditText) findViewById(R.id.password_field)).getText().clear();
-                findViewById(R.id.button_login).setEnabled(true);
             }
         });
     }

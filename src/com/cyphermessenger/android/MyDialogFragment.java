@@ -27,7 +27,6 @@ public class MyDialogFragment extends DialogFragment {
         builder.setPositiveButton(R.string.alert_button_add, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                caller.onBackPressed();
                 caller.handleOk(contactName);
             }
         });

@@ -2,11 +2,8 @@ package com.cyphermessenger.android;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +24,6 @@ public class AddContactActivity extends FragmentActivity {
     private final List<String> contacts = new LinkedList<>();
     private ProgressBar progressBar;
     private ArrayAdapter<String> contactsAdapter;
-    private MenuItem menuItem;
     private boolean lock = false;
 
     @Override
@@ -56,7 +52,7 @@ public class AddContactActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_contact, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        menuItem = menu.findItem(R.id.add_contact_search_view);
+        MenuItem menuItem = menu.findItem(R.id.add_contact_search_view);
         MenuItemCompat.expandActionView(menuItem);
         final SearchView searchContactsView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchContactsView.setIconifiedByDefault(true);
@@ -117,6 +113,7 @@ public class AddContactActivity extends FragmentActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            finish();
                             AUtils.shortToast(R.string.alert_text, getApplicationContext());
                         }
                     });
@@ -157,9 +154,5 @@ public class AddContactActivity extends FragmentActivity {
             cm.addContact(name);
         }
         lock = false;
-    }
-
-    public MenuItem getMenuItem() {
-        return menuItem;
     }
 }

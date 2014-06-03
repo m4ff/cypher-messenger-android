@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import com.cyphermessenger.client.*;
-import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
 import java.util.HashMap;
@@ -21,7 +19,7 @@ import java.util.List;
 public class ContactsActivity extends Activity implements NotificationListener {
 
     private ListView mainView;
-    private List<CypherContact> contact = new LinkedList<>();
+    private List<CypherContact> contactList = new LinkedList<>();
     private ArrayAdapter<CypherContact> adapter;
     private final ContactsActivity that = this;
 
@@ -32,7 +30,7 @@ public class ContactsActivity extends Activity implements NotificationListener {
     private ContentManager contentManager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
@@ -41,20 +39,24 @@ public class ContactsActivity extends Activity implements NotificationListener {
 
         mainView = (ListView) findViewById(R.id.contacts_list);
 
-        contact = contentManager.getContactList();
+        contactList = contentManager.getContactList();
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View template = inflater.inflate(R.layout.contacts_template, null);
 
-        adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contact);
+        adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contactList);
         mainView.setAdapter(adapter);
 
         mainView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                CypherContact contact = contactList.get(position);
                 Intent conversationTo = new Intent(that, MessagesActivity.class);
                 conversationTo.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                bundle.putLong("CONTACT", contact.getUserID());
+                conversationTo.putExtras(bundle);
                 that.startActivity(conversationTo);
             }
         });
@@ -64,8 +66,8 @@ public class ContactsActivity extends Activity implements NotificationListener {
     protected void onResume() {
         super.onResume();
         updateManager.setShortInterval();
-        contact.clear();
-        contact.addAll(contentManager.getContactList());
+        contactList.clear();
+        contactList.addAll(contentManager.getContactList());
     }
 
     @Override
@@ -101,7 +103,7 @@ public class ContactsActivity extends Activity implements NotificationListener {
 
     @Override
     public void onNewContacts(List<CypherContact> contacts) {
-        contact.addAll(contacts);
+        contactList.addAll(contacts);
         adapter.notifyDataSetChanged();
     }
 
