@@ -12,8 +12,17 @@ public class CypherContact extends CypherUser {
     public static final String BLOCKED = "blocked";
     public static final String DENIED = "denied";
 
+
     String status;
     Long contactTimestamp;
+    Boolean isFirst;
+
+    public CypherContact(String username, Long userID, ECKey key, Long keyTime, String status, Long timestamp, Boolean isFirst) {
+        super(username, userID, key, keyTime);
+        this.status = status;
+        this.contactTimestamp = timestamp;
+        this.isFirst = isFirst;
+    }
 
     public CypherContact(String username, Long userID, ECKey key, Long keyTime, String status, Long timestamp) {
         super(username, userID, key, keyTime);
@@ -28,6 +37,10 @@ public class CypherContact extends CypherUser {
 
     public String getStatus() {
         return status;
+    }
+
+    public Boolean isFirst() {
+        return isFirst;
     }
 
     @Override

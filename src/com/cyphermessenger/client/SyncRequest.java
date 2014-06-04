@@ -23,7 +23,8 @@ import java.util.*;
 
 public final class SyncRequest {
 
-    final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
+    //final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
+    final static String DOMAIN = "http://10.23.19.140:8080/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
     public static final boolean SINCE = true;
@@ -235,7 +236,8 @@ public final class SyncRequest {
             long keyTimestamp = node.get("keyTimestamp").asLong();
             long contactTimestamp = node.get("contactTimestamp").asLong();
             ECKey key = Utils.decodeKey(node.get("publicKey").asText());
-            return new CypherContact(contactName, userID, key, keyTimestamp, CypherContact.ACCEPTED, contactTimestamp);
+            boolean isFirst = node.get("isFirst").asBoolean();
+            return new CypherContact(contactName, userID, key, keyTimestamp, CypherContact.ACCEPTED, contactTimestamp, isFirst);
         } else {
             String status;
             switch (statusCode) {
@@ -402,8 +404,9 @@ public final class SyncRequest {
                 String username = selectedNode.get("username").asText();
                 String contactStatus = selectedNode.get("contactStatus").asText();
                 ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
+                boolean isFirst = selectedNode.get("isFirst").asBoolean();
                 publicKey.setTime(keyTime);
-                CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp);
+                CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp, isFirst);
                 array.add(newContact);
             }
         }

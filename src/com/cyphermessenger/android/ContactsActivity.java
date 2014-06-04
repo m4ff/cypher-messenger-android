@@ -72,7 +72,6 @@ public class ContactsActivity extends MainActivity {
                 startActivity(new Intent(this, AddContactActivity.class));
                 return true;
             case R.id.action_logout:
-                cm.logout();
                 startActivity(new Intent(this, LoginActivity.class));
                 return  true;
             default:

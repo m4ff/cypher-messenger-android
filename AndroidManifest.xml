@@ -31,6 +31,7 @@
         <activity
                 android:name=".LoginActivity"
                 android:launchMode="singleTop"
+                android:screenOrientation="portrait"
                 android:label="@string/login_activity_name">
         </activity>
 
@@ -38,6 +39,7 @@
                 android:name=".RegistrationActivity"
                 android:label="@string/registration_activity_name"
                 android:windowSoftInputMode="adjustResize|stateHidden"
+                android:screenOrientation="portrait"
                 android:parentActivityName=".LoginActivity"
                 android:launchMode="singleTop">
 

@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class ContentUpdateManager extends BroadcastReceiver implements ContentListener {
 
-    private final static long LONG_INTERVAL = 1000 * 60 * 1;
+    private final static long LONG_INTERVAL = 1000 * 60;
     private final static long SHORT_INTERVAL = 1000 * 10;
     private final static long MAX_THREAD_TIME = 1000 * 10;
 
@@ -84,7 +84,7 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         }
     }
 
-    public void startDefaultReceiver(Context ctx) {
+    public void startDefaultReceiver() {
         toggleDefaultReceiver(true);
         setLongInterval();
     }
@@ -110,6 +110,7 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     }
 
     public void clearAlarm() {
+        toggleDefaultReceiver(false);
         alarmManager.cancel(pendingIntent);
     }
 
@@ -123,12 +124,8 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
 
         contentManager.pullAll();
         /**
-        try {
-            contentManager.waitForAllRequests(MAX_THREAD_TIME);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
+         * TODO Wake lock
+         */
     }
 
 
@@ -137,6 +134,9 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         Log.d("MSGS", Arrays.toString(messages.toArray()));
         HashMap<Long, List<CypherMessage>> map = new HashMap<>();
         for(CypherMessage m : messages) {
+            if(m.isSender() == true) {
+                continue;
+            }
             long id = m.getContactID();
             LinkedList<CypherMessage> list = (LinkedList<CypherMessage>) map.get(id);
             if(list == null) {
@@ -169,8 +169,12 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     @Override
     public final void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
         Log.d("CTCTS", Arrays.toString(contacts.toArray()));
-        for(CypherContact contact : contacts) {
-            if(contact.getContactTimestamp() > notifiedUntil) {
+        Iterator<CypherContact> i = contacts.iterator();
+        while(i.hasNext()) {
+            CypherContact contact = i.next();
+            if(contact.isFirst()) {
+                i.remove();
+            } else if(contact.getContactTimestamp() > notifiedUntil) {
                 NotificationCompat.Builder tmp = notificationBuilder;
                 String text = null;
                 switch(contact.getStatus()) {

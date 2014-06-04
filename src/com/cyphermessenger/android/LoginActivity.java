@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -32,6 +33,8 @@ public class LoginActivity extends Activity implements ContentListener {
         new ContentUpdateManager(this).clearAlarm();
 
         cm = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
+
+        cm.logout();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
@@ -104,14 +107,14 @@ public class LoginActivity extends Activity implements ContentListener {
     public void onLogged(CypherUser user) {
         // Start AlarmManager for notifications
         ContentUpdateManager updateManager = new ContentUpdateManager(this);
-        updateManager.startDefaultReceiver(this);
-
+        updateManager.startDefaultReceiver();
+        Log.d("LOGIN", "1");
         // Load data from server
         cm.pullAll();
         cm.waitForAllRequests();
-
+        Log.d("LOGIN", "2");
         progressDialog.dismiss();
-
+        Log.d("LOGIN", "3");
         Intent contactIntent = new Intent(this, ContactsActivity.class);
         contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(contactIntent);
@@ -179,7 +182,13 @@ public class LoginActivity extends Activity implements ContentListener {
 
     @Override
     public void onServerError() {
-
+        progressDialog.dismiss();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AUtils.shortTopToast(R.string.error_general_error, getApplicationContext());
+            }
+        });
     }
 
     @Override

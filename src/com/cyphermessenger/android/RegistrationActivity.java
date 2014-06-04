@@ -108,6 +108,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         savedState.putString("passwordClient", passwordFromClient);
         savedState.putString("passwordConfirmationClient", confirmFromClient);
         savedState.putString("captchaValue", captchaTextFromClient);
+        savedState.putBoolean("wasDialogShowing", progressDialog.isShowing());
         if(captcha != null) {
             savedState.putStringArray("captchaSerialized", captcha.toStringArray());
         }
@@ -121,12 +122,16 @@ public class RegistrationActivity extends Activity implements ContentListener {
         passwordTextField.setText(savedState.getString("passwordClient"));
         passwordConfirmTextField.setText(savedState.getString("passwordConfirmationClient"));
         captchaTextField.setText(savedState.getString("captchaValue"));
+        if(savedState.getBoolean("wasDialogShowing")) {
+            progressDialog.show();
+        }
     }
+
 
     @Override
     public void onLogged(CypherUser user) {
         // Start AlarmManager for notifications
-        new ContentUpdateManager(this).startDefaultReceiver(this);
+        new ContentUpdateManager(this).startDefaultReceiver();
 
         // Load data from server
         cm.pullAll();
@@ -225,8 +230,8 @@ public class RegistrationActivity extends Activity implements ContentListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progressDialog.dismiss();
                 usernameTextField.getText().clear();
+                onCaptchaInvalid();
                 AUtils.shortToast(R.string.registration_username_already_taken, getApplicationContext());
             }
         });

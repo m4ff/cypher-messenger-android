@@ -53,6 +53,7 @@ public class ContentManager {
                 Thread th = i.next();
                 if (th.isAlive()) {
                     th.join(millis);
+                    Log.d("ContentManger", "Waiting for thread " + th);
                 }
                 i.remove();
             }
@@ -61,7 +62,7 @@ public class ContentManager {
 
     public void waitForAllRequests() {
         try {
-            waitForAllRequests(1000 * 30);
+            waitForAllRequests(1000 * 60);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -90,6 +91,7 @@ public class ContentManager {
 
     private void handleException(Exception e) {
         Log.e("ContentManager", "handleException", e);
+        e.printStackTrace();
         if(e instanceof IOException) {
             contentListener.onServerError();
         } else if(e instanceof APIErrorException) {
