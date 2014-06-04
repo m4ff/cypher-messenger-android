@@ -19,15 +19,19 @@ import java.util.List;
 public class LoginActivity extends Activity implements ContentListener {
 
     private Toast toast;
-    private ContentManager contentManager;
     private ProgressDialog progressDialog;
     private EditText name;
     private EditText password;
+    private ContentManager cm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        new ContentUpdateManager(this).clearAlarm();
+
+        cm = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading_message));
@@ -35,13 +39,12 @@ public class LoginActivity extends Activity implements ContentListener {
 
         name = (EditText) findViewById(R.id.name_field);
         password = (EditText) findViewById(R.id.password_field);
-        contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        contentManager.interruptRequests();
+        cm.interruptRequests();
     }
 
     @Override
@@ -68,7 +71,7 @@ public class LoginActivity extends Activity implements ContentListener {
                 String _pass = password.getText().toString();
                 if (!"".equals(_name) && !"".equals(_pass)) {
                     progressDialog.show();
-                    contentManager.login(_name, _pass);
+                    cm.login(_name, _pass);
                 } else {
                     toast.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG).show();
                 }
@@ -89,52 +92,103 @@ public class LoginActivity extends Activity implements ContentListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                toast.makeText(getApplicationContext(), R.string.login_toast_failed, Toast.LENGTH_LONG).show();
                 ((EditText) findViewById(R.id.password_field)).getText().clear();
+                AUtils.shortToast(R.string.login_toast_failed, getApplicationContext());
             }
         });
     }
 
     @Override
     public void onLogged(CypherUser user) {
+        progressDialog.dismiss();
+        new ContentUpdateManager(this).startDefaultReceiver(this);
         Intent contactIntent = new Intent(this, ContactsActivity.class);
         contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(contactIntent);
-        finish();
     }
 
     @Override
-    public void onCaptcha(Captcha captcha) {}
+    public void onContactNotFound() {
+
+    }
+
     @Override
-    public void onCaptchaInvalid() {}
+    public void onContactWaiting() {
+
+    }
+
     @Override
-    public void onUsernameTaken() {}
+    public void onContactBlocked() {
+
+    }
+
     @Override
-    public void onUsernameNotFound() {}
+    public void onContactDenied() {
+
+    }
+
     @Override
-    public void onMessageSent(CypherMessage message) {}
+    public void onMessageSent(CypherMessage message) {
+
+    }
+
     @Override
-    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {}
+    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
+
+    }
+
     @Override
-    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {}
+    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
+
+    }
+
     @Override
-    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {}
+    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {
+
+    }
+
     @Override
-    public void onGetMessages(List<CypherMessage> messages) {}
+    public void onGetMessages(List<CypherMessage> messages) {
+
+    }
+
     @Override
-    public void onFindUser(List<String> list) {}
+    public void onCaptcha(Captcha captcha) {
+
+    }
+
     @Override
-    public void onContactChange(CypherContact contact) {}
+    public void onFindUser(List<String> list) {
+
+    }
+
     @Override
-    public void onServerError() {}
+    public void onContactChange(CypherContact contact) {
+
+    }
+
     @Override
-    public void onSessionInvalid() {}
+    public void onServerError() {
+
+    }
+
     @Override
-    public void onContactNotFound() {}
+    public void onSessionInvalid() {
+
+    }
+
     @Override
-    public void onContactWaiting() {}
+    public void onCaptchaInvalid() {
+
+    }
+
     @Override
-    public void onContactBlocked() {}
+    public void onUsernameTaken() {
+
+    }
+
     @Override
-    public void onContactDenied() {}
+    public void onUsernameNotFound() {
+
+    }
 }

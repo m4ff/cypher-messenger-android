@@ -4,18 +4,15 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
+import android.content.pm.PackageManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import com.cyphermessenger.client.*;
 import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paolo on 24/05/14.
@@ -26,23 +23,40 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     private final static long SHORT_INTERVAL = 1000 * 10;
     private final static long MAX_THREAD_TIME = 1000 * 10;
 
+    public static final String BROADCAST_NOTIFICATIONS = "com.cyphermessenger.android.BROADCAST_NOTIFICATIONS";
+
     private final AlarmManager alarmManager;
     private final PendingIntent pendingIntent;
-    private final NotificationManager notificationManager;
-    private final NotificationCompat.Builder notificationBuilder;
-    private final Context ctx;
-    private final ContentManager contentManager;
+    private final PackageManager packageManager;
+    private final ComponentName componentName;
+    private final IntentFilter intentFilter;
+
+
+
+    private NotificationManager notificationManager;
+    private NotificationCompat.Builder notificationBuilder;
     private NotificationListener notificationListener;
-    private long activeContact;
+    private long activeContact = -1;
+    private ContentManager contentManager;
+
+    public ContentUpdateManager() {
+        this.alarmManager = null;
+        this.notificationManager = null;
+        this.pendingIntent = null;
+        this.packageManager = null;
+        this.componentName = null;
+        this.intentFilter = null;
+    }
 
     public ContentUpdateManager(Context ctx) {
-        this.ctx = ctx;
         this.alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-        this.notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent intent = new Intent(ctx, ContentUpdateManager.class);
-        this.pendingIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
-        this.contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(ctx), this);
-        this.notificationBuilder = new NotificationCompat.Builder(ctx).setSmallIcon(android.R.drawable.stat_notify_chat);
+        Intent intent = new Intent();
+        intent.setAction(BROADCAST_NOTIFICATIONS);
+        //intent.setClass(ctx, ContentUpdateManager.class);
+        this.pendingIntent = PendingIntent.getBroadcast(ctx, 1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        this.packageManager = ctx.getPackageManager();
+        this.componentName = new ComponentName(ctx, ContentUpdateManager.class);
+        this.intentFilter = new IntentFilter(BROADCAST_NOTIFICATIONS);
     }
 
     public ContentUpdateManager(Context ctx, NotificationListener notificationListener) {
@@ -62,32 +76,65 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         this.activeContact = -1;
     }
 
-    void startReceiver() {
+    private void toggleDefaultReceiver(boolean enabled) {
+        if(enabled) {
+            packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        } else {
+            packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        }
+    }
+
+    public void startDefaultReceiver(Context ctx) {
+        toggleDefaultReceiver(true);
         setLongInterval();
     }
 
-    public void setLongInterval() {
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), LONG_INTERVAL, pendingIntent);
+    public void register(Context ctx) {
+        toggleDefaultReceiver(false);
+        ctx.registerReceiver(this, intentFilter);
+        setShortInterval();
     }
 
-    public void setShortInterval() {
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), SHORT_INTERVAL, pendingIntent);
+    public void unregister(Context ctx) {
+        ctx.unregisterReceiver(this);
+        toggleDefaultReceiver(true);
+        setLongInterval();
+    }
+
+    private void setLongInterval() {
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), LONG_INTERVAL, pendingIntent);
+    }
+
+    private void setShortInterval() {
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), SHORT_INTERVAL, pendingIntent);
+    }
+
+    public void clearAlarm() {
+        alarmManager.cancel(pendingIntent);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("onReceive", "onReceive called");
+        contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(context), this);
+        notificationBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(android.R.drawable.stat_notify_chat);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         contentManager.pullAll();
+        /**
         try {
             contentManager.waitForAllRequests(MAX_THREAD_TIME);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        */
     }
 
 
     @Override
-    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
+    public final void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
+        Log.d("MSGS", Arrays.toString(messages.toArray()));
         HashMap<Long, List<CypherMessage>> map = new HashMap<>();
         for(CypherMessage m : messages) {
             long id = m.getContactID();
@@ -120,7 +167,8 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     }
 
     @Override
-    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
+    public final void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
+        Log.d("CTCTS", Arrays.toString(contacts.toArray()));
         for(CypherContact contact : contacts) {
             if(contact.getContactTimestamp() > notifiedUntil) {
                 NotificationCompat.Builder tmp = notificationBuilder;
@@ -151,17 +199,15 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     }
 
     @Override
-    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {
+    public final void onPullKeys(List<ECKey> keys, long notifiedUntil) {
+        Log.d("KEYS", Arrays.toString(keys.toArray()));
         if(notificationListener != null) {
             notificationListener.onNewKeys();
         }
     }
 
     @Override
-    public void onGetMessages(List<CypherMessage> messages) {
-
-    }
-
+    public final void onGetMessages(List<CypherMessage> messages) {}
     @Override
     public void onLogged(CypherUser user) {}
     @Override

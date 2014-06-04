@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:weightSum="100"
     android:id="@+id/messages_main_view"
-    tools:context="com.cyphermessenger.MessagesActivity">
+    tools:context=".MessagesActivity">
 
     <LinearLayout
         android:id="@+id/message_bubble_list"
@@ -50,7 +50,7 @@
         <ImageButton
             android:id="@+id/message_button_send"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:background="@drawable/ic_action_send_now"
             android:layout_weight="0.1" />

@@ -1,5 +1,6 @@
 package com.cyphermessenger.android;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,7 +17,7 @@ import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
 import java.util.List;
 
-public class RegistrationActivity extends ActionBarActivity implements View.OnClickListener, ContentListener {
+public class RegistrationActivity extends Activity implements ContentListener {
 
 
     private EditText usernameTextField;
@@ -94,22 +95,6 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onClick(View v) {
-
-
-        /*
-        if(passwordFromClient.length() < 8) {
-            Toast.makeText(this.getApplicationContext(), "Invalid password: please insert a password longer than 8 characters", Toast.LENGTH_LONG);
-        } else {
-
-        }
-
-        if(passwordFromServer.equals(passwordFromClient)) {
-
-        }*/
-    }
-
 
     @Override
     protected void onSaveInstanceState(Bundle savedState) {
@@ -138,6 +123,7 @@ public class RegistrationActivity extends ActionBarActivity implements View.OnCl
 
     @Override
     public void onLogged(CypherUser user) {
+        new ContentUpdateManager(this).startDefaultReceiver(this);
         progressDialog.dismiss();
         startActivity(new Intent(this, ContactsActivity.class));
     }

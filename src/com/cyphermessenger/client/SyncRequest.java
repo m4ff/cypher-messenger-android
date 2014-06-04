@@ -176,18 +176,16 @@ public final class SyncRequest {
         return findUser(session, username, 10);
     }
 
-    public static CypherMessage sendMessage(CypherSession session, CypherUser contactUser, String message) throws IOException, APIErrorException {
+    public static void sendMessage(CypherSession session, CypherUser contactUser, CypherMessage message) throws IOException, APIErrorException {
         CypherUser user = session.getUser();
-        long timestamp = System.currentTimeMillis();
-        byte[] messageID = Utils.randomBytes(4);
-        byte[] timestampBytes = Utils.longToBytes(timestamp);
-        int messageIDLong = (int) Utils.bytesToLong(messageID);
+        byte[] timestampBytes = Utils.longToBytes(message.getTimestamp());
+        int messageIDLong = message.getMessageID();
         Encrypt encryptionCtx = new Encrypt(user.getKey().getSharedSecret(contactUser.getKey()));
-        encryptionCtx.updateAuthenticatedData(messageID);
+        encryptionCtx.updateAuthenticatedData(Utils.longToBytes(messageIDLong));
         encryptionCtx.updateAuthenticatedData(timestampBytes);
         byte[] payload;
         try {
-            payload = encryptionCtx.process(message.getBytes());
+            payload = encryptionCtx.process(message.getText().getBytes());
         } catch (InvalidCipherTextException e) {
             throw new RuntimeException(e);
         }
@@ -195,7 +193,7 @@ public final class SyncRequest {
         pairs.put("payload", Utils.BASE64_URL.encode(payload));
         pairs.put("contactID", contactUser.getUserID() + "");
         pairs.put("messageID", messageIDLong + "");
-        pairs.put("messageTimestamp", timestamp + "");
+        pairs.put("messageTimestamp", message.getTimestamp() + "");
         pairs.put("userKeyTimestamp", session.getUser().getKeyTime() + "");
         pairs.put("contactKeyTimestamp", contactUser.getKeyTime() + "");
 
@@ -211,7 +209,6 @@ public final class SyncRequest {
         if (statusCode != StatusCode.OK) {
             throw new APIErrorException(statusCode);
         }
-        return new CypherMessage(messageIDLong, message, timestamp, true, contactUser.getUserID());
     }
 
     private static CypherContact manageContact(CypherSession session, String contactName, boolean add) throws IOException, APIErrorException {
@@ -320,7 +317,7 @@ public final class SyncRequest {
         JsonNode node = pullUpdate(session, contact, "keys", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
-            return new PullResults(null, null, handleKeyNode(node, session.getUser().getLocalPassword()), node.get("notifiedUntil").asLong());
+            return new PullResults(null, null, handleKeyNode(node, contact == null ? session.getUser().getLocalPassword() : null), node.get("notifiedUntil").asLong());
         } else {
             throw new APIErrorException(statusCode);
         }
@@ -330,9 +327,9 @@ public final class SyncRequest {
         JsonNode node = pullUpdate(session, contact, "all", since, time);
         int statusCode = node.get("status").asInt();
         if (statusCode == StatusCode.OK) {
-            ArrayList<ECKey> keysArray = handleKeyNode(node, session.getUser().getLocalPassword());
+            ArrayList<ECKey> keysArray = handleKeyNode(node, contact == null ? session.getUser().getLocalPassword() : null);
             ArrayList<CypherContact> contactsArray = handleContactNode(node);
-            ArrayList<CypherMessage> messagesArray = handleMessageNode(node, session.getUser().getKey(), contact.getKey());
+            ArrayList<CypherMessage> messagesArray = handleMessageNode(node, session.getUser().getKey(), contact != null ? contact.getKey() : null);
             long notifiedUntil = node.get("notifiedUntil").asLong();
             return new PullResults(messagesArray, contactsArray, keysArray, notifiedUntil);
         } else {
@@ -350,19 +347,24 @@ public final class SyncRequest {
                 long timestamp = selectedNode.get("timestamp").asLong();
                 int messageID = selectedNode.get("messageID").asInt();
                 byte[] payload = Utils.BASE64_URL.decode(selectedNode.get("payload").asText());
-                byte[] sharedSecret = key1.getSharedSecret(key2);
+                String plainText = null;
 
+                boolean handleDecryption = false;
                 // try to decrypt message
-                try {
-                    String plainText = new String(Decrypt.process(sharedSecret, payload, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
-                    CypherMessage message = new CypherMessage(messageID, plainText, timestamp, isSender, receivedContactID);
-                    array.add(message);
+                if(key2 != null) try {
+                    byte[] sharedSecret = key1.getSharedSecret(key2);
+                    plainText = new String(Decrypt.process(sharedSecret, payload, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
+                    handleDecryption = true;
                 } catch (InvalidCipherTextException ex) {
                     Log.e("PULL", "Message decryption failed", ex);
-                    /** TODO
-                     * handle message decryption error
-                     */
                 }
+                CypherMessage message;
+                if(handleDecryption) {
+                    message = new CypherMessage(messageID, plainText, timestamp, isSender, receivedContactID);
+                } else {
+                    message = new CypherMessage(messageID, payload, timestamp, isSender, receivedContactID);
+                }
+                array.add(message);
             }
         }
         return array;
@@ -443,8 +445,8 @@ public final class SyncRequest {
         String[] keys = null;
         String[] vals = null;
         if (m != null) {
-            keys = (String[]) m.keySet().toArray();
-            vals = (String[]) m.values().toArray();
+            keys = (String[]) m.keySet().toArray(new String[]{});
+            vals = (String[]) m.values().toArray(new String[]{});
         }
         return doRequest(endpoint, session, keys, vals);
     }

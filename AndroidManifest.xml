@@ -2,84 +2,69 @@
 <manifest
         xmlns:android="http://schemas.android.com/apk/res/android"
         package="com.cyphermessenger.android"
-        android:installLocation="preferExternal" >
+        android:installLocation="preferExternal">
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="19" />
+            android:minSdkVersion="8"
+            android:targetSdkVersion="19"/>
 
     <uses-permission
             android:name="android.permission.INTERNET"
-            android:maxSdkVersion="19" />
+            android:maxSdkVersion="19"/>
 
     <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+            android:allowBackup="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+
+        <receiver
+                android:name=".ContentUpdateManager"
+                android:enabled="false"
+                android:exported="true" >
+            <intent-filter>
+                <action android:name="com.cyphermessenger.android.BROADCAST_NOTIFICATIONS" />
+            </intent-filter>
+         </receiver>
+
 
         <activity
-            android:name=".LoginActivity"
-            android:launchMode="singleTop"
-            android:label="@string/login_activity_name" >
+                android:name=".LoginActivity"
+                android:launchMode="singleTop"
+                android:label="@string/login_activity_name">
         </activity>
 
         <activity
-            android:name=".RegistrationActivity"
-            android:label="@string/registration_activity_name"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:parentActivityName=".LoginActivity"
-            android:launchMode="singleTop" >
+                android:name=".RegistrationActivity"
+                android:label="@string/registration_activity_name"
+                android:windowSoftInputMode="adjustResize|stateHidden"
+                android:parentActivityName=".LoginActivity"
+                android:launchMode="singleTop">
 
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".LoginActivity" />
+                    android:value=".LoginActivity"/>
         </activity>
 
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <!--
-        <activity
-            android:name=".ConversationsActivity"
-            android:label="@string/conversations_activity_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable" />
-        </activity>
-        -->
         <activity
                 android:name=".ContactsActivity"
                 android:label="@string/contacts_activity_name"
                 android:launchMode="singleTop">
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
-            <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable" />
         </activity>
 
         <activity
-            android:name=".MessagesActivity"
-            android:parentActivityName=".ContactsActivity"
-            android:label="@string/title_activity_messages"
-            android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustPan" >
+                android:name=".MessagesActivity"
+                android:parentActivityName=".ContactsActivity"
+                android:label="@string/title_activity_messages"
+                android:launchMode="singleTop"
+                android:windowSoftInputMode="adjustPan">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ContactsActivity" />
+                    android:value=".ContactsActivity"/>
         </activity>
 
         <activity
@@ -87,19 +72,19 @@
                 android:parentActivityName=".ContactsActivity"
                 android:launchMode="singleTop"
                 android:allowTaskReparenting="false"
-                android:windowSoftInputMode="adjustResize" >
+                android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
 
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ContactsActivity" />
+                    android:value=".ContactsActivity"/>
 
             <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                    android:name="android.app.searchable"
+                    android:resource="@xml/searchable"/>
         </activity>
 
     </application>

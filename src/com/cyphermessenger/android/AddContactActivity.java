@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import android.support.v7.widget.SearchView;
-import android.support.v4.app.FragmentActivity;
 import com.cyphermessenger.client.BasicContentListener;
 import com.cyphermessenger.client.ContentManager;
 import com.cyphermessenger.client.CypherContact;
@@ -19,7 +18,7 @@ import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AddContactActivity extends FragmentActivity {
+public class AddContactActivity extends MainActivity {
 
     private final List<String> contacts = new LinkedList<>();
     private ProgressBar progressBar;
@@ -72,25 +71,9 @@ public class AddContactActivity extends FragmentActivity {
                 return true;
             }
 
-            private void doRequest(final String s) {
+            private void doRequest(String s) {
                 progressBar.setVisibility(View.VISIBLE);
-                final ContentManager contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(getApplicationContext()));
-                contentManager.setContentListener(new BasicContentListener() {
-                    @Override
-                    public void onFindUser(List<String> list) {
-                        contacts.clear();
-                        list.remove(contentManager.getSession().getUser().getUsername());
-                        contacts.addAll(list);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                contactsAdapter.notifyDataSetChanged();
-                                progressBar.setVisibility(View.GONE);
-                            }
-                        });
-                    }
-                });
-                contentManager.findUser(s);
+                cm.findUser(s);
             }
         });
         searchContactsView.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -106,53 +89,40 @@ public class AddContactActivity extends FragmentActivity {
     public void handleOk(String name) {
         if(!lock) {
             lock = true;
-            ContentManager cm = new ContentManager(DBManagerAndroidImpl.getInstance(this));
-            cm.setContentListener(new BasicContentListener() {
-                @Override
-                public void onContactChange(final CypherContact contact) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            finish();
-                            AUtils.shortToast(R.string.alert_text, getApplicationContext());
-                        }
-                    });
-                }
-
-                @Override
-                public void onContactDenied() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AUtils.shortToast(R.string.error_contact_denied, getApplicationContext());
-                        }
-                    });
-                }
-
-                @Override
-                public void onUsernameNotFound() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AUtils.shortToast(R.string.error_contact_not_found, getApplicationContext());
-                        }
-                    });
-                }
-
-                @Override
-                public void onServerError() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AUtils.shortToast(R.string.error_general_error, getApplicationContext());
-                        }
-                    });
-                }
-            });
             contacts.remove(name);
             contactsAdapter.notifyDataSetChanged();
             cm.addContact(name);
         }
         lock = false;
+    }
+
+    @Override
+    public void onContactChange(final CypherContact contact) {
+        finish();
+        showToast(R.string.alert_text);
+    }
+
+    @Override
+    public void onContactDenied() {
+        showToast(R.string.error_contact_denied);
+    }
+
+    @Override
+    public void onUsernameNotFound() {
+        showToast(R.string.error_contact_not_found);
+    }
+
+    @Override
+    public void onFindUser(List<String> list) {
+        contacts.clear();
+        list.remove(cm.getSession().getUser().getUsername());
+        contacts.addAll(list);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                contactsAdapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 }

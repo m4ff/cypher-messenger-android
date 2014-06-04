@@ -63,6 +63,7 @@ public class DBManagerAndroidImpl implements DBManager {
         val.put(DBHelper.COLUMN_MESSAGE_DATE_TIME, msg.getTimestamp());
         val.put(DBHelper.COLUMN_MESSAGE_IS_SENDER, msg.isSender());
         val.put(DBHelper.COLUMN_MESSAGE_CONTACT_ID, msg.getContactID());
+        val.put(DBHelper.COLUMN_MESSAGE_SENT, msg.isSent());
         db.replace(DBHelper.TABLE_MESSAGES, null, val);
     }
 
@@ -104,25 +105,24 @@ public class DBManagerAndroidImpl implements DBManager {
     @Override
     public CypherContact getContactByID(long id) {
         SQLiteDatabase db = openHelper.getReadableDatabase();
-        Cursor c = db.query(DBHelper.TABLE_CONTACTS, new String[]{DBHelper.COLUMN_KEY_ID, DBHelper.COLUMN_KEY_PUBLIC}, DBHelper.COLUMN_CONTACT_ID + " = " + id, null, null, null, null);
-        if (c.moveToNext()) {
-            long keyTime = c.getLong(0);
-            byte[] publicKey = c.getBlob(1);
-            Cursor d = db.query(DBHelper.TABLE_KEYS, new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME}, DBHelper.COLUMN_KEY_USER + " = " + id, null, null, null, null);
-            if (d.moveToNext()) {
-                String username = d.getString(0);
-                String status = d.getString(1);
-                long contactTime = d.getLong(2);
-                ECKey key = new ECKey(publicKey, null);
-                CypherContact contact = new CypherContact(username, id, key, keyTime, status, contactTime);
-                return contact;
-            } else {
-                return null;
+        Cursor d = db.query(DBHelper.TABLE_CONTACTS, new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME}, DBHelper.COLUMN_CONTACT_ID + " = " + id, null, null, null, null);
+        if (d.moveToNext()) {
+            String username = d.getString(0);
+            String status = d.getString(1);
+            long contactTime = d.getLong(2);
+            Cursor c = db.query(DBHelper.TABLE_KEYS, new String[]{DBHelper.COLUMN_KEY_ID, DBHelper.COLUMN_KEY_PUBLIC}, DBHelper.COLUMN_KEY_USER + " = " + id, null, null, null, null);
+            ECKey key = null;
+            Long keyTime = null;
+            if (c.moveToNext()) {
+                keyTime = c.getLong(0);
+                byte[] publicKey = c.getBlob(1);
+                key = new ECKey(publicKey, null, keyTime);
             }
+            CypherContact contact = new CypherContact(username, id, key, keyTime, status, contactTime);
+            return contact;
         } else {
             return null;
         }
-
     }
 
     @Override
@@ -130,7 +130,7 @@ public class DBManagerAndroidImpl implements DBManager {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues val = new ContentValues();
         val.put(DBHelper.COLUMN_MESSAGE_SENT, true);
-        db.update(DBHelper.TABLE_MESSAGES, val, DBHelper.COLUMN_MESSAGE_ID + " = ? AND " + DBHelper.COLUMN_CONTACT_ID + " = ?", new String[]{msg.getMessageID() + "", msg.getContactID() + ""});
+        db.update(DBHelper.TABLE_MESSAGES, val, DBHelper.COLUMN_MESSAGE_ID + " = ? AND " + DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ?", new String[]{msg.getMessageID() + "", msg.getContactID() + ""});
     }
 
     @Override
@@ -171,10 +171,10 @@ public class DBManagerAndroidImpl implements DBManager {
     public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit) {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         String[] columns = new String[]{DBHelper.COLUMN_MESSAGE_ID, DBHelper.COLUMN_MESSAGE_IS_SENDER, DBHelper.COLUMN_MESSAGE_TEXT, DBHelper.COLUMN_MESSAGE_SENT, DBHelper.COLUMN_MESSAGE_DATE_TIME};
-        Cursor c = db.query(DBHelper.TABLE_MESSAGES, columns, DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ?", new String[]{contact.getUserID() + ""}, null, null, null, offset + ", " + limit);
+        Cursor c = db.query(DBHelper.TABLE_MESSAGES, columns, DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ?", new String[]{contact.getUserID() + ""}, "", "", "", offset + ", " + limit);
         List<CypherMessage> list = new LinkedList<>();
         while(c.moveToNext()) {
-            list.add(new CypherMessage(c.getInt(0), c.getString(2), c.getLong(4), c.getInt(1) != 0, contact.getUserID()));
+            list.add(new CypherMessage(c.getInt(0), c.getString(2), c.getLong(4), c.getInt(1) != 0, contact.getUserID(), c.getInt(3) != 0));
         }
         return list;
     }

@@ -6,6 +6,13 @@
 
 package com.cyphermessenger.client;
 
+import android.util.Log;
+import com.cyphermessenger.crypto.Decrypt;
+import com.cyphermessenger.crypto.ECKey;
+import com.cyphermessenger.crypto.Encrypt;
+import com.cyphermessenger.utils.Utils;
+import org.spongycastle.crypto.InvalidCipherTextException;
+
 /**
  *
  * @author halfblood
@@ -16,6 +23,9 @@ public class CypherMessage {
     private long timestamp;
     private boolean isSender;
     private long contactID;
+    private boolean isSent;
+    private boolean isEncrypted;
+    private byte[] ciphertext;
 
     public CypherMessage(int messageID, String payload, long timestamp, boolean isSender, long contactID) {
         this.messageID = messageID;
@@ -23,6 +33,54 @@ public class CypherMessage {
         this.timestamp = timestamp;
         this.isSender = isSender;
         this.contactID = contactID;
+        this.isSent = true;
+        this.isEncrypted = false;
+    }
+
+    public CypherMessage(int messageID, byte[] payload, long timestamp, boolean isSender, long contactID) {
+        this.messageID = messageID;
+        this.ciphertext = payload;
+        this.timestamp = timestamp;
+        this.isSender = isSender;
+        this.contactID = contactID;
+        this.isSent = true;
+        this.isEncrypted = true;
+    }
+
+    public CypherMessage(int messageID, String text, long timestamp, boolean isSender, long contactID, boolean isSent) {
+        this(messageID, text, timestamp, isSender, contactID);
+        this.isSent = false;
+    }
+
+    public static CypherMessage create(CypherUser user, CypherUser contactUser, String message) {
+        long timestamp = System.currentTimeMillis();
+        byte[] messageID = Utils.randomBytes(4);
+        byte[] timestampBytes = Utils.longToBytes(timestamp);
+        int messageIDLong = (int) Utils.bytesToLong(messageID);
+        Encrypt encryptionCtx = new Encrypt(user.getKey().getSharedSecret(contactUser.getKey()));
+        encryptionCtx.updateAuthenticatedData(messageID);
+        encryptionCtx.updateAuthenticatedData(timestampBytes);
+        byte[] payload;
+        try {
+            payload = encryptionCtx.process(message.getBytes());
+        } catch (InvalidCipherTextException e) {
+            throw new RuntimeException(e);
+        }
+        return new CypherMessage(messageIDLong, message, timestamp, true, contactUser.getUserID(), false);
+    }
+
+    public void decrypt(ECKey key, ECKey peerKey) throws InvalidCipherTextException {
+        if(!isEncrypted) {
+            return;
+        }
+        byte[] sharedSecret = key.getSharedSecret(peerKey);
+        text = new String(Decrypt.process(sharedSecret, ciphertext, Utils.longToBytes(messageID), Utils.longToBytes(timestamp)));
+        isEncrypted = false;
+        ciphertext = null;
+    }
+
+    public boolean isEncrypted() {
+        return isEncrypted;
     }
 
     public int getMessageID() {
@@ -45,9 +103,11 @@ public class CypherMessage {
         return contactID;
     }
 
+    public boolean isSent() { return isSent; }
+
     @Override
     public String toString() {
-        return '"' + text + '"';
+        return text;
     }
 
     @Override

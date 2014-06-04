@@ -1,6 +1,5 @@
 package com.cyphermessenger.android;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,33 +15,21 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ContactsActivity extends Activity implements NotificationListener {
+public class ContactsActivity extends MainActivity {
 
     private ListView mainView;
-    private List<CypherContact> contactList = new LinkedList<>();
+    private final List<CypherContact> contactList = new LinkedList<>();
     private ArrayAdapter<CypherContact> adapter;
     private final ContactsActivity that = this;
-
-    private MenuItem menuItem;
-    private Menu menu;
-
-    private ContentUpdateManager updateManager;
-    private ContentManager contentManager;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(this));
-        updateManager = new ContentUpdateManager(this, this);
-
         mainView = (ListView) findViewById(R.id.contacts_list);
 
-        contactList = contentManager.getContactList();
-
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View template = inflater.inflate(R.layout.contacts_template, null);
+        contactList.addAll(cm.getContactList());
 
         adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contactList);
         mainView.setAdapter(adapter);
@@ -65,22 +52,15 @@ public class ContactsActivity extends Activity implements NotificationListener {
     @Override
     protected void onResume() {
         super.onResume();
-        updateManager.setShortInterval();
         contactList.clear();
-        contactList.addAll(contentManager.getContactList());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        updateManager.setLongInterval();
+        contactList.addAll(cm.getContactList());
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts, menu);
-        this.menu = menu;
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -93,7 +73,7 @@ public class ContactsActivity extends Activity implements NotificationListener {
                 startActivity(new Intent(this, AddContactActivity.class));
                 return true;
             case R.id.action_logout:
-                contentManager.logout();
+                cm.logout();
                 startActivity(new Intent(this, LoginActivity.class));
                 return  true;
             default:
@@ -104,7 +84,12 @@ public class ContactsActivity extends Activity implements NotificationListener {
     @Override
     public void onNewContacts(List<CypherContact> contacts) {
         contactList.addAll(contacts);
-        adapter.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
