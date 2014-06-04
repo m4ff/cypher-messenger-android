@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:isScrollContainer="true"
+        android:gravity="bottom"
         android:layout_weight="99">
 
         <ListView
@@ -50,7 +51,8 @@
         <ImageButton
             android:id="@+id/message_button_send"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="center"
             android:clickable="true"
             android:background="@drawable/ic_action_send_now"
             android:layout_weight="0.1" />

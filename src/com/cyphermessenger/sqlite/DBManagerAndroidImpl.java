@@ -88,13 +88,13 @@ public class DBManagerAndroidImpl implements DBManager {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues val = new ContentValues();
         val.put(DBHelper.COLUMN_USER_NOTIFIED_UNTIL, time);
-        db.update(DBHelper.TABLE_USERS, val, DBHelper.COLUMN_USER_ID + " != ?", new String[]{"0"});
+        db.update(DBHelper.TABLE_USERS, val, null, null);
     }
 
     @Override
     public long getLastUpdateTime() {
         SQLiteDatabase db = openHelper.getReadableDatabase();
-        Cursor c = db.query(DBHelper.TABLE_USERS, new String[]{DBHelper.COLUMN_USER_NOTIFIED_UNTIL}, null, null, null, null, null);
+        Cursor c = db.query(DBHelper.TABLE_USERS, new String[] {DBHelper.COLUMN_USER_NOTIFIED_UNTIL}, null, null, null, null, null);
         if (c.moveToNext()) {
             return c.getLong(0);
         } else {

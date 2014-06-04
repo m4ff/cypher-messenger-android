@@ -1,6 +1,7 @@
 package com.cyphermessenger.android;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.widget.Toast;
 
 /**
@@ -14,6 +15,12 @@ public class AUtils {
 
     public static void shortToast(int string, Context ctx) {
         new Toast(ctx).makeText(ctx, string, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void shortTopToast(int string, Context ctx) {
+        Toast t = new Toast(ctx).makeText(ctx, string, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.TOP, 0, 0);
+        t.show();
     }
 
 }

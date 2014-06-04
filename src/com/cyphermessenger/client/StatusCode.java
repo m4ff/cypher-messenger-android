@@ -32,5 +32,10 @@ public class StatusCode {
     public static final int CONTACT_BLOCKED = 402;
     public static final int CONTACT_DENIED = 403;
     public static final int CONTACT_NOT_FOUND = 404;
+
+    // MESSAGE
+    public static int USER_KEY_OUTDATED = 501;
+    public static int CONTACT_KEY_OUTDATED = 502;
+    public static int TIMESTAMP_SYNC_ERROR = 503;
 }
 

@@ -39,6 +39,8 @@ public class RegistrationActivity extends Activity implements ContentListener {
         cm = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
 
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage(getString(R.string.loading_message));
 
         // VIEWS
@@ -123,7 +125,13 @@ public class RegistrationActivity extends Activity implements ContentListener {
 
     @Override
     public void onLogged(CypherUser user) {
+        // Start AlarmManager for notifications
         new ContentUpdateManager(this).startDefaultReceiver(this);
+
+        // Load data from server
+        cm.pullAll();
+        cm.waitForAllRequests();
+
         progressDialog.dismiss();
         startActivity(new Intent(this, ContactsActivity.class));
     }

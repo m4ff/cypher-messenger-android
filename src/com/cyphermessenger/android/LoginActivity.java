@@ -34,6 +34,8 @@ public class LoginActivity extends Activity implements ContentListener {
         cm = new ContentManager(DBManagerAndroidImpl.getInstance(this), this);
 
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage(getString(R.string.loading_message));
         toast = new Toast(this);
 
@@ -100,8 +102,16 @@ public class LoginActivity extends Activity implements ContentListener {
 
     @Override
     public void onLogged(CypherUser user) {
+        // Start AlarmManager for notifications
+        ContentUpdateManager updateManager = new ContentUpdateManager(this);
+        updateManager.startDefaultReceiver(this);
+
+        // Load data from server
+        cm.pullAll();
+        cm.waitForAllRequests();
+
         progressDialog.dismiss();
-        new ContentUpdateManager(this).startDefaultReceiver(this);
+
         Intent contactIntent = new Intent(this, ContactsActivity.class);
         contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(contactIntent);

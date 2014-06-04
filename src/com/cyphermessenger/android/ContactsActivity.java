@@ -20,7 +20,6 @@ public class ContactsActivity extends MainActivity {
     private ListView mainView;
     private final List<CypherContact> contactList = new LinkedList<>();
     private ArrayAdapter<CypherContact> adapter;
-    private final ContactsActivity that = this;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -38,13 +37,13 @@ public class ContactsActivity extends MainActivity {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                CypherContact contact = contactList.get(position);
-                Intent conversationTo = new Intent(that, MessagesActivity.class);
-                conversationTo.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                CypherContact contact = adapter.getItem(position);
+                Intent conversationTo = new Intent(getApplicationContext(), MessagesActivity.class);
+                //conversationTo.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 Bundle bundle = new Bundle();
                 bundle.putLong("CONTACT", contact.getUserID());
                 conversationTo.putExtras(bundle);
-                that.startActivity(conversationTo);
+                startActivity(conversationTo);
             }
         });
     }

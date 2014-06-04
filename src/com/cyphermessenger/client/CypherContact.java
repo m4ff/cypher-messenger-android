@@ -30,6 +30,11 @@ public class CypherContact extends CypherUser {
         return status;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " (" + status + ")";
+    }
+
     public Long getContactTimestamp() {
         return contactTimestamp;
     }

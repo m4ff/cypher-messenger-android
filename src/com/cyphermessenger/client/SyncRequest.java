@@ -89,6 +89,7 @@ public final class SyncRequest {
         if (statusCode == StatusCode.OK) {
             long userID = node.get("userID").asLong();
             long keyTime = node.get("timestamp").asLong();
+            key.setTime(keyTime);
             return new CypherUser(username, localPassword, serverPassword, userID, key, keyTime);
         } else {
             throw new APIErrorException(statusCode);
@@ -117,6 +118,7 @@ public final class SyncRequest {
                 throw new RuntimeException(ex);
             }
             long keyTimestamp = node.get("keyTimestamp").asLong();
+            key.setTime(keyTimestamp);
             CypherUser newUser = new CypherUser(username, localPassword, serverPassword, userID, key, keyTimestamp);
             String sessionID = node.get("sessionID").asText();
             return new CypherSession(newUser, sessionID);
@@ -262,18 +264,17 @@ public final class SyncRequest {
     }
 
     private static JsonNode pullUpdate(CypherSession session, CypherUser contact, String action, Boolean since, Long time) throws IOException, APIErrorException {
-
-        String timeRelativeTo = "since";
-        if (since != null && !since) {
-            timeRelativeTo = "until";
+        String timeBoundary = "since";
+        if (since != null && since == UNTIL) {
+            timeBoundary = "until";
         }
         HashMap<String, String> pairs = new HashMap<>(3);
         pairs.put("action", action);
         if (contact != null) {
-            pairs.put("contactID", contact.getUserID() + "");
+            pairs.put("contactID", contact.getUserID().toString());
         }
-        if (since != null) {
-            pairs.put(timeRelativeTo, time + "");
+        if (time != null) {
+            pairs.put(timeBoundary, time.toString());
         }
         HttpURLConnection conn = doRequest("pull", session, pairs);
         if (conn.getResponseCode() != 200) {
@@ -401,7 +402,7 @@ public final class SyncRequest {
                 String username = selectedNode.get("username").asText();
                 String contactStatus = selectedNode.get("contactStatus").asText();
                 ECKey publicKey = Utils.decodeKey(selectedNode.get("publicKey").asText());
-
+                publicKey.setTime(keyTime);
                 CypherContact newContact = new CypherContact(username, receivedContactID, publicKey, keyTime, contactStatus, timestamp);
                 array.add(newContact);
             }

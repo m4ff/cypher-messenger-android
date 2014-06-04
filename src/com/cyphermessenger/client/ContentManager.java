@@ -400,6 +400,7 @@ public class ContentManager {
 
     public void pullAll() {
         final long since = dbManager.getLastUpdateTime();
+        Log.d("LAST UPDATE TIME", since + "");
         dbManager.setLastUpdateTime(System.currentTimeMillis());
         Thread th = new Thread(new Runnable() {
             @Override
@@ -422,8 +423,13 @@ public class ContentManager {
                 List<CypherMessage> messages = dbManager.getMessages(user, offset, limit);
                 contentListener.onGetMessages(messages);
                 if(messages.size() < limit) {
-                    CypherMessage last = messages.get(messages.size() - 1);
-                    long untilTime = last.getTimestamp();
+                    long untilTime;
+                    if(messages.size() > 0) {
+                        CypherMessage last = messages.get(messages.size() - 1);
+                        untilTime = last.getTimestamp();
+                    } else {
+                        untilTime = System.currentTimeMillis() + 1000 * 120;
+                    }
                     try {
                         PullResults res = SyncRequest.pullMessages(session, user, SyncRequest.UNTIL, untilTime);
                         messages.addAll(res.getMessages());

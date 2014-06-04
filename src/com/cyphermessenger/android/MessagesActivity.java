@@ -19,8 +19,8 @@ import java.util.List;
 public class MessagesActivity extends MainActivity {
 
     final List<CypherMessage> messagesList = new LinkedList<>();
-    ListView messageListView = null;
-    MessageAdapter adapter = null;
+    ListView messageListView;
+    MessageAdapter adapter;
     CypherContact contact;
 
     private static final int DEFAULT_MESSAGE_NUM = 20;
@@ -31,8 +31,10 @@ public class MessagesActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messages);
 
-        if(savedInstanceState != null) {
-            contact = cm.getContactByID(savedInstanceState.getLong("CONTACT"));
+        Intent intent = getIntent();
+
+        if(intent != null) {
+            contact = cm.getContactByID(intent.getLongExtra("CONTACT", 0));
         }
 
         if(contact != null) {
@@ -52,13 +54,14 @@ public class MessagesActivity extends MainActivity {
             @Override
             public void onClick(View v) {
                 if(contact == null) {
-                    showToast(R.string.error_general_error);
+                    showTopToast(R.string.error_general_error);
                     return;
                 }
-                String text = ((EditText) v).getText().toString();
+                String text = ((EditText) findViewById(R.id.message_editor)).getText().toString();
                 synchronized (messagesList) {
                     CypherMessage newMessage = cm.sendMessage(contact, text);
                     messagesList.add(newMessage);
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
@@ -140,7 +143,7 @@ public class MessagesActivity extends MainActivity {
         });
     }
 
-        @Override
+    @Override
     public void onGetMessages(final List<CypherMessage> messages) {
         runOnUiThread(new Runnable() {
             @Override

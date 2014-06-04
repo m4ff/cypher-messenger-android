@@ -75,6 +75,15 @@ public class MainActivity extends FragmentActivity implements ContentListener, N
         });
     }
 
+    protected void showTopToast(final int str) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AUtils.shortTopToast(str, getApplicationContext());
+            }
+        });
+    }
+
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
@@ -84,12 +93,12 @@ public class MainActivity extends FragmentActivity implements ContentListener, N
     // ContentListener
     @Override
     public void onServerError() {
-        showToast(R.string.error_general_error);
+        showTopToast(R.string.error_general_error);
     }
 
     @Override
     public void onSessionInvalid() {
-        showToast(R.string.error_general_error);
+        showTopToast(R.string.error_general_error);
         cm.login();
     }
 
