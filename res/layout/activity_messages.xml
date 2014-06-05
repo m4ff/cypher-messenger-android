@@ -44,9 +44,13 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/message_editor"
-            android:inputType="textLongMessage"
+            android:inputType="textMultiLine|textAutoCorrect"
+            android:lines="1"
+            android:maxLines="1"
+            android:gravity="top|left"
             android:hint="@string/prompt_text_message_hint"
-            android:layout_weight="0.9" />
+            android:layout_weight="0.9"
+            android:scrollbars="vertical" />
 
         <FrameLayout android:layout_width="wrap_content"
               android:layout_height="match_parent"

@@ -5,14 +5,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.cyphermessenger.client.*;
 import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -43,6 +46,47 @@ public class LoginActivity extends Activity implements ContentListener {
 
         name = (EditText) findViewById(R.id.name_field);
         password = (EditText) findViewById(R.id.password_field);
+
+        if(name.getText().toString() != "" && password.getText().toString() != "") {
+            name.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                        if(i == KeyEvent.KEYCODE_ENTER) {
+                            final Context that = getApplicationContext();
+                            String _name = name.getText().toString();
+                            String _pass = password.getText().toString();
+                            if (!"".equals(_name) && !"".equals(_pass)) {
+                                progressDialog.show();
+                                cm.login(_name, _pass);
+                            } else {
+                                AUtils.shortToast(R.string.login_toast_failed, that);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+            password.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                        if(i == KeyEvent.KEYCODE_ENTER) {
+                            final Context that = getApplicationContext();
+                            String _name = name.getText().toString();
+                            String _pass = password.getText().toString();
+                            if (!"".equals(_name) && !"".equals(_pass)) {
+                                progressDialog.show();
+                                cm.login(_name, _pass);
+                            } else {
+                                AUtils.shortToast(R.string.login_toast_failed, that);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
     }
 
     @Override

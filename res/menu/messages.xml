@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.cyphermessenger.MessagesActivity" >
 
+    <item
+        android:id="@+id/message_contact_delete"
+        android:title="DELETE"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/message_contact_block"
+        android:title="BLOCK"
+        android:showAsAction="never" />
 </menu>
