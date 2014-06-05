@@ -171,12 +171,19 @@ public class DBManagerAndroidImpl implements DBManager {
     public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit) {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         String[] columns = new String[]{DBHelper.COLUMN_MESSAGE_ID, DBHelper.COLUMN_MESSAGE_IS_SENDER, DBHelper.COLUMN_MESSAGE_TEXT, DBHelper.COLUMN_MESSAGE_SENT, DBHelper.COLUMN_MESSAGE_DATE_TIME};
-        Cursor c = db.query(DBHelper.TABLE_MESSAGES, columns, DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ?", new String[]{contact.getUserID() + ""}, "", "", "", offset + ", " + limit);
+        Cursor c = db.query(DBHelper.TABLE_MESSAGES, columns, DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ?", new String[]{contact.getUserID() + ""}, "", "", DBHelper.COLUMN_MESSAGE_DATE_TIME + " DESC", offset + ", " + limit);
         List<CypherMessage> list = new LinkedList<>();
         while(c.moveToNext()) {
             list.add(new CypherMessage(c.getInt(0), c.getString(2), c.getLong(4), c.getInt(1) != 0, contact.getUserID(), c.getInt(3) != 0));
         }
         return list;
+    }
+
+    @Override
+    public boolean messageExists(CypherMessage msg) {
+        SQLiteDatabase db = openHelper.getReadableDatabase();
+        Cursor c = db.query(DBHelper.TABLE_MESSAGES, new String[]{DBHelper.COLUMN_MESSAGE_ID}, DBHelper.COLUMN_MESSAGE_CONTACT_ID + " = ? AND " + DBHelper.COLUMN_MESSAGE_ID + " = ?", new String[]{msg.getContactID() + "", msg.getMessageID() + ""}, null, null, null);
+        return c.moveToNext();
     }
 
     @Override

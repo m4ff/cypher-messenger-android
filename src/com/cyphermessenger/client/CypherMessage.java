@@ -17,15 +17,15 @@ import org.spongycastle.crypto.InvalidCipherTextException;
  *
  * @author halfblood
  */
-public class CypherMessage {
-    private int messageID;
-    private String text;
-    private long timestamp;
-    private boolean isSender;
-    private long contactID;
-    private boolean isSent;
-    private boolean isEncrypted;
-    private byte[] ciphertext;
+public class CypherMessage implements Comparable {
+    int messageID;
+    String text;
+    long timestamp;
+    boolean isSender;
+    long contactID;
+    boolean isSent;
+    boolean isEncrypted;
+    byte[] ciphertext;
 
     public CypherMessage(int messageID, String payload, long timestamp, boolean isSender, long contactID) {
         this.messageID = messageID;
@@ -49,23 +49,13 @@ public class CypherMessage {
 
     public CypherMessage(int messageID, String text, long timestamp, boolean isSender, long contactID, boolean isSent) {
         this(messageID, text, timestamp, isSender, contactID);
-        this.isSent = false;
+        this.isSent = isSent;
     }
 
-    public static CypherMessage create(CypherUser user, CypherUser contactUser, String message) {
+    public static CypherMessage create(CypherUser contactUser, String message) {
         long timestamp = System.currentTimeMillis();
         byte[] messageID = Utils.randomBytes(4);
-        byte[] timestampBytes = Utils.longToBytes(timestamp);
         int messageIDLong = (int) Utils.bytesToLong(messageID);
-        Encrypt encryptionCtx = new Encrypt(user.getKey().getSharedSecret(contactUser.getKey()));
-        encryptionCtx.updateAuthenticatedData(messageID);
-        encryptionCtx.updateAuthenticatedData(timestampBytes);
-        byte[] payload;
-        try {
-            payload = encryptionCtx.process(message.getBytes());
-        } catch (InvalidCipherTextException e) {
-            throw new RuntimeException(e);
-        }
         return new CypherMessage(messageIDLong, message, timestamp, true, contactUser.getUserID(), false);
     }
 
@@ -128,5 +118,11 @@ public class CypherMessage {
         int result = messageID;
         result = 31 * result + (int) (contactID ^ (contactID >>> 32));
         return result;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        CypherMessage m = (CypherMessage) o;
+        return timestamp < m.timestamp ? -1 : (timestamp == m.timestamp ? 0 : 1);
     }
 }

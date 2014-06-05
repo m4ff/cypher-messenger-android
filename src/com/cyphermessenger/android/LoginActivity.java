@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -39,7 +38,7 @@ public class LoginActivity extends Activity implements ContentListener {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setMessage(getString(R.string.loading_message));
+        progressDialog.setMessage(getString(R.string.messages_loading_message));
         toast = new Toast(this);
 
         name = (EditText) findViewById(R.id.name_field);
@@ -78,7 +77,7 @@ public class LoginActivity extends Activity implements ContentListener {
                     progressDialog.show();
                     cm.login(_name, _pass);
                 } else {
-                    toast.makeText(that, R.string.login_toast_failed, Toast.LENGTH_LONG).show();
+                   AUtils.shortToast(R.string.login_toast_failed, this);
                 }
 
                 return true;
@@ -97,6 +96,7 @@ public class LoginActivity extends Activity implements ContentListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                progressDialog.dismiss();
                 ((EditText) findViewById(R.id.password_field)).getText().clear();
                 AUtils.shortToast(R.string.login_toast_failed, getApplicationContext());
             }
@@ -108,13 +108,11 @@ public class LoginActivity extends Activity implements ContentListener {
         // Start AlarmManager for notifications
         ContentUpdateManager updateManager = new ContentUpdateManager(this);
         updateManager.startDefaultReceiver();
-        Log.d("LOGIN", "1");
+
         // Load data from server
-        cm.pullAll();
-        cm.waitForAllRequests();
-        Log.d("LOGIN", "2");
+        cm.pullAllSync();
         progressDialog.dismiss();
-        Log.d("LOGIN", "3");
+
         Intent contactIntent = new Intent(this, ContactsActivity.class);
         contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(contactIntent);
@@ -186,7 +184,7 @@ public class LoginActivity extends Activity implements ContentListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AUtils.shortTopToast(R.string.error_general_error, getApplicationContext());
+                AUtils.shortToast(R.string.error_general_error, getApplicationContext());
             }
         });
     }

@@ -46,28 +46,6 @@ public class ContentManager {
         }
     }
 
-    public void waitForAllRequests(long millis) throws InterruptedException {
-        synchronized (activeThreads) {
-            Iterator<Thread> i = activeThreads.iterator();
-            while (i.hasNext()) {
-                Thread th = i.next();
-                if (th.isAlive()) {
-                    th.join(millis);
-                    Log.d("ContentManger", "Waiting for thread " + th);
-                }
-                i.remove();
-            }
-        }
-    }
-
-    public void waitForAllRequests() {
-        try {
-            waitForAllRequests(1000 * 60);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void addThread(Thread thread) {
         thread.start();
         synchronized (activeThreads) {
@@ -80,14 +58,12 @@ public class ContentManager {
             activeThreads.add(thread);
         }
     }
-    
-    public boolean isLogged() {
-    	return session != null;
-    }
 
     public CypherSession getSession() {
         return session;
     }
+
+    public CypherUser getUser() { return session != null ? session.getUser() : null; }
 
     private void handleException(Exception e) {
         Log.e("ContentManager", "handleException", e);
@@ -213,19 +189,15 @@ public class ContentManager {
         session = null;
     }
 
-
-    public List<CypherMessage> getMessageList(CypherUser contact) {
-        return dbManager.getMessages(contact, 0, 100);
-    }
-
     public CypherMessage sendMessage(final CypherUser contact, final String text) {
-        final CypherMessage msg = CypherMessage.create(session.getUser(), contact, text);
+        final CypherMessage msg = CypherMessage.create(contact, text);
         dbManager.insertMessage(msg);
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     SyncRequest.sendMessage(session, contact, msg);
+                    msg.isSent = true;
                     dbManager.setMessageSent(msg);
                     contentListener.onMessageSent(msg);
                 } catch (Exception e) {
@@ -326,6 +298,10 @@ public class ContentManager {
             Iterator<CypherMessage> i = res.getMessages().iterator();
             while(i.hasNext()) {
                 CypherMessage m = i.next();
+                if(dbManager.messageExists(m)) {
+                    i.remove();
+                    continue;
+                }
                 if(m.isEncrypted()) {
                     try {
                         m.decrypt(session.getUser().getKey(), getContactByID(m.getContactID()).getKey());
@@ -400,19 +376,23 @@ public class ContentManager {
         addThread(th);
     }
 
-    public void pullAll() {
-        final long since = dbManager.getLastUpdateTime();
+    public void pullAllSync() {
+        long since = dbManager.getLastUpdateTime();
         Log.d("LAST UPDATE TIME", since + "");
         dbManager.setLastUpdateTime(System.currentTimeMillis());
-        Thread th = new Thread(new Runnable() {
-            @Override
-            public void run() {
                 try {
                     PullResults res = SyncRequest.pullAll(session, null, SyncRequest.SINCE, since);
                     handlePullResults(res, null);
                 } catch(Exception e) {
                     handleException(e);
                 }
+    }
+
+    public void pullAll() {
+        Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pullAllSync();
             }
         });
         addThread(th);

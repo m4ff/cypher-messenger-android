@@ -1,8 +1,6 @@
 package com.cyphermessenger.android;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -79,7 +77,7 @@ public class MainActivity extends FragmentActivity implements ContentListener, N
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AUtils.shortTopToast(str, getApplicationContext());
+                AUtils.shortToast(str, getApplicationContext());
             }
         });
     }

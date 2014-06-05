@@ -45,8 +45,9 @@
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
-
-    <string name="loading_message">Loading...</string>
+    <string name="empty_message">Please type a message</string>
+    <string name="messages_loading_message">Loading...</string>
+    <string name="messages_new_message">You got a new message</string>
 
 
 

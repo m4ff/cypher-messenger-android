@@ -23,6 +23,7 @@ public interface DBManager {
     public ECKey getKeyForTime(long time);
     public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit);
     public List<CypherContact> getContacts();
+    public boolean messageExists(CypherMessage msg);
     
     public void logout();
     public void deleteContact(CypherUser contact);

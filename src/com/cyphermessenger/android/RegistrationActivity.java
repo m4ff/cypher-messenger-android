@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +40,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setMessage(getString(R.string.loading_message));
+        progressDialog.setMessage(getString(R.string.messages_loading_message));
 
         // VIEWS
         usernameTextField = (EditText) findViewById(R.id.name_field);
@@ -134,8 +133,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         new ContentUpdateManager(this).startDefaultReceiver();
 
         // Load data from server
-        cm.pullAll();
-        cm.waitForAllRequests();
+        cm.pullAllSync();
 
         progressDialog.dismiss();
         startActivity(new Intent(this, ContactsActivity.class));

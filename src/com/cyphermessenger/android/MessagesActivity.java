@@ -1,27 +1,28 @@
 package com.cyphermessenger.android;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.cyphermessenger.client.*;
-import com.cyphermessenger.crypto.ECKey;
-import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 
 public class MessagesActivity extends MainActivity {
 
-    final List<CypherMessage> messagesList = new LinkedList<>();
+    final TreeSet<CypherMessage> messagesSet = new TreeSet<>();
     ListView messageListView;
     MessageAdapter adapter;
     CypherContact contact;
+
+
 
     private static final int DEFAULT_MESSAGE_NUM = 20;
 
@@ -43,7 +44,7 @@ public class MessagesActivity extends MainActivity {
 
         messageListView = (ListView) findViewById(R.id.messages_list_view);
 
-        adapter = new MessageAdapter(this, R.id.message_bubble, messagesList);
+        adapter = new MessageAdapter(messagesSet);
         messageListView.setAdapter(adapter);
 
         final EditText messageEditor = (EditText) findViewById(R.id.message_editor);
@@ -58,11 +59,17 @@ public class MessagesActivity extends MainActivity {
                     return;
                 }
                 String text = ((EditText) findViewById(R.id.message_editor)).getText().toString();
-                synchronized (messagesList) {
-                    CypherMessage newMessage = cm.sendMessage(contact, text);
-                    messagesList.add(newMessage);
-                    adapter.notifyDataSetChanged();
+                if(!text.equals("")) {
+                    synchronized (messagesSet) {
+                        CypherMessage newMessage = cm.sendMessage(contact, text);
+                        messagesSet.add(newMessage);
+                        adapter.notifyDataSetChanged();
+                        messageListView.smoothScrollToPosition(messagesSet.size() - 1);
+                    }
+                } else {
+                    AUtils.shortToast(R.string.empty_message, getApplicationContext());
                 }
+                ((EditText) findViewById(R.id.message_editor)).setText("");
             }
         });
 
@@ -71,9 +78,16 @@ public class MessagesActivity extends MainActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateManager.setActiveContact(contact.getUserID());
         if(contact != null) {
             cm.getMessages(contact, 0, DEFAULT_MESSAGE_NUM);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        updateManager.unsetActiveContact();
     }
 
     @Override
@@ -91,10 +105,35 @@ public class MessagesActivity extends MainActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class MessageAdapter extends ArrayAdapter<CypherMessage> {
+    private class MessageAdapter extends BaseAdapter {
 
-        public MessageAdapter(Context context, int textViewResourceId, List<CypherMessage> objects) {
-            super(context, textViewResourceId, objects);
+        private final TreeSet<CypherMessage> messages;
+        private CypherMessage[] messageArray;
+
+        public MessageAdapter(TreeSet<CypherMessage> messages) {
+            this.messages = messages;
+            this.messageArray = messages.toArray(new CypherMessage[] {});
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+            this.messageArray = messages.toArray(new CypherMessage[]{});
+        }
+
+        @Override
+        public int getCount() {
+            return messages.size();
+        }
+
+        @Override
+        public CypherMessage getItem(int i) {
+            return messageArray[i];
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return messageArray[i].getMessageID();
         }
 
         @Override
@@ -102,10 +141,8 @@ public class MessagesActivity extends MainActivity {
             CypherMessage nowConsidering = getItem(position);
 
 
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View template = inflater.inflate(R.layout.messages_template, null);
-
-            int width = parent.getWidth() - 100;
 
             LinearLayout messageDisplayingLayout = (LinearLayout) template.findViewById(R.id.message_bubble);
             TextView messageDisplaying = (TextView) template.findViewById(R.id.message_bubble_text);
@@ -124,17 +161,13 @@ public class MessagesActivity extends MainActivity {
                 messageDisplayingLayout.setGravity(Gravity.LEFT);
                 messageDisplayingLayout.setPadding(0, 0, dpToPx(60), 0);
             }
-
+            messageDisplaying.setTextColor(Color.BLACK);
             return template;
         }
     }
 
     @Override
     public void onMessageSent(CypherMessage message) {
-        synchronized (messagesList) {
-            int pos = messagesList.indexOf(message);
-            messagesList.set(pos, message);
-        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -144,13 +177,30 @@ public class MessagesActivity extends MainActivity {
     }
 
     @Override
+    public void onNewMessages(HashMap<Long, List<CypherMessage>> message) {
+        super.onNewMessages(message);
+        List<CypherMessage> messages = message.get(contact.getUserID());
+        if(messages != null) {
+            messagesSet.addAll(messages);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            showToast(R.string.messages_new_message);
+        }
+    }
+
+    @Override
     public void onGetMessages(final List<CypherMessage> messages) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                messagesList.clear();
-                messagesList.addAll(messages);
+                messagesSet.clear();
+                messagesSet.addAll(messages);
                 adapter.notifyDataSetChanged();
+                messageListView.setSelection(adapter.getCount() - 1);
             }
         });
     }

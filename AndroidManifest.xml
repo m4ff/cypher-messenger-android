@@ -63,7 +63,7 @@
                 android:parentActivityName=".ContactsActivity"
                 android:label="@string/title_activity_messages"
                 android:launchMode="singleTop"
-                android:windowSoftInputMode="adjustPan">
+                android:windowSoftInputMode="adjustResize|stateHidden">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".ContactsActivity"/>

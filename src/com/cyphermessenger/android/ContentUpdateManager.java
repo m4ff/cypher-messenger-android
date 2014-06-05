@@ -38,6 +38,7 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     private NotificationListener notificationListener;
     private long activeContact = -1;
     private ContentManager contentManager;
+    private Context applicationContext;
 
     public ContentUpdateManager() {
         this.alarmManager = null;
@@ -117,15 +118,13 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("onReceive", "onReceive called");
+        applicationContext = context;
         contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(context), this);
         notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(android.R.drawable.stat_notify_chat);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         contentManager.pullAll();
-        /**
-         * TODO Wake lock
-         */
     }
 
 
@@ -134,9 +133,6 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         Log.d("MSGS", Arrays.toString(messages.toArray()));
         HashMap<Long, List<CypherMessage>> map = new HashMap<>();
         for(CypherMessage m : messages) {
-            if(m.isSender() == true) {
-                continue;
-            }
             long id = m.getContactID();
             LinkedList<CypherMessage> list = (LinkedList<CypherMessage>) map.get(id);
             if(list == null) {
@@ -147,14 +143,17 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         }
         for(Map.Entry<Long, List<CypherMessage>> e : map.entrySet()) {
             // discard active contact
-            if(e.getKey().equals(activeContact)) {
+            if(e.getKey().equals(activeContact) || e.getKey() == contentManager.getUser().getUserID()) {
                 continue;
             }
             CypherMessage first = e.getValue().get(0);
             if(first != null && first.getTimestamp() > notifiedUntil) {
                 CypherContact contact = contentManager.getContactByID(e.getKey());
+                Intent contentIntent = new Intent(applicationContext, MessagesActivity.class);
+                contentIntent.putExtra("CONTACT", contact.getUserID());
                 notificationManager.notify(contact.getUsername().hashCode(),
                         notificationBuilder
+                                .setContentIntent(PendingIntent.getActivity(applicationContext, 1, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                                 .setContentTitle(contact.getUsername())
                                 .setContentText(first.getText())
                                 .build()
@@ -188,8 +187,11 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
                         text = contact.getUsername() + " sent you a contact request";
                 }
                 if(text != null) {
+                    Intent contactWaitingNotification = new Intent(applicationContext, ContactsActivity.class);
+                    contactWaitingNotification.putExtra("CONTACT", contact.getUserID());
                     notificationManager.notify(contact.getUsername().hashCode(),
                             notificationBuilder
+                                    .setContentIntent(PendingIntent.getActivity(applicationContext, 1, contactWaitingNotification, PendingIntent.FLAG_UPDATE_CURRENT))
                                     .setContentTitle(contact.getUsername())
                                     .setContentText(text)
                                     .build()
