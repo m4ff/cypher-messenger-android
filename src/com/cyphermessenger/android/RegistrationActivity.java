@@ -2,10 +2,12 @@ package com.cyphermessenger.android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,11 +60,123 @@ public class RegistrationActivity extends Activity implements ContentListener {
         } else {
             cm.requestCaptcha();
         }
+
+        //
+        if(usernameTextField.getText().toString() != "" && passwordTextField.getText().toString() != "" && passwordConfirmTextField.getText().toString() != "" && captchaTextField.getText().toString() != "") {
+            usernameTextField.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
+                        if (i == keyEvent.KEYCODE_ENTER) {
+                            Context that = getApplicationContext();
+                            String uNameFromClient = usernameTextField.getText().toString();
+                            String passwordFromClient = passwordTextField.getText().toString();
+                            String confirmFromClient = passwordConfirmTextField.getText().toString();
+                            String captchaTextFromClient = captchaTextField.getText().toString();
+                            if (!captcha.verify(captchaTextFromClient)) {
+                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
+                            } else if (passwordFromClient.length() < 8) {
+                                AUtils.shortToast(R.string.registration_password_too_short, that);
+                            } else if (!passwordFromClient.equals(confirmFromClient)) {
+                                AUtils.shortToast(R.string.registration_password_dont_match, that);
+                            } else if (uNameFromClient.length() <= 3) {
+                                AUtils.shortToast(R.string.registration_username_too_short, that);
+                            } else {
+                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+                                progressDialog.show();
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+            passwordTextField.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
+                        if (i == keyEvent.KEYCODE_ENTER) {
+                            Context that = getApplicationContext();
+                            String uNameFromClient = usernameTextField.getText().toString();
+                            String passwordFromClient = passwordTextField.getText().toString();
+                            String confirmFromClient = passwordConfirmTextField.getText().toString();
+                            String captchaTextFromClient = captchaTextField.getText().toString();
+                            if (!captcha.verify(captchaTextFromClient)) {
+                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
+                            } else if (passwordFromClient.length() < 8) {
+                                AUtils.shortToast(R.string.registration_password_too_short, that);
+                            } else if (!passwordFromClient.equals(confirmFromClient)) {
+                                AUtils.shortToast(R.string.registration_password_dont_match, that);
+                            } else if (uNameFromClient.length() <= 3) {
+                                AUtils.shortToast(R.string.registration_username_too_short, that);
+                            } else {
+                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+                                progressDialog.show();
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+            passwordConfirmTextField.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
+                        if (i == keyEvent.KEYCODE_ENTER) {
+                            Context that = getApplicationContext();
+                            String uNameFromClient = usernameTextField.getText().toString();
+                            String passwordFromClient = passwordTextField.getText().toString();
+                            String confirmFromClient = passwordConfirmTextField.getText().toString();
+                            String captchaTextFromClient = captchaTextField.getText().toString();
+                            if (!captcha.verify(captchaTextFromClient)) {
+                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
+                            } else if (passwordFromClient.length() < 8) {
+                                AUtils.shortToast(R.string.registration_password_too_short, that);
+                            } else if (!passwordFromClient.equals(confirmFromClient)) {
+                                AUtils.shortToast(R.string.registration_password_dont_match, that);
+                            } else if (uNameFromClient.length() <= 3) {
+                                AUtils.shortToast(R.string.registration_username_too_short, that);
+                            } else {
+                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+                                progressDialog.show();
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+            captchaTextField.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
+                        if (i == keyEvent.KEYCODE_ENTER) {
+                            Context that = getApplicationContext();
+                            String uNameFromClient = usernameTextField.getText().toString();
+                            String passwordFromClient = passwordTextField.getText().toString();
+                            String confirmFromClient = passwordConfirmTextField.getText().toString();
+                            String captchaTextFromClient = captchaTextField.getText().toString();
+                            if (!captcha.verify(captchaTextFromClient)) {
+                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
+                            } else if (passwordFromClient.length() < 8) {
+                                AUtils.shortToast(R.string.registration_password_too_short, that);
+                            } else if (!passwordFromClient.equals(confirmFromClient)) {
+                                AUtils.shortToast(R.string.registration_password_dont_match, that);
+                            } else if (uNameFromClient.length() <= 3) {
+                                AUtils.shortToast(R.string.registration_username_too_short, that);
+                            } else {
+                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+                                progressDialog.show();
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.registration, menu);
         return true;

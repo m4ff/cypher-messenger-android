@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbarStyle="outsideInset"
-    tools:context="com.cyphermessenger.RegistrationActivity">
+    tools:context=".RegistrationActivity">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
             android:orientation="vertical"
@@ -20,6 +20,7 @@
                 android:id="@+id/name_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
                 style="@style/FormElementPadding" />
 
 
@@ -77,6 +78,7 @@
                 android:id="@+id/captcha_text_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
                 style="@style/FormElementPadding" />
 
 
