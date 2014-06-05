@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.*;
 import android.content.pm.PackageManager;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.cyphermessenger.client.*;
@@ -121,7 +122,9 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         applicationContext = context;
         contentManager = new ContentManager(DBManagerAndroidImpl.getInstance(context), this);
         notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(android.R.drawable.stat_notify_chat);
+                .setSmallIcon(android.R.drawable.stat_notify_chat)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         contentManager.pullAll();
@@ -143,7 +146,7 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         }
         for(Map.Entry<Long, List<CypherMessage>> e : map.entrySet()) {
             // discard active contact
-            if(e.getKey().equals(activeContact) || e.getKey() == contentManager.getUser().getUserID()) {
+            if(e.getKey().equals(activeContact)) {
                 continue;
             }
             CypherMessage first = e.getValue().get(0);
@@ -174,7 +177,6 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
             if(contact.isFirst()) {
                 i.remove();
             } else if(contact.getContactTimestamp() > notifiedUntil) {
-                NotificationCompat.Builder tmp = notificationBuilder;
                 String text = null;
                 switch(contact.getStatus()) {
                     case CypherContact.ACCEPTED:
@@ -187,11 +189,10 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
                         text = contact.getUsername() + " sent you a contact request";
                 }
                 if(text != null) {
-                    Intent contactWaitingNotification = new Intent(applicationContext, ContactsActivity.class);
-                    contactWaitingNotification.putExtra("CONTACT", contact.getUserID());
+                    Intent contactNotification = new Intent(applicationContext, ContactsActivity.class);
                     notificationManager.notify(contact.getUsername().hashCode(),
                             notificationBuilder
-                                    .setContentIntent(PendingIntent.getActivity(applicationContext, 1, contactWaitingNotification, PendingIntent.FLAG_UPDATE_CURRENT))
+                                    .setContentIntent(PendingIntent.getActivity(applicationContext, 1, contactNotification, PendingIntent.FLAG_UPDATE_CURRENT))
                                     .setContentTitle(contact.getUsername())
                                     .setContentText(text)
                                     .build()

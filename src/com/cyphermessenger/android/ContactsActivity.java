@@ -3,6 +3,7 @@ package com.cyphermessenger.android;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,6 +82,7 @@ public class ContactsActivity extends MainActivity {
 
     @Override
     public void onNewContacts(List<CypherContact> contacts) {
+        Log.d("onNewContacts", "CALLED");
         contactList.addAll(contacts);
         runOnUiThread(new Runnable() {
             @Override

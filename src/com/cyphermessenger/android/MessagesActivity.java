@@ -1,5 +1,6 @@
 package com.cyphermessenger.android;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -40,6 +41,7 @@ public class MessagesActivity extends MainActivity {
 
         if(contact != null) {
             setTitle(contact.getUsername());
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(contact.getUsername().hashCode());
         }
 
         messageListView = (ListView) findViewById(R.id.messages_list_view);

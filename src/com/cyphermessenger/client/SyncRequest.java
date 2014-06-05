@@ -23,8 +23,8 @@ import java.util.*;
 
 public final class SyncRequest {
 
-    //final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
-    final static String DOMAIN = "http://10.23.26.131:8080/";
+    final static String DOMAIN = "https://cyphermessenger.herokuapp.com/beta1/";
+    //final static String DOMAIN = "http://10.23.26.131:8080/";
     final static ObjectMapper MAPPER = new ObjectMapper();
 
     public static final boolean SINCE = true;

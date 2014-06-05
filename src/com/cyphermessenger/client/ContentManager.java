@@ -282,18 +282,18 @@ public class ContentManager {
         long notifiedUntil = res.getNotifiedUntil();
         CypherUser user = contact != null ? contact : session.getUser();
         if(res.getKeys() != null) {
-            contentListener.onPullKeys(res.getKeys(), notifiedUntil);
             for(ECKey k : res.getKeys()) {
                 dbManager.insertKey(user, k);
             }
+            contentListener.onPullKeys(res.getKeys(), notifiedUntil);
         } if(res.getContacts() != null) {
-            contentListener.onPullContacts(res.getContacts(), notifiedUntil);
             for(CypherContact c : res.getContacts()) {
                 dbManager.insertContact(c);
                 if(c.getKey() != null) {
                     dbManager.insertKey(c, c.getKey());
                 }
             }
+            contentListener.onPullContacts(res.getContacts(), notifiedUntil);
         } if(res.getMessages() != null) {
             Iterator<CypherMessage> i = res.getMessages().iterator();
             while(i.hasNext()) {
