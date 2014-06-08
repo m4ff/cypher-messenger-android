@@ -68,23 +68,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
                 public boolean onKey(View view, int i, KeyEvent keyEvent) {
                     if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
                         if (i == keyEvent.KEYCODE_ENTER) {
-                            Context that = getApplicationContext();
-                            String uNameFromClient = usernameTextField.getText().toString();
-                            String passwordFromClient = passwordTextField.getText().toString();
-                            String confirmFromClient = passwordConfirmTextField.getText().toString();
-                            String captchaTextFromClient = captchaTextField.getText().toString();
-                            if (!captcha.verify(captchaTextFromClient)) {
-                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
-                            } else if (passwordFromClient.length() < 8) {
-                                AUtils.shortToast(R.string.registration_password_too_short, that);
-                            } else if (!passwordFromClient.equals(confirmFromClient)) {
-                                AUtils.shortToast(R.string.registration_password_dont_match, that);
-                            } else if (uNameFromClient.length() <= 3) {
-                                AUtils.shortToast(R.string.registration_username_too_short, that);
-                            } else {
-                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-                                progressDialog.show();
-                            }
+                            sendRegistration();
                         }
                     }
                     return true;
@@ -95,23 +79,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
                 public boolean onKey(View view, int i, KeyEvent keyEvent) {
                     if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
                         if (i == keyEvent.KEYCODE_ENTER) {
-                            Context that = getApplicationContext();
-                            String uNameFromClient = usernameTextField.getText().toString();
-                            String passwordFromClient = passwordTextField.getText().toString();
-                            String confirmFromClient = passwordConfirmTextField.getText().toString();
-                            String captchaTextFromClient = captchaTextField.getText().toString();
-                            if (!captcha.verify(captchaTextFromClient)) {
-                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
-                            } else if (passwordFromClient.length() < 8) {
-                                AUtils.shortToast(R.string.registration_password_too_short, that);
-                            } else if (!passwordFromClient.equals(confirmFromClient)) {
-                                AUtils.shortToast(R.string.registration_password_dont_match, that);
-                            } else if (uNameFromClient.length() <= 3) {
-                                AUtils.shortToast(R.string.registration_username_too_short, that);
-                            } else {
-                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-                                progressDialog.show();
-                            }
+                            sendRegistration();
                         }
                     }
                     return true;
@@ -122,23 +90,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
                 public boolean onKey(View view, int i, KeyEvent keyEvent) {
                     if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
                         if (i == keyEvent.KEYCODE_ENTER) {
-                            Context that = getApplicationContext();
-                            String uNameFromClient = usernameTextField.getText().toString();
-                            String passwordFromClient = passwordTextField.getText().toString();
-                            String confirmFromClient = passwordConfirmTextField.getText().toString();
-                            String captchaTextFromClient = captchaTextField.getText().toString();
-                            if (!captcha.verify(captchaTextFromClient)) {
-                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
-                            } else if (passwordFromClient.length() < 8) {
-                                AUtils.shortToast(R.string.registration_password_too_short, that);
-                            } else if (!passwordFromClient.equals(confirmFromClient)) {
-                                AUtils.shortToast(R.string.registration_password_dont_match, that);
-                            } else if (uNameFromClient.length() <= 3) {
-                                AUtils.shortToast(R.string.registration_username_too_short, that);
-                            } else {
-                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-                                progressDialog.show();
-                            }
+                            sendRegistration();
                         }
                     }
                     return true;
@@ -149,28 +101,32 @@ public class RegistrationActivity extends Activity implements ContentListener {
                 public boolean onKey(View view, int i, KeyEvent keyEvent) {
                     if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
                         if (i == keyEvent.KEYCODE_ENTER) {
-                            Context that = getApplicationContext();
-                            String uNameFromClient = usernameTextField.getText().toString();
-                            String passwordFromClient = passwordTextField.getText().toString();
-                            String confirmFromClient = passwordConfirmTextField.getText().toString();
-                            String captchaTextFromClient = captchaTextField.getText().toString();
-                            if (!captcha.verify(captchaTextFromClient)) {
-                                AUtils.shortToast(R.string.registration_captcha_invalid, that);
-                            } else if (passwordFromClient.length() < 8) {
-                                AUtils.shortToast(R.string.registration_password_too_short, that);
-                            } else if (!passwordFromClient.equals(confirmFromClient)) {
-                                AUtils.shortToast(R.string.registration_password_dont_match, that);
-                            } else if (uNameFromClient.length() <= 3) {
-                                AUtils.shortToast(R.string.registration_username_too_short, that);
-                            } else {
-                                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-                                progressDialog.show();
-                            }
+                            sendRegistration();
                         }
                     }
                     return true;
                 }
             });
+        }
+    }
+
+    private void sendRegistration(){
+        Context that = getApplicationContext();
+        String uNameFromClient = usernameTextField.getText().toString();
+        String passwordFromClient = passwordTextField.getText().toString();
+        String confirmFromClient = passwordConfirmTextField.getText().toString();
+        String captchaTextFromClient = captchaTextField.getText().toString();
+        if (!captcha.verify(captchaTextFromClient)) {
+            AUtils.shortToast(R.string.registration_captcha_invalid, that);
+        } else if (passwordFromClient.length() < 8) {
+            AUtils.shortToast(R.string.registration_password_too_short, that);
+        } else if (!passwordFromClient.equals(confirmFromClient)) {
+            AUtils.shortToast(R.string.registration_password_dont_match, that);
+        } else if (uNameFromClient.length() <= 3) {
+            AUtils.shortToast(R.string.registration_username_too_short, that);
+        } else {
+            cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+            progressDialog.show();
         }
     }
 
@@ -189,22 +145,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.register_button) {
-            String uNameFromClient = usernameTextField.getText().toString();
-            String passwordFromClient = passwordTextField.getText().toString();
-            String confirmFromClient = passwordConfirmTextField.getText().toString();
-            String captchaTextFromClient = captchaTextField.getText().toString();
-            if(!captcha.verify(captchaTextFromClient)) {
-                AUtils.shortToast(R.string.registration_captcha_invalid, this);
-            } else if(passwordFromClient.length() < 8) {
-                AUtils.shortToast(R.string.registration_password_too_short, this);
-            } else if(!passwordFromClient.equals(confirmFromClient)) {
-                AUtils.shortToast(R.string.registration_password_dont_match, this);
-            } else if(uNameFromClient.length() <= 3) {
-                AUtils.shortToast(R.string.registration_username_too_short, this);
-            } else {
-                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-                progressDialog.show();
-            }
+            sendRegistration();
             return false;
         }
         return super.onOptionsItemSelected(item);

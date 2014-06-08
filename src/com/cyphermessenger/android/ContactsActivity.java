@@ -30,9 +30,12 @@ public class ContactsActivity extends MainActivity {
         mainView = (ListView) findViewById(R.id.contacts_list);
         contactList.addAll(cm.getContactList());
 
+        if(contactList.size() == 0) {
+            setContentView(R.layout.activity_contacts_no_contact);
+        }
+
         adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contactList);
         mainView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
 
         mainView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -48,9 +51,6 @@ public class ContactsActivity extends MainActivity {
             }
         });
 
-        if(contactList.size() == 0) {
-            setContentView(R.layout.activity_contacts_no_contact);
-        }
     }
 
     @Override
@@ -78,6 +78,7 @@ public class ContactsActivity extends MainActivity {
                 return true;
             case R.id.action_logout:
                 startActivity(new Intent(this, LoginActivity.class));
+                finish();
                 return  true;
             default:
                 return false;
