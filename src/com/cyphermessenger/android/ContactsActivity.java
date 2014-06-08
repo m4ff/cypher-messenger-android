@@ -28,11 +28,11 @@ public class ContactsActivity extends MainActivity {
         setContentView(R.layout.activity_contacts);
 
         mainView = (ListView) findViewById(R.id.contacts_list);
-
         contactList.addAll(cm.getContactList());
 
         adapter = new ArrayAdapter<>(this, R.layout.contacts_template, R.id.contact_last_time, contactList);
         mainView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
         mainView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -47,6 +47,10 @@ public class ContactsActivity extends MainActivity {
                 startActivity(conversationTo);
             }
         });
+
+        if(contactList.size() == 0) {
+            setContentView(R.layout.activity_contacts_no_contact);
+        }
     }
 
     @Override
