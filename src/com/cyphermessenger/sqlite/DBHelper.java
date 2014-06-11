@@ -13,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper instance;
 
     private static final String DATABASE_NAME = "cypherMessenger.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // TABLES
     public static final String TABLE_USERS = "users";
@@ -37,6 +37,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CONTACT_STATUS = "contactStatus";
     public static final String COLUMN_CONTACT_DATE_TIME = "timestamp";
     public static final String COLUMN_CONTACT_AVATAR = "avatar";
+    public static final String COLUMN_CONTACT_ISFIRST = "isFirst";
 
     // MESSAGES COLUMNS
     public static final String COLUMN_MESSAGE_ID = "messageID";
@@ -68,7 +69,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + COLUMN_CONTACT_ID + " INTEGER, "
             + COLUMN_CONTACT_DATE_TIME + " INTEGER, "
             + COLUMN_CONTACT_STATUS + " TEXT NOT NULL, "
-            + COLUMN_CONTACT_AVATAR + " BLOB);";
+            + COLUMN_CONTACT_AVATAR + " BLOB, "
+            + COLUMN_CONTACT_ISFIRST + " INTEGER DEFAULT 0);";
 
     private static final String DATABASE_CREATE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "("
             + COLUMN_MESSAGE_ID + " INTEGER NOT NULL, "

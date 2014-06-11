@@ -9,6 +9,5 @@
 
     <item android:id="@+id/action_register"
           android:title="@string/button_register_login"
-          android:icon="@drawable/ic_action_new_account"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
 </menu>

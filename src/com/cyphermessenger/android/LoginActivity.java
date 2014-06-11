@@ -223,6 +223,11 @@ public class LoginActivity extends Activity implements ContentListener {
     }
 
     @Override
+    public void onContactDeleted(String name) {
+
+    }
+
+    @Override
     public void onServerError() {
         progressDialog.dismiss();
         runOnUiThread(new Runnable() {

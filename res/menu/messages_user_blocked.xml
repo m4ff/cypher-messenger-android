@@ -3,6 +3,11 @@
     tools:context="com.cyphermessenger.MessagesActivity" >
 
     <item
+        android:id="@+id/message_contact_block"
+        android:title="block"
+        android:showAsAction="never" />
+
+    <item
         android:id="@+id/message_delete_conversation"
         android:title="delete"
         android:showAsAction="never" />

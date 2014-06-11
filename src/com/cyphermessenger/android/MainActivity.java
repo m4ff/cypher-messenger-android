@@ -114,7 +114,9 @@ public class MainActivity extends FragmentActivity implements ContentListener, N
     @Override
     public void onFindUser(List<String> list) {}
     @Override
-    public void onContactWaiting() {}
+    public void onContactWaiting() {
+        showToast(R.string.error_contact_waiting);
+    }
     @Override
     public void onLogged(CypherUser user) {}
     @Override
@@ -128,15 +130,26 @@ public class MainActivity extends FragmentActivity implements ContentListener, N
     @Override
     public void onUsernameTaken() {}
     @Override
-    public void onUsernameNotFound() {}
+    public void onUsernameNotFound() {
+        showToast(R.string.error_contact_not_found);
+    }
     @Override
-    public void onContactNotFound() {}
+    public void onContactNotFound() {
+        showToast(R.string.error_contact_not_found);
+    }
     @Override
-    public void onContactBlocked() {}
+    public void onContactBlocked() {
+        showToast(R.string.error_contact_block);
+    }
     @Override
-    public void onContactDenied() {}
+    public void onContactDenied() {
+        showToast(R.string.error_contact_denied);
+    }
     @Override
     public void onContactChange(CypherContact contact) {}
+
+    @Override
+    public void onContactDeleted(String name) {}
 
     // NotificationListener
     @Override

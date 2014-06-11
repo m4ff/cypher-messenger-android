@@ -259,6 +259,22 @@ public class ContentManager {
         addThread(th);
     }
 
+    public void deleteContactRequest(final String username) {
+        Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SyncRequest.blockContact(session, username);
+                    dbManager.deleteContact(new CypherContact(username, null));
+                    contentListener.onContactDeleted(username);
+                } catch (Exception e) {
+                    handleException(e);
+                }
+            }
+        });
+        addThread(th);
+    }
+
     public CypherContact getContactByID(long id) {
         return dbManager.getContactByID(id);
     }

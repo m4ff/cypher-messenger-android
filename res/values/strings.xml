@@ -43,12 +43,22 @@
     <string name="error_contact_denied">This user blocked you</string>
     <string name="error_contact_not_found">User not found</string>
     <string name="error_general_error">Server error</string>
+    <string name="error_contact_waiting">Contact is waiting</string>
+    <string name="error_contact_block">You blocked this contact</string>
+    <string name="contact_waiting_actions">actions</string>
+    <string name="contacts_waiting_action_accepted">You have a new friend!</string>
+    <string name="contacts_waiting_action_declined">Do not worry, you have probably done well</string>
 
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
+    <string name="prompt_text_message_hint_user_blocked">You have been blocked by this contact</string>
+    <string name="prompt_text_message_hint_contact_blocked">Please unblock this contact before typing</string>
     <string name="empty_message">Please type a message</string>
     <string name="messages_loading_message">Loading...</string>
     <string name="messages_new_message">You got a new message</string>
+    <string name="messages_delete_conversation">Messages have been deleted successfully</string>
+    <string name="messages_contact_blocked">This contact has been blocked successfully</string>
+
 
 
 

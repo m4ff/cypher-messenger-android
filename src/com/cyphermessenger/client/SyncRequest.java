@@ -231,11 +231,12 @@ public final class SyncRequest {
         JsonNode node = MAPPER.readTree(in);
         conn.disconnect();
         int statusCode = node.get("status").asInt();
-        if (statusCode == StatusCode.OK) {
+        if (statusCode == StatusCode.OK && add) {
             long userID = node.get("contactID").asLong();
             long keyTimestamp = node.get("keyTimestamp").asLong();
             long contactTimestamp = node.get("contactTimestamp").asLong();
             ECKey key = Utils.decodeKey(node.get("publicKey").asText());
+            key.setTime(keyTimestamp);
             boolean isFirst = node.get("isFirst").asBoolean();
             return new CypherContact(contactName, userID, key, keyTimestamp, CypherContact.ACCEPTED, contactTimestamp, isFirst);
         } else {
@@ -244,6 +245,7 @@ public final class SyncRequest {
                 case StatusCode.CONTACT_WAITING:
                     status = CypherContact.WAITING;
                     break;
+                case StatusCode.OK:
                 case StatusCode.CONTACT_BLOCKED:
                     status = CypherContact.BLOCKED;
                     break;

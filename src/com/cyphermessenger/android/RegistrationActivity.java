@@ -248,6 +248,11 @@ public class RegistrationActivity extends Activity implements ContentListener {
     }
 
     @Override
+    public void onContactDeleted(String name) {
+
+    }
+
+    @Override
     public void onServerError() {
         runOnUiThread(new Runnable() {
             @Override

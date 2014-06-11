@@ -22,7 +22,9 @@ public class MessagesActivity extends MainActivity {
     ListView messageListView;
     MessageAdapter adapter;
     CypherContact contact;
-
+    CypherUser user;
+    EditText editor;
+    ImageButton buttonSend;
 
 
     private static final int DEFAULT_MESSAGE_NUM = 20;
@@ -34,9 +36,12 @@ public class MessagesActivity extends MainActivity {
         setContentView(R.layout.activity_messages);
 
         Intent intent = getIntent();
+        editor = (EditText) findViewById(R.id.message_editor);
+        buttonSend = (ImageButton) findViewById(R.id.message_button_send);
 
         if(intent != null) {
             contact = cm.getContactByID(intent.getLongExtra("CONTACT", 0));
+            user = cm.getUser();
         }
 
         if(contact != null) {
@@ -44,15 +49,18 @@ public class MessagesActivity extends MainActivity {
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(contact.getUsername().hashCode());
         }
 
+        if(contact.getStatus().equals(CypherContact.BLOCKED)) {
+            getLayoutInflater().inflate(R.layout.activity_messages_contact_blocked, null);
+        } else if(contact.getStatus().equals(CypherContact.DENIED) ) {
+            getLayoutInflater().inflate(R.layout.activity_messages_user_blocked, null);
+        }
+
         messageListView = (ListView) findViewById(R.id.messages_list_view);
 
         adapter = new MessageAdapter(messagesSet);
         messageListView.setAdapter(adapter);
 
-        final EditText messageEditor = (EditText) findViewById(R.id.message_editor);
-        ImageButton buttonSend = (ImageButton) findViewById(R.id.message_button_send);
-
-        messageEditor.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editor.setImeOptions(EditorInfo.IME_ACTION_DONE);
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +68,7 @@ public class MessagesActivity extends MainActivity {
                     showTopToast(R.string.error_general_error);
                     return;
                 }
-                String text = ((EditText) findViewById(R.id.message_editor)).getText().toString();
+                String text = editor.getText().toString();
                 if(!text.equals("")) {
                     synchronized (messagesSet) {
                         CypherMessage newMessage = cm.sendMessage(contact, text);
@@ -71,7 +79,7 @@ public class MessagesActivity extends MainActivity {
                 } else {
                     AUtils.shortToast(R.string.empty_message, getApplicationContext());
                 }
-                ((EditText) findViewById(R.id.message_editor)).setText("");
+                editor.setText("");
             }
         });
 
@@ -93,6 +101,17 @@ public class MessagesActivity extends MainActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        if(contact.getStatus().equals(CypherContact.BLOCKED)) {
+            getMenuInflater().inflate(R.menu.messages_user_blocked, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.messages, menu);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.messages, menu);
         return true;
@@ -100,9 +119,17 @@ public class MessagesActivity extends MainActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.message_contact_block:
+                showToast(R.string.messages_contact_blocked);
+                break;
+            case R.id.message_delete_conversation:
+                showToast(R.string.messages_delete_conversation);
+                messagesSet.clear();
+                adapter.notifyDataSetChanged();
+                break;
+            default:
+                return false;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -207,4 +234,21 @@ public class MessagesActivity extends MainActivity {
         });
     }
 
+    @Override
+    public void onContactBlocked() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                editor.setEnabled(false);
+                editor.setAlpha(0.8f);
+                editor.setHint(R.string.prompt_text_message_hint_contact_blocked);
+
+                buttonSend.setEnabled(false);
+                buttonSend.setClickable(false);
+                buttonSend.setAlpha(0.8f);
+
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
 }

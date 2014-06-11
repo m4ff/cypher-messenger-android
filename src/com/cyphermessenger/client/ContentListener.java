@@ -27,6 +27,8 @@ public interface ContentListener {
 
     public void onContactChange(CypherContact contact);
 
+    public void onContactDeleted(String name);
+
     public void onServerError();
 
     public void onSessionInvalid();

@@ -51,6 +51,7 @@ public class DBManagerAndroidImpl implements DBManager {
         val.put(DBHelper.COLUMN_CONTACT_NAME, contact.getUsername());
         val.put(DBHelper.COLUMN_CONTACT_STATUS, contact.getStatus());
         val.put(DBHelper.COLUMN_CONTACT_DATE_TIME, contact.getContactTimestamp());
+        val.put(DBHelper.COLUMN_CONTACT_ISFIRST, contact.isFirst());
         db.replace(DBHelper.TABLE_CONTACTS, null, val);
     }
 
@@ -105,7 +106,7 @@ public class DBManagerAndroidImpl implements DBManager {
     @Override
     public CypherContact getContactByID(long id) {
         SQLiteDatabase db = openHelper.getReadableDatabase();
-        Cursor d = db.query(DBHelper.TABLE_CONTACTS, new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME}, DBHelper.COLUMN_CONTACT_ID + " = " + id, null, null, null, null);
+        Cursor d = db.query(DBHelper.TABLE_CONTACTS, new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME, DBHelper.COLUMN_CONTACT_ISFIRST}, DBHelper.COLUMN_CONTACT_ID + " = " + id, null, null, null, null);
         if (d.moveToNext()) {
             String username = d.getString(0);
             String status = d.getString(1);
@@ -189,7 +190,7 @@ public class DBManagerAndroidImpl implements DBManager {
     @Override
     public List<CypherContact> getContacts() {
         SQLiteDatabase db = openHelper.getReadableDatabase();
-        String[] columns = new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_ID, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME};
+        String[] columns = new String[]{DBHelper.COLUMN_CONTACT_NAME, DBHelper.COLUMN_CONTACT_ID, DBHelper.COLUMN_CONTACT_STATUS, DBHelper.COLUMN_CONTACT_DATE_TIME, DBHelper.COLUMN_CONTACT_ISFIRST};
         Cursor c = db.query(DBHelper.TABLE_CONTACTS, columns, null, null, null, null, null, null);
         List<CypherContact> list = new LinkedList<>();
         while(c.moveToNext()) {
@@ -203,7 +204,7 @@ public class DBManagerAndroidImpl implements DBManager {
                 keyTime = d.getLong(0);
                 key.setTime(keyTime);
             }
-            list.add(new CypherContact(c.getString(0), contactID, key, keyTime, c.getString(2), c.getLong(3)));
+            list.add(new CypherContact(c.getString(0), contactID, key, keyTime, c.getString(2), c.getLong(3), c.getInt(4) != 0));
         }
         return list;
     }

@@ -55,6 +55,11 @@ public class BasicContentListener implements ContentListener {
     }
 
     @Override
+    public void onContactDeleted(String name) {
+
+    }
+
+    @Override
     public void onServerError() {
 
     }

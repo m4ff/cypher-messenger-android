@@ -45,7 +45,11 @@ public class CypherContact extends CypherUser {
 
     @Override
     public String toString() {
-        return super.toString() + " (" + status + ")";
+        if(status.equals(WAITING)) {
+            return super.toString() + " (waiting)";
+        } else {
+            return super.toString();
+        }
     }
 
     public Long getContactTimestamp() {
