@@ -6,6 +6,6 @@
         android:id="@+id/message_delete_conversation"
         android:title="@string/message_clear_conversation"
         android:showAsAction="never"
-            android:visible="false"/>
+        android:visible="false" />
 
 </menu>

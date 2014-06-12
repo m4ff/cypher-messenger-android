@@ -20,9 +20,8 @@ import java.util.*;
  */
 public class ContentUpdateManager extends BroadcastReceiver implements ContentListener {
 
-    private final static long LONG_INTERVAL = 1000 * 60;
-    private final static long SHORT_INTERVAL = 1000 * 10;
-    private final static long MAX_THREAD_TIME = 1000 * 10;
+    private final static long LONG_INTERVAL = 1000 * 10;
+    private final static long SHORT_INTERVAL = 1000 * 2;
 
     public static final String BROADCAST_NOTIFICATIONS = "com.cyphermessenger.android.BROADCAST_NOTIFICATIONS";
 

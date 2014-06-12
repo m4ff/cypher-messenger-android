@@ -126,6 +126,6 @@ public class CypherMessage implements Comparable {
         if(m.equals(this)) {
             return 0;
         }
-        return timestamp <= m.timestamp ? -1 : 0;
+        return timestamp <= m.timestamp ? -1 : 1;
     }
 }

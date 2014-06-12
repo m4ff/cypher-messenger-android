@@ -240,6 +240,7 @@ public final class SyncRequest {
             boolean isFirst = node.get("isFirst").asBoolean();
             return new CypherContact(contactName, userID, key, keyTimestamp, CypherContact.ACCEPTED, contactTimestamp, isFirst);
         } else {
+            boolean isFirst = node.get("isFirst").asBoolean();
             String status;
             switch (statusCode) {
                 case StatusCode.CONTACT_WAITING:
@@ -255,7 +256,7 @@ public final class SyncRequest {
                 default:
                     throw new APIErrorException(statusCode);
             }
-            return new CypherContact(contactName, status);
+            return new CypherContact(contactName, null, null, null, status, null, isFirst);
         }
     }
 

@@ -158,20 +158,21 @@ public class ContactsActivity extends MainActivity {
         super.onContactChange(contact);
         switch(contact.getStatus()) {
             case CypherContact.ACCEPTED:
-                showToast(R.string.contacts_waiting_action_accepted);
+                if(contact.isFirst()) {
+                    showToast(R.string.contacts_waiting_action_accepted);
+                }
                 break;
             case CypherContact.BLOCKED:
-                contactView = getLayoutInflater().inflate(R.layout.messages_template, null);
-                ImageView contactAvatar = (ImageView) findViewById(R.id.contact_avatar);
-                TextView contactName = (TextView) findViewById(R.id.contact_last_time);
-                contactAvatar.setImageResource(R.drawable.ic_action_person_blocked);
-                contactName.setTextColor(Color.LTGRAY);
-                contactView.setClickable(false);
-                contactView.setFocusable(false);
+                break;
+            case CypherContact.DENIED:
                 showToast(R.string.contacts_waiting_action_declined);
                 break;
             default:
                 showToast(R.string.error_general_error);
+        }
+        synchronized (contactSet) {
+            contactSet.remove(contact);
+            contactSet.add(contact);
         }
         adapter.notifyDataSetChanged();
     }
@@ -180,7 +181,12 @@ public class ContactsActivity extends MainActivity {
     public void onNewContacts(List<CypherContact> contacts) {
         Log.d("onNewContacts", Arrays.toString(contacts.toArray(new CypherContact[] {})));
         synchronized (contactSet) {
-            contactSet.addAll(contacts);
+            for(CypherContact c : contacts) {
+                if(contactSet.contains(c)) {
+                    contactSet.remove(c);
+                }
+                contactSet.add(c);
+            }
         }
         runOnUiThread(new Runnable() {
             @Override
@@ -242,14 +248,18 @@ public class ContactsActivity extends MainActivity {
             Time time = new Time();
             if(m != null) {
                 time.set(m.getTimestamp());
-            } else {
+                if(DateUtils.isToday(time.toMillis(false))) {
+                    contactTime.setText(time.format("%H.%M"));
+                } else {
+                    contactTime.setText(time.format("%d/%m"));
+                }
+            } else if(nowConsidering.getContactTimestamp() != null) {
                 time.set(nowConsidering.getContactTimestamp());
-            }
-
-            if(DateUtils.isToday(time.toMillis(false))) {
-                contactTime.setText(time.format("%H.%M"));
-            } else {
-                contactTime.setText(time.format("%d/%m"));
+                if(DateUtils.isToday(time.toMillis(false))) {
+                    contactTime.setText(time.format("%H.%M"));
+                } else {
+                    contactTime.setText(time.format("%d/%m"));
+                }
             }
 
             int previewMaxLength = 37;

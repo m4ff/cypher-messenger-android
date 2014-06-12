@@ -65,7 +65,7 @@ public class CypherContact extends CypherUser implements Comparable {
         if(m.equals(this)) {
             return 0;
         }
-        if(m.contactTimestamp == null) {
+        if(m.contactTimestamp == null || contactTimestamp == null) {
             return -1;
         }
         return contactTimestamp <= m.contactTimestamp ? -1 : 1;
