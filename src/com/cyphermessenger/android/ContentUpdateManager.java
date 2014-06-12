@@ -180,13 +180,13 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
                 String text = null;
                 switch(contact.getStatus()) {
                     case CypherContact.ACCEPTED:
-                        text = contact.getUsername() + " accepted your contact request";
+                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_accepted);
                         break;
                     case CypherContact.DENIED:
-                        text = contact.getUsername() + " blocked you";
+                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_denied);
                         break;
                     case CypherContact.WAITING:
-                        text = contact.getUsername() + " sent you a contact request";
+                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_request);
                 }
                 if(text != null) {
                     Intent contactNotification = new Intent(applicationContext, ContactsActivity.class);

@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.cyphermessenger.utils.Utils;
 import org.spongycastle.asn1.sec.SECNamedCurves;
@@ -35,6 +36,8 @@ public class ECKey {
     private byte[] priv;
     private byte[] pub;
     private long time;
+
+    private static HashMap<byte[], HashMap<byte[], byte[]>> secretCache = new HashMap<>();
 
     private final ECPrivateKeyParameters privParams;
     private final ECPublicKeyParameters pubParams;
@@ -124,16 +127,26 @@ public class ECKey {
      * @return
      */
     public byte[] getSharedSecret(ECKey peer) {
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        HashMap<byte[], byte[]> secrets = secretCache.get(getPublicKey());
+        if(secrets == null) {
+            secrets = new HashMap<>();
+            secretCache.put(pub, secrets);
         }
-        BasicAgreement agr = new ECDHBasicAgreement();
-        agr.init(privParams);
-        byte[] secret = BigIntegers.asUnsignedByteArray(agr.calculateAgreement(peer.pubParams));
-        return digest.digest(secret);
+        byte[] secret = secrets.get(peer.getPublicKey());
+        if(secret == null) {
+            MessageDigest digest;
+            try {
+                digest = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+            BasicAgreement agr = new ECDHBasicAgreement();
+            agr.init(privParams);
+            secret = BigIntegers.asUnsignedByteArray(agr.calculateAgreement(peer.pubParams));
+            secret = digest.digest(secret);
+            secrets.put(peer.pub, secret);
+        }
+        return secret;
     }
 
     @SuppressWarnings("deprecation")
@@ -161,5 +174,11 @@ public class ECKey {
     @Override
     public String toString() {
         return Utils.BASE32.encode(getPublicKey());
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+
     }
 }

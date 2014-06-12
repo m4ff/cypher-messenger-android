@@ -49,6 +49,11 @@
     <string name="contacts_waiting_action_accepted">You have a new friend!</string>
     <string name="contacts_waiting_action_declined">Do not worry, you have probably done well</string>
 
+    <!-- NOTIFICATIONS -->
+    <string name="notification_contact_accepted"> accepted your contact request</string>
+    <string name="notification_contact_request"> blocked you</string>
+    <string name="notification_contact_denied"> sent you a contact request</string>
+
     <!-- MESSAGES STRINGS -->
     <string name="prompt_text_message_hint">Type your message</string>
     <string name="prompt_text_message_hint_user_blocked">You have been blocked by this contact</string>
