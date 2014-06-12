@@ -123,6 +123,9 @@ public class CypherMessage implements Comparable {
     @Override
     public int compareTo(Object o) {
         CypherMessage m = (CypherMessage) o;
-        return timestamp < m.timestamp ? -1 : (timestamp == m.timestamp ? 0 : 1);
+        if(m.equals(this)) {
+            return 0;
+        }
+        return timestamp <= m.timestamp ? -1 : 0;
     }
 }

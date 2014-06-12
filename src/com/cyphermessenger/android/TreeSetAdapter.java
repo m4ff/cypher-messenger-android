@@ -24,18 +24,24 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter {
 
     public TreeSetAdapter(TreeSet<T> treeSet, T[] treeSetArray) {
         this.treeSet = treeSet;
-        this.treeSetArray = treeSet.toArray(treeSetArray);
+        synchronized (treeSet) {
+            this.treeSetArray = treeSet.toArray(treeSetArray);
+        }
     }
 
     @Override
     public void notifyDataSetChanged() {
+        synchronized (treeSet) {
+            this.treeSetArray = treeSet.toArray(treeSetArray);
+        }
         super.notifyDataSetChanged();
-        this.treeSetArray = treeSet.toArray(treeSetArray);
     }
 
     @Override
     public int getCount() {
-        return treeSet.size();
+        synchronized (treeSet) {
+            return treeSet.size();
+        }
     }
 
     @Override

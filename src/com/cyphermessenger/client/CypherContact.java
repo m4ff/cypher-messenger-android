@@ -62,10 +62,13 @@ public class CypherContact extends CypherUser implements Comparable {
     @Override
     public int compareTo(Object o) {
         CypherContact m = (CypherContact) o;
+        if(m.equals(this)) {
+            return 0;
+        }
         if(m.contactTimestamp == null) {
             return -1;
         }
-        return contactTimestamp < m.contactTimestamp ? -1 : (contactTimestamp == m.contactTimestamp ? 0 : 1);
+        return contactTimestamp <= m.contactTimestamp ? -1 : 1;
     }
 
     public Long getContactTimestamp() {

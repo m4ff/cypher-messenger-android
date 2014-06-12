@@ -70,12 +70,14 @@ public class MessagesActivity extends MainActivity {
                 }
                 String text = editor.getText().toString();
                 if(!text.equals("")) {
+
+                    CypherMessage newMessage = cm.sendMessage(contact, text);
                     synchronized (messagesSet) {
-                        CypherMessage newMessage = cm.sendMessage(contact, text);
                         messagesSet.add(newMessage);
-                        adapter.notifyDataSetChanged();
-                        messageListView.smoothScrollToPosition(messagesSet.size() - 1);
                     }
+                    adapter.notifyDataSetChanged();
+                    messageListView.smoothScrollToPosition(messagesSet.size() - 1);
+
                 } else {
                     AUtils.shortToast(R.string.empty_message, getApplicationContext());
                 }

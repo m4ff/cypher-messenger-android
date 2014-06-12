@@ -102,7 +102,9 @@ public class ContactsActivity extends MainActivity {
                                 switch(which) {
                                     case 0:
                                         cm.blockContact(contact.getUsername());
-                                        contactSet.remove(contact);
+                                        synchronized (contactSet) {
+                                            contactSet.remove(contact);
+                                        }
                                         adapter.notifyDataSetChanged();
                                 }
                             }
@@ -117,10 +119,12 @@ public class ContactsActivity extends MainActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        contactSet.clear();
         List<CypherContact> list = cm.getContactList();
         Log.d("CONTACTS:", Arrays.toString(list.toArray(new CypherContact[] {})));
-        contactSet.addAll(list);
+        synchronized (contactSet) {
+            contactSet.clear();
+            contactSet.addAll(list);
+        }
         adapter.notifyDataSetChanged();
     }
 
@@ -174,8 +178,10 @@ public class ContactsActivity extends MainActivity {
 
     @Override
     public void onNewContacts(List<CypherContact> contacts) {
-        Log.d("onNewContacts", "CALLED");
-        contactSet.addAll(contacts);
+        Log.d("onNewContacts", Arrays.toString(contacts.toArray(new CypherContact[] {})));
+        synchronized (contactSet) {
+            contactSet.addAll(contacts);
+        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -189,7 +195,9 @@ public class ContactsActivity extends MainActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                contactSet.remove(new CypherContact(name, null));
+                synchronized (contactSet) {
+                    contactSet.remove(new CypherContact(name, null));
+                }
                 adapter.notifyDataSetChanged();
             }
         });
