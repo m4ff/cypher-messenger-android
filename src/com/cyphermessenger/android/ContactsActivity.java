@@ -247,14 +247,17 @@ public class ContactsActivity extends MainActivity {
                 contactTime.setText("%d/%m");
             }
 
-            int previewMaxLength = 27;
+            int previewMaxLength = 37;
 
 
             switch(nowConsidering.getStatus()) {
                 case CypherContact.ACCEPTED:
                     String text = "";
                     if(m != null) {
-                        text = m.getText().substring(0, Math.min(previewMaxLength, text.length())) + "...";
+                        int messLen = m.getText().length();
+                        int min = Math.min(previewMaxLength, messLen);
+                        String closing = messLen < previewMaxLength ? "" : "...";
+                        text = m.getText().substring(0, min) + closing;
                     }
                     contactStatus.setText(text);
                     break;
