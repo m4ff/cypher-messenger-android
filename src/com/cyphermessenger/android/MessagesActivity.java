@@ -124,9 +124,9 @@ public class MessagesActivity extends MainActivity {
                 showToast(R.string.messages_contact_blocked);
                 break;
             case R.id.message_delete_conversation:
-                showToast(R.string.messages_delete_conversation);
-                messagesSet.clear();
-                adapter.notifyDataSetChanged();
+                //showToast(R.string.messages_delete_conversation);
+                //messagesSet.clear();
+                //adapter.notifyDataSetChanged();
                 break;
             default:
                 return false;

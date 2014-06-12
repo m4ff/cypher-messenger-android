@@ -60,17 +60,11 @@ public class CypherContact extends CypherUser implements Comparable {
     }
 
     @Override
-    public String toString() {
-        if(status.equals(WAITING)) {
-            return super.toString() + " (waiting)";
-        } else {
-            return super.toString();
-        }
-    }
-
-    @Override
     public int compareTo(Object o) {
         CypherContact m = (CypherContact) o;
+        if(m.contactTimestamp == null) {
+            return -1;
+        }
         return contactTimestamp < m.contactTimestamp ? -1 : (contactTimestamp == m.contactTimestamp ? 0 : 1);
     }
 

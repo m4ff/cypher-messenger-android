@@ -75,10 +75,7 @@ public class ContactsActivity extends MainActivity {
                         builder.setTitle(R.string.contact_waiting_actions)
                                 .setItems(actions, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        switch(which) {
-                                            case 0:
-                                                cm.deleteContactRequest(contact.getUsername());
-                                        }
+                                        cm.deleteContactRequest(contact.getUsername());
                                     }
                                 });
                         builder.create().show();
@@ -244,7 +241,7 @@ public class ContactsActivity extends MainActivity {
             if(DateUtils.isToday(time.toMillis(false))) {
                 contactTime.setText(time.format("%H.%M"));
             } else {
-                contactTime.setText("%d/%m");
+                contactTime.setText(time.format("%d/%m"));
             }
 
             int previewMaxLength = 37;

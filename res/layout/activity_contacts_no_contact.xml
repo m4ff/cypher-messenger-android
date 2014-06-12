@@ -3,24 +3,26 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:isScrollContainer="true"
-    tools:context="com.cyphermessenger.ContactsActivity" >
+    android:isScrollContainer="false"
+    android:padding="50dp"
+    tools:context=".ContactsActivity" >
 
-    <ImageView
+    <!--ImageView
             android:id="@+id/contacts_add_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingLeft="145dp"
-            android:src="@drawable/arrow"/>
+            android:src="@drawable/arrow"/-->
 
     <TextView
             android:id="@+id/contacts_add_arrow_hint"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="120dp"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
+            android:layout_height="match_parent"
+            android:textStyle="bold"
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
             android:text="@string/contacts_add_arrow_hint"/>
 
 </LinearLayout>

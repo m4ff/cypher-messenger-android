@@ -35,7 +35,7 @@
     <string name="add_contact_name_hint">Insert contact name</string>
     <string name="add_contact_search_view_title">Search</string>
     <string name="add_contact_activity_title">SearchCypheredUser</string>
-    <string name="contacts_add_arrow_hint">Welcome to Cyphermessenger, you can add a friend by clicking this button!</string>
+    <string name="contacts_add_arrow_hint">Welcome to Cypher Messenger, you can search and add contacts by tapping the button above!</string>
     <string name="alert_text">Contact request sent</string>
     <string name="alert_title">Add a Contact</string>
     <string name="alert_button_add">Add</string>
@@ -62,6 +62,7 @@
     <string name="messages_new_message">You got a new message</string>
     <string name="messages_delete_conversation">Messages have been deleted successfully</string>
     <string name="messages_contact_blocked">This contact has been blocked successfully</string>
+    <string name="message_clear_conversation">Clear conversation</string>
 
 
 
