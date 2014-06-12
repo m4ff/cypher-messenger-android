@@ -226,6 +226,8 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
     @Override
     public void onContactChange(CypherContact contact) {}
     @Override
+    public void onContactDeleted(String name) {}
+    @Override
     public void onServerError() {}
     @Override
     public void onSessionInvalid() {}

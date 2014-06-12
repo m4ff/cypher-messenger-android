@@ -3,11 +3,12 @@ package com.cyphermessenger.client;
 
 import android.util.Log;
 import com.cyphermessenger.crypto.ECKey;
-import org.apache.http.impl.entity.StrictContentLengthStrategy;
 import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class ContentManager {
 
@@ -63,34 +64,45 @@ public class ContentManager {
         return session;
     }
 
-    public CypherUser getUser() { return session != null ? session.getUser() : null; }
+    public CypherUser getUser() {
+        return session != null ? session.getUser() : null;
+    }
 
     private void handleException(Exception e) {
         Log.e("ContentManager", "handleException", e);
         e.printStackTrace();
-        if(e instanceof IOException) {
+        if (e instanceof IOException) {
             contentListener.onServerError();
-        } else if(e instanceof APIErrorException) {
-            switch(((APIErrorException) e).getStatusCode()) {
+        } else if (e instanceof APIErrorException) {
+            switch (((APIErrorException) e).getStatusCode()) {
                 case StatusCode.SESSION_INVALID:
                 case StatusCode.SESSION_EXPIRED:
-                    contentListener.onSessionInvalid(); break;
+                    contentListener.onSessionInvalid();
+                    break;
                 case StatusCode.CAPTCHA_INVALID:
-                    contentListener.onCaptchaInvalid(); break;
+                    contentListener.onCaptchaInvalid();
+                    break;
                 case StatusCode.LOGIN_INVALID:
-                    contentListener.onLoginInvalid(); break;
+                    contentListener.onLoginInvalid();
+                    break;
                 case StatusCode.USERNAME_TAKEN:
-                    contentListener.onUsernameTaken(); break;
+                    contentListener.onUsernameTaken();
+                    break;
                 case StatusCode.USERNAME_NOT_FOUND:
-                    contentListener.onUsernameNotFound(); break;
+                    contentListener.onUsernameNotFound();
+                    break;
                 case StatusCode.CONTACT_NOT_FOUND:
-                    contentListener.onContactNotFound(); break;
+                    contentListener.onContactNotFound();
+                    break;
                 case StatusCode.CONTACT_WAITING:
-                    contentListener.onContactWaiting(); break;
+                    contentListener.onContactWaiting();
+                    break;
                 case StatusCode.CONTACT_BLOCKED:
-                    contentListener.onContactBlocked(); break;
+                    contentListener.onContactBlocked();
+                    break;
                 case StatusCode.CONTACT_DENIED:
-                    contentListener.onContactDenied(); break;
+                    contentListener.onContactDenied();
+                    break;
                 default:
                     contentListener.onServerError();
             }
@@ -98,7 +110,7 @@ public class ContentManager {
     }
 
     public void requestCaptcha() {
-    	Thread th = new Thread(new Runnable() {
+        Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -168,7 +180,7 @@ public class ContentManager {
     }
 
     public void logout() {
-        if(session == null) {
+        if (session == null) {
             return;
         }
         final CypherSession sessionBackup = session;
@@ -231,7 +243,7 @@ public class ContentManager {
                 try {
                     CypherContact contact = SyncRequest.addContact(session, username);
                     dbManager.insertContact(contact);
-                    if(contact.getKey() != null) {
+                    if (contact.getKey() != null) {
                         dbManager.insertKey(contact, contact.getKey());
                     }
                     contentListener.onContactChange(contact);
@@ -297,33 +309,35 @@ public class ContentManager {
     private void handlePullResults(PullResults res, CypherUser contact) {
         long notifiedUntil = res.getNotifiedUntil();
         CypherUser user = contact != null ? contact : session.getUser();
-        if(res.getKeys() != null) {
-            for(ECKey k : res.getKeys()) {
+        if (res.getKeys() != null) {
+            for (ECKey k : res.getKeys()) {
                 dbManager.insertKey(user, k);
             }
             contentListener.onPullKeys(res.getKeys(), notifiedUntil);
-        } if(res.getContacts() != null) {
-            for(CypherContact c : res.getContacts()) {
+        }
+        if (res.getContacts() != null) {
+            for (CypherContact c : res.getContacts()) {
                 dbManager.insertContact(c);
-                if(c.getKey() != null) {
+                if (c.getKey() != null) {
                     dbManager.insertKey(c, c.getKey());
                 }
             }
             contentListener.onPullContacts(res.getContacts(), notifiedUntil);
-        } if(res.getMessages() != null) {
+        }
+        if (res.getMessages() != null) {
             Iterator<CypherMessage> i = res.getMessages().iterator();
-            while(i.hasNext()) {
+            while (i.hasNext()) {
                 CypherMessage m = i.next();
-                if(dbManager.messageExists(m)) {
+                if (dbManager.messageExists(m)) {
                     i.remove();
                     continue;
                 }
-                if(m.isEncrypted()) {
+                if (m.isEncrypted()) {
                     try {
                         m.decrypt(session.getUser().getKey(), getContactByID(m.getContactID()).getKey());
                     } catch (InvalidCipherTextException e) {
                         try {
-                            if(!recoverMessage(m, contact)) {
+                            if (!recoverMessage(m, contact)) {
                                 /**
                                  * TODO
                                  * inform the server that this message was rejected
@@ -331,7 +345,7 @@ public class ContentManager {
                                 i.remove();
                                 continue;
                             }
-                        } catch(Exception ex) {
+                        } catch (Exception ex) {
                             handleException(ex);
                             break;
                         }
@@ -350,7 +364,7 @@ public class ContentManager {
                 try {
                     PullResults res = SyncRequest.pullMessages(session, contact, since, time);
                     handlePullResults(res, contact);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     handleException(e);
                 }
             }
@@ -365,7 +379,7 @@ public class ContentManager {
                 try {
                     PullResults res = SyncRequest.pullContacts(session, SyncRequest.SINCE, since);
                     handlePullResults(res, null);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     handleException(e);
                 }
             }
@@ -384,7 +398,7 @@ public class ContentManager {
                 try {
                     PullResults res = SyncRequest.pullKeys(session, user, since, time);
                     handlePullResults(res, user);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     handleException(e);
                 }
             }
@@ -396,12 +410,12 @@ public class ContentManager {
         long since = dbManager.getLastUpdateTime();
         Log.d("LAST UPDATE TIME", since + "");
         dbManager.setLastUpdateTime(System.currentTimeMillis());
-                try {
-                    PullResults res = SyncRequest.pullAll(session, null, SyncRequest.SINCE, since);
-                    handlePullResults(res, null);
-                } catch(Exception e) {
-                    handleException(e);
-                }
+        try {
+            PullResults res = SyncRequest.pullAll(session, null, SyncRequest.SINCE, since);
+            handlePullResults(res, null);
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     public void pullAll() {
@@ -420,9 +434,9 @@ public class ContentManager {
             public void run() {
                 List<CypherMessage> messages = dbManager.getMessages(user, offset, limit);
                 contentListener.onGetMessages(messages);
-                if(messages.size() < limit) {
+                if (messages.size() < limit) {
                     long untilTime;
-                    if(messages.size() > 0) {
+                    if (messages.size() > 0) {
                         CypherMessage last = messages.get(messages.size() - 1);
                         untilTime = last.getTimestamp();
                     } else {

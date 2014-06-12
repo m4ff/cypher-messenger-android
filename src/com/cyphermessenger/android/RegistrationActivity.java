@@ -2,7 +2,6 @@ package com.cyphermessenger.android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,14 +10,16 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import com.cyphermessenger.client.*;
 import com.cyphermessenger.crypto.ECKey;
 import com.cyphermessenger.sqlite.DBManagerAndroidImpl;
 
 import java.util.List;
 
-public class RegistrationActivity extends Activity implements ContentListener {
+public class RegistrationActivity extends Activity implements ContentListener, View.OnKeyListener {
 
 
     private EditText usernameTextField;
@@ -52,87 +53,44 @@ public class RegistrationActivity extends Activity implements ContentListener {
         progressBar = (ProgressBar) findViewById(R.id.captcha_loading_spinner);
 
         String[] captchaSerialized = null;
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             captchaSerialized = savedInstanceState.getStringArray("captchaSerialized");
         }
-        if(captchaSerialized != null) {
+        if (captchaSerialized != null) {
             onCaptcha(new Captcha(captchaSerialized));
         } else {
             cm.requestCaptcha();
         }
 
-        //
-        if(usernameTextField.getText().toString() != "" && passwordTextField.getText().toString() != "" && passwordConfirmTextField.getText().toString() != "" && captchaTextField.getText().toString() != "") {
-            usernameTextField.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
-                        if (i == keyEvent.KEYCODE_ENTER) {
-                            sendRegistration();
-                        }
-                    }
-                    return true;
-                }
-            });
-            passwordTextField.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
-                        if (i == keyEvent.KEYCODE_ENTER) {
-                            sendRegistration();
-                        }
-                    }
-                    return true;
-                }
-            });
-            passwordConfirmTextField.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
-                        if (i == keyEvent.KEYCODE_ENTER) {
-                            sendRegistration();
-                        }
-                    }
-                    return true;
-                }
-            });
-            captchaTextField.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if (keyEvent.getAction() == keyEvent.ACTION_DOWN) {
-                        if (i == keyEvent.KEYCODE_ENTER) {
-                            sendRegistration();
-                        }
-                    }
-                    return true;
-                }
-            });
-        }
+        usernameTextField.setOnKeyListener(this);
+        passwordTextField.setOnKeyListener(this);
+        passwordConfirmTextField.setOnKeyListener(this);
+        captchaTextField.setOnKeyListener(this);
     }
 
-    private void sendRegistration(){
-        Context that = getApplicationContext();
-        String uNameFromClient = usernameTextField.getText().toString();
-        String passwordFromClient = passwordTextField.getText().toString();
-        String confirmFromClient = passwordConfirmTextField.getText().toString();
-        String captchaTextFromClient = captchaTextField.getText().toString();
-        if (!captcha.verify(captchaTextFromClient)) {
-            AUtils.shortToast(R.string.registration_captcha_invalid, that);
-        } else if (passwordFromClient.length() < 8) {
-            AUtils.shortToast(R.string.registration_password_too_short, that);
-        } else if (!passwordFromClient.equals(confirmFromClient)) {
-            AUtils.shortToast(R.string.registration_password_dont_match, that);
-        } else if (uNameFromClient.length() <= 3) {
-            AUtils.shortToast(R.string.registration_username_too_short, that);
-        } else {
-            cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
-            progressDialog.show();
+    private void sendRegistration() {
+        if (!usernameTextField.getText().toString().isEmpty() && !passwordTextField.getText().toString().isEmpty() && !passwordConfirmTextField.getText().toString().isEmpty() && !captchaTextField.getText().toString().isEmpty()) {
+            String uNameFromClient = usernameTextField.getText().toString();
+            String passwordFromClient = passwordTextField.getText().toString();
+            String confirmFromClient = passwordConfirmTextField.getText().toString();
+            String captchaTextFromClient = captchaTextField.getText().toString();
+            if (!captcha.verify(captchaTextFromClient)) {
+                AUtils.shortToast(R.string.registration_captcha_invalid, this);
+            } else if (passwordFromClient.length() < 8) {
+                AUtils.shortToast(R.string.registration_password_too_short, this);
+            } else if (!passwordFromClient.equals(confirmFromClient)) {
+                AUtils.shortToast(R.string.registration_password_dont_match, this);
+            } else if (uNameFromClient.length() <= 3) {
+                AUtils.shortToast(R.string.registration_username_too_short, this);
+            } else {
+                cm.register(uNameFromClient, passwordFromClient, captchaTextFromClient, captcha);
+                progressDialog.show();
+            }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.registration, menu);
         return true;
@@ -163,7 +121,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         savedState.putString("passwordConfirmationClient", confirmFromClient);
         savedState.putString("captchaValue", captchaTextFromClient);
         savedState.putBoolean("wasDialogShowing", progressDialog.isShowing());
-        if(captcha != null) {
+        if (captcha != null) {
             savedState.putStringArray("captchaSerialized", captcha.toStringArray());
         }
         super.onSaveInstanceState(savedState);
@@ -176,7 +134,7 @@ public class RegistrationActivity extends Activity implements ContentListener {
         passwordTextField.setText(savedState.getString("passwordClient"));
         passwordConfirmTextField.setText(savedState.getString("passwordConfirmationClient"));
         captchaTextField.setText(savedState.getString("captchaValue"));
-        if(savedState.getBoolean("wasDialogShowing")) {
+        if (savedState.getBoolean("wasDialogShowing")) {
             progressDialog.show();
         }
     }
@@ -192,31 +150,6 @@ public class RegistrationActivity extends Activity implements ContentListener {
 
         progressDialog.dismiss();
         startActivity(new Intent(this, ContactsActivity.class));
-    }
-
-    @Override
-    public void onMessageSent(CypherMessage message) {
-
-    }
-
-    @Override
-    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
-
-    }
-
-    @Override
-    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
-
-    }
-
-    @Override
-    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {
-
-    }
-
-    @Override
-    public void onGetMessages(List<CypherMessage> messages) {
-
     }
 
     @Override
@@ -238,39 +171,19 @@ public class RegistrationActivity extends Activity implements ContentListener {
     }
 
     @Override
-    public void onFindUser(List<String> list) {
-
-    }
-
-    @Override
-    public void onContactChange(CypherContact contact) {
-
-    }
-
-    @Override
-    public void onContactDeleted(String name) {
-
-    }
-
-    @Override
     public void onServerError() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.dismiss();
-                AUtils.shortToast(R.string.registration_captcha_invalid, getApplicationContext());
+                AUtils.shortToast(R.string.error_general_error, getApplicationContext());
             }
         });
     }
 
     @Override
-    public void onSessionInvalid() {
-
-    }
-
-    @Override
     public void onCaptchaInvalid() {
-        runOnUiThread( new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.dismiss();
@@ -288,11 +201,46 @@ public class RegistrationActivity extends Activity implements ContentListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                progressDialog.dismiss();
+                progressBar.setVisibility(View.VISIBLE);
+                captchaView.setVisibility(View.GONE);
+                cm.requestCaptcha();
+                captchaTextField.getText().clear();
                 usernameTextField.getText().clear();
-                onCaptchaInvalid();
                 AUtils.shortToast(R.string.registration_username_already_taken, getApplicationContext());
             }
         });
+    }
+
+    @Override
+    public boolean onKey(View v, int i, KeyEvent keyEvent) {
+        if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+            if (i == KeyEvent.KEYCODE_ENTER) {
+                sendRegistration();
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public void onSessionInvalid() {
+
+    }
+
+    @Override
+    public void onFindUser(List<String> list) {
+
+    }
+
+    @Override
+    public void onContactChange(CypherContact contact) {
+
+    }
+
+    @Override
+    public void onContactDeleted(String name) {
+
     }
 
     @Override
@@ -324,4 +272,30 @@ public class RegistrationActivity extends Activity implements ContentListener {
     public void onContactDenied() {
 
     }
+
+    @Override
+    public void onMessageSent(CypherMessage message) {
+
+    }
+
+    @Override
+    public void onPullMessages(List<CypherMessage> messages, long notifiedUntil) {
+
+    }
+
+    @Override
+    public void onPullContacts(List<CypherContact> contacts, long notifiedUntil) {
+
+    }
+
+    @Override
+    public void onPullKeys(List<ECKey> keys, long notifiedUntil) {
+
+    }
+
+    @Override
+    public void onGetMessages(List<CypherMessage> messages) {
+
+    }
 }
+
