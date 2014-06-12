@@ -149,7 +149,9 @@ public class RegistrationActivity extends Activity implements ContentListener, V
         cm.pullAllSync();
 
         progressDialog.dismiss();
-        startActivity(new Intent(this, ContactsActivity.class));
+        Intent intent = new Intent(this, ContactsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

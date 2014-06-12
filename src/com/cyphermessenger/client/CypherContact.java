@@ -43,6 +43,22 @@ public class CypherContact extends CypherUser {
         return isFirst;
     }
 
+    public boolean isAccepted() {
+        return status.equals(ACCEPTED);
+    }
+
+    public boolean isBlocked() {
+        return status.equals(BLOCKED);
+    }
+
+    public boolean isDenied() {
+        return status.equals(DENIED);
+    }
+
+    public boolean isWaiting() {
+        return status.equals(WAITING);
+    }
+
     @Override
     public String toString() {
         if(status.equals(WAITING)) {

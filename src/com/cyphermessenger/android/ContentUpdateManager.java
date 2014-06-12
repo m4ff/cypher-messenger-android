@@ -174,19 +174,16 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         Iterator<CypherContact> i = contacts.iterator();
         while(i.hasNext()) {
             CypherContact contact = i.next();
-            if(contact.isFirst()) {
+            if((!contact.isFirst() && contact.isAccepted()) || (contact.isFirst() && contact.isWaiting())) {
                 i.remove();
             } else if(contact.getContactTimestamp() > notifiedUntil) {
                 String text = null;
                 switch(contact.getStatus()) {
                     case CypherContact.ACCEPTED:
-                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_accepted);
-                        break;
-                    case CypherContact.DENIED:
-                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_denied);
+                        text = contact.getUsername() + " " + applicationContext.getString(R.string.notification_contact_accepted);
                         break;
                     case CypherContact.WAITING:
-                        text = contact.getUsername() + applicationContext.getString(R.string.notification_contact_request);
+                        text = contact.getUsername() + " " + applicationContext.getString(R.string.notification_contact_request);
                 }
                 if(text != null) {
                     Intent contactNotification = new Intent(applicationContext, ContactsActivity.class);

@@ -41,7 +41,7 @@
                 android:windowSoftInputMode="adjustResize|stateHidden"
                 android:screenOrientation="portrait"
                 android:parentActivityName=".LoginActivity"
-                android:launchMode="singleTop">
+                android:launchMode="standard">
 
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -62,8 +62,8 @@
                 android:name=".MessagesActivity"
                 android:parentActivityName=".ContactsActivity"
                 android:label="@string/title_activity_messages"
-                android:launchMode="singleTop"
-                android:windowSoftInputMode="adjustResize|stateHidden">
+                android:launchMode="standard"
+                android:windowSoftInputMode="adjustPan|stateHidden">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".ContactsActivity"/>
@@ -72,8 +72,7 @@
         <activity
                 android:name=".AddContactActivity"
                 android:parentActivityName=".ContactsActivity"
-                android:launchMode="singleTop"
-                android:allowTaskReparenting="false"
+                android:launchMode="standard"
                 android:windowSoftInputMode="adjustResize">
 
             <intent-filter>

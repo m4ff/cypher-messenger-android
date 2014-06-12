@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.util.List;
 
 
-public class LoginActivity extends Activity implements ContentListener {
+public class LoginActivity extends Activity implements ContentListener, View.OnKeyListener {
 
     private Toast toast;
     private ProgressDialog progressDialog;
@@ -47,46 +47,18 @@ public class LoginActivity extends Activity implements ContentListener {
         name = (EditText) findViewById(R.id.name_field);
         password = (EditText) findViewById(R.id.password_field);
 
-        if(name.getText().toString() != "" && password.getText().toString() != "") {
-            name.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                        if(i == KeyEvent.KEYCODE_ENTER) {
-                            final Context that = getApplicationContext();
-                            String _name = name.getText().toString();
-                            String _pass = password.getText().toString();
-                            if (!"".equals(_name) && !"".equals(_pass)) {
-                                progressDialog.show();
-                                cm.login(_name, _pass);
-                            } else {
-                                AUtils.shortToast(R.string.login_toast_failed, that);
-                            }
-                        }
-                    }
-                    return true;
-                }
-            });
-            password.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                        if(i == KeyEvent.KEYCODE_ENTER) {
-                            final Context that = getApplicationContext();
-                            String _name = name.getText().toString();
-                            String _pass = password.getText().toString();
-                            if (!"".equals(_name) && !"".equals(_pass)) {
-                                progressDialog.show();
-                                cm.login(_name, _pass);
-                            } else {
-                                AUtils.shortToast(R.string.login_toast_failed, that);
-                            }
-                        }
-                    }
-                    return true;
-                }
-            });
+        name.setOnKeyListener(this);
+        password.setOnKeyListener(this);
+    }
+
+    @Override
+    public boolean onKey(View v, int i, KeyEvent keyEvent) {
+        if(keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+            if(i == KeyEvent.KEYCODE_ENTER) {
+                doLogin();
+            }
         }
+        return false;
     }
 
     @Override
@@ -103,34 +75,28 @@ public class LoginActivity extends Activity implements ContentListener {
         return true;
     }
 
+    private void doLogin() {
+        String _name = name.getText().toString();
+        String _pass = password.getText().toString();
+        if (!"".equals(_name) && !"".equals(_pass)) {
+            progressDialog.show();
+            cm.login(_name, _pass);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch(item.getItemId()) {
-            case R.id.home :
-                break;
-            case R.id.action_settings:
-                return true;
             case R.id.action_login:
-                final Context that = getApplicationContext();
-                String _name = name.getText().toString();
-                String _pass = password.getText().toString();
-                if (!"".equals(_name) && !"".equals(_pass)) {
-                    progressDialog.show();
-                    cm.login(_name, _pass);
-                } else {
-                   AUtils.shortToast(R.string.login_toast_failed, this);
-                }
-
+                doLogin();
                 return true;
             case R.id.action_register:
-                final Intent registrationIntent = new Intent(this, RegistrationActivity.class);
+                Intent registrationIntent = new Intent(this, RegistrationActivity.class);
                 startActivity(registrationIntent);
                 return true;
-            default:
-                return false;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -158,7 +124,7 @@ public class LoginActivity extends Activity implements ContentListener {
         progressDialog.dismiss();
 
         Intent contactIntent = new Intent(this, ContactsActivity.class);
-        contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        contactIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(contactIntent);
     }
 
