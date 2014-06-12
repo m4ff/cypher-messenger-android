@@ -39,7 +39,7 @@ public class ContactsActivity extends MainActivity {
         setContentView(R.layout.activity_contacts);
         mainView = (ListView) findViewById(R.id.contacts_list);
 
-        if(contactList.size() == 0) {
+        if(contactList.isEmpty()) {
             setContentView(R.layout.activity_contacts_no_contact);
         }
 
