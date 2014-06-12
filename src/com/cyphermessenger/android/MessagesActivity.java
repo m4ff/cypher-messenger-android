@@ -57,7 +57,7 @@ public class MessagesActivity extends MainActivity {
 
         messageListView = (ListView) findViewById(R.id.messages_list_view);
 
-        adapter = new MessageAdapter(messagesSet);
+        adapter = new MessageAdapter(messagesSet, new CypherMessage[] {});
         messageListView.setAdapter(adapter);
 
         editor.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -134,35 +134,16 @@ public class MessagesActivity extends MainActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class MessageAdapter extends BaseAdapter {
+    private class MessageAdapter extends TreeSetAdapter<CypherMessage> {
 
-        private final TreeSet<CypherMessage> messages;
-        private CypherMessage[] messageArray;
 
-        public MessageAdapter(TreeSet<CypherMessage> messages) {
-            this.messages = messages;
-            this.messageArray = messages.toArray(new CypherMessage[] {});
-        }
-
-        @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
-            this.messageArray = messages.toArray(new CypherMessage[]{});
-        }
-
-        @Override
-        public int getCount() {
-            return messages.size();
-        }
-
-        @Override
-        public CypherMessage getItem(int i) {
-            return messageArray[i];
+        public MessageAdapter(TreeSet<CypherMessage> treeSet, CypherMessage[] treeSetArray) {
+            super(treeSet, treeSetArray);
         }
 
         @Override
         public long getItemId(int i) {
-            return messageArray[i].getMessageID();
+            return treeSetArray[i].getMessageID();
         }
 
         @Override

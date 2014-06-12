@@ -22,6 +22,7 @@ public interface DBManager {
     public CypherSession getSession();
     public ECKey getKeyForTime(long time);
     public List<CypherMessage> getMessages(CypherUser contact, int offset, int limit);
+    public CypherMessage getLastMessage(CypherUser contact);
     public List<CypherContact> getContacts();
     public boolean messageExists(CypherMessage msg);
     

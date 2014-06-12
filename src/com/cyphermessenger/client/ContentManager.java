@@ -456,6 +456,10 @@ public class ContentManager {
         addThread(th);
     }
 
+    public CypherMessage getLastMessage(CypherUser user) {
+        return dbManager.getLastMessage(user);
+    }
+
 
     public List<CypherContact> getContactList() {
         return dbManager.getContacts();

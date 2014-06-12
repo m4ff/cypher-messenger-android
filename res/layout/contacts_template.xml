@@ -11,40 +11,65 @@
         android:id="@+id/contact_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:maxWidth="120dp"
         android:maxHeight="120dp"
         android:padding="10dp"
         android:src="@drawable/ic_action_person" />
-    <!--
+
     <LinearLayout
-        android:id="@+id/contact_text_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:id="@+id/contact_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:orientation="horizontal" >
+
+            <TextView
+                    android:id="@+id/contact_name"
+                    android:fontFamily="Arial|sans-serif"
+                    android:textColor="@android:color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="left"
+                    android:editable="false" />
+
+            <TextView
+                    android:id="@+id/contact_last_time"
+                    android:fontFamily="Arial|sans-serif"
+                    android:textColor="@android:color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="true"
+                    android:layout_weight="0.5"
+                    android:gravity="right"
+                    android:layout_gravity="center_vertical"
+                    android:padding="10dp"
+                    android:editable="false" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:editable="false" />
-
-        <TextView
-            android:id="@+id/contact_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:editable="false" />
-
+                android:id="@+id/contact_status"
+                android:fontFamily="Arial|sans-serif"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="italic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="left"
+                android:paddingBottom="5dp"
+                android:editable="false" />
     </LinearLayout>
-    -->
-    <TextView
-        android:id="@+id/contact_last_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:includeFontPadding="true"
-        android:layout_gravity="center"
-        android:fontFamily="Arial|sans-serif"
-        android:textColor="@android:color/black"
-        android:padding="10dp"
-        android:editable="false" />
+
+
+
 
 </LinearLayout>

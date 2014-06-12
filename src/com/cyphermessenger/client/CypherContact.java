@@ -5,7 +5,7 @@ import com.cyphermessenger.crypto.ECKey;
 /**
  * Created by halfblood on 15/05/14.
  */
-public class CypherContact extends CypherUser {
+public class CypherContact extends CypherUser implements Comparable {
 
     public static final String ACCEPTED = "accepted";
     public static final String WAITING = "waiting";
@@ -66,6 +66,12 @@ public class CypherContact extends CypherUser {
         } else {
             return super.toString();
         }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        CypherContact m = (CypherContact) o;
+        return contactTimestamp < m.contactTimestamp ? -1 : (contactTimestamp == m.contactTimestamp ? 0 : 1);
     }
 
     public Long getContactTimestamp() {

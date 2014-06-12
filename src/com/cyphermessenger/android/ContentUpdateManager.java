@@ -175,7 +175,7 @@ public class ContentUpdateManager extends BroadcastReceiver implements ContentLi
         while(i.hasNext()) {
             CypherContact contact = i.next();
             if((!contact.isFirst() && contact.isAccepted()) || (contact.isFirst() && contact.isWaiting())) {
-                i.remove();
+                continue;
             } else if(contact.getContactTimestamp() > notifiedUntil) {
                 String text = null;
                 switch(contact.getStatus()) {
